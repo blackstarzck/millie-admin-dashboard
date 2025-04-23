@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/millie-admin-dashboard/static/css/main.6fef7ef3.css",
+    "main.js": "/millie-admin-dashboard/static/js/main.9764b6e3.js",
+    "index.html": "/millie-admin-dashboard/index.html",
+    "main.6fef7ef3.css.map": "/millie-admin-dashboard/static/css/main.6fef7ef3.css.map",
+    "main.9764b6e3.js.map": "/millie-admin-dashboard/static/js/main.9764b6e3.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.6fef7ef3.css",
+    "static/js/main.9764b6e3.js"
+  ]
+}
