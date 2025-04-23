@@ -12,6 +12,7 @@ import {
     Tag,
     List,
     Descriptions,
+    Divider,
 } from 'antd';
 import {
     ArrowUpOutlined,
@@ -22,11 +23,23 @@ import {
     ClockCircleOutlined,
     CheckCircleOutlined,
     QuestionCircleOutlined,
-    PlusOutlined, // Icon for Add buttons
-    MessageOutlined, // Icon for Quick Action: 이야기 보내기
-    SoundOutlined, // Icon for Quick Action: 공지 올리기
-  GiftOutlined, // Icon for Quick Action: 이벤트 시작
-    PictureOutlined
+    PlusOutlined,
+    MessageOutlined,
+    SoundOutlined,
+    GiftOutlined,
+    PictureOutlined,
+    DatabaseOutlined,
+    TagsOutlined,
+    SettingOutlined,
+    FileTextOutlined,
+    ShoppingOutlined,
+    TeamOutlined,
+    CreditCardOutlined,
+    SafetyCertificateOutlined,
+    LockOutlined,
+    SecurityScanOutlined,
+    AreaChartOutlined,
+    DownloadOutlined,
 } from '@ant-design/icons';
 
 // --- Chart Component (Keep as is) ---
@@ -74,7 +87,7 @@ const Dashboard = () => {
   const quickActions = [
     { label: "새 책 추가", icon: <BookOutlined />, link: "/content/add-book" },
     { label: "이야기 보내기", icon: <MessageOutlined />, link: "/notifications/send" },
-    { label: "팝업 열기", icon: <PictureOutlined />, link: "/popups/create" }, // Assuming PictureOutlined exists or import it
+    { label: "팝업 열기", icon: <PictureOutlined />, link: "/popups/create" },
     { label: "공지 올리기", icon: <SoundOutlined />, link: "/notices/create" },
     { label: "이벤트 시작", icon: <GiftOutlined />, link: "/events/create" },
     { label: "문의 답변하기", icon: <QuestionCircleOutlined />, link: "/inquiries/respond" },
@@ -149,7 +162,7 @@ const Dashboard = () => {
 
 
   // --- Render with AntD Components ---
-  const { Title, Text, Link: AntLink } = Typography; // Using AntLink to avoid confusion
+  const { Title, Text, Link: AntLink } = Typography;
 
   return (
     <Space direction="vertical" size="large" style={{ display: 'flex' }}>
@@ -196,10 +209,10 @@ const Dashboard = () => {
                {quickActions.map((action) => (
                  <Col key={action.label} xs={12} sm={8} md={6} lg={4}>
                    <Button
-                     type="primary" // Use primary button style
+                     type="primary"
                      icon={action.icon}
                      size="large"
-                     block // Make button fill column width
+                     block
                      style={{ height: '100px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}
                      onClick={() => console.log(`Navigating to ${action.link}...`)}
                    >
@@ -229,17 +242,15 @@ const Dashboard = () => {
                    </div>
                </Card>
            </Col>
-           <Col xs={24} md={24} lg={8}> {/* Full width on medium, 1/3 on large */} 
+           <Col xs={24} md={24} lg={8}>
                <Card title="도서 완독률 Top 5" bodyStyle={{ padding: '0 16px 16px' }}>
                    <Table
                      columns={bookCompletionColumns}
                      dataSource={bookCompletionData}
-                     pagination={false} // Disable pagination for short list
+                     pagination={false}
                      size="small"
                      style={{ marginTop: 8 }}
-                     // scroll={{ y: 240 }} // Optional: if list can get long
                    />
-                   {/* Optional Link: <AntLink href="/analysis/content/completion" style={{ float: 'right' }}>더보기</AntLink> */}
                </Card>
            </Col>
         </Row>
@@ -269,7 +280,7 @@ const Dashboard = () => {
                            />
                          </List.Item>
                        )}
-                       style={{ maxHeight: 250, overflowY: 'auto' }} // Limit height and scroll
+                       style={{ maxHeight: 250, overflowY: 'auto' }}
                     />
                  </Card>
             </Col>
@@ -318,12 +329,12 @@ const Dashboard = () => {
                      <Statistic
                        title="미답변 문의"
                        value={coreMetrics.unansweredInquiries.value}
-                       valueStyle={{ color: '#cf1322' }} // Red for danger
+                       valueStyle={{ color: '#cf1322' }}
                        prefix={<QuestionCircleOutlined />}
                        suffix={<span>건 <Text type="danger" style={{ fontSize: '0.8em' }}>(+{coreMetrics.unansweredInquiries.change})</Text></span>}
                      />
                    </Col>
-                   <Col flex="250px"> {/* Chart takes fixed space */}
+                   <Col flex="250px">
                      <div style={{ height: '150px', position: 'relative' }}>
                        <ChartComponent chartId="inquiryTypeChart" type="doughnut" data={inquiryTypeData} options={{...doughnutChartOptions, plugins: { legend: { display: false }}}} />
                      </div>
@@ -344,7 +355,138 @@ const Dashboard = () => {
          </Row>
        </section>
 
-    </Space> // End of main Space component
+       {/* 6. 도서 메타데이터 및 콘텐츠 관리 (Metadata & Content Management) */}
+       <section>
+         <Title level={3} style={{ marginBottom: 16 }}><DatabaseOutlined /> 도서 메타데이터 및 콘텐츠 관리</Title>
+         <Row gutter={[16, 16]}>
+            <Col xs={24} sm={12} md={12} lg={6}>
+              <Card title="등록 도서 현황">
+                <Descriptions layout="vertical" size="small">
+                  <Descriptions.Item label="EPUB">15,280</Descriptions.Item>
+                  <Descriptions.Item label="PDF">3,150</Descriptions.Item>
+                  <Descriptions.Item label="오디오북">1,820</Descriptions.Item>
+                </Descriptions>
+                 <Button icon={<BookOutlined />} type="link" style={{paddingLeft: 0}}>전체 목록 보기</Button>
+              </Card>
+            </Col>
+            <Col xs={24} sm={12} md={12} lg={6}>
+              <Card title="메타데이터 관리 상태">
+                 <Descriptions column={1} size="small">
+                    <Descriptions.Item label="ISBN 미입력">120건</Descriptions.Item>
+                    <Descriptions.Item label="카테고리 오류">55건</Descriptions.Item>
+                    <Descriptions.Item label="표지/요약 누락">80건</Descriptions.Item>
+                 </Descriptions>
+                 <Button icon={<TagsOutlined />} type="link" style={{paddingLeft: 0}}>상세 확인</Button>
+              </Card>
+            </Col>
+             <Col xs={24} sm={12} md={12} lg={6}>
+               <Card title="콘텐츠 검수">
+                 <Statistic title="미승인/검수 대기" value={35} suffix="건" />
+                 <Button icon={<FileTextOutlined />} style={{ marginTop: 16 }}>검수하기</Button>
+               </Card>
+             </Col>
+              <Col xs={24} sm={12} md={12} lg={6}>
+                 <Card title="빠른 수정">
+                    <Space direction="vertical" align="start">
+                       <Button icon={<SettingOutlined />}>메타데이터 일괄 수정</Button>
+                       <Button icon={<PictureOutlined />}>표지 이미지 변경</Button>
+                    </Space>
+                 </Card>
+              </Col>
+         </Row>
+       </section>
+
+       <Divider />
+
+       {/* 7. B2B·B2G 기관용 라이선스 관리 (B2B/B2G License Management) */}
+       <section>
+         <Title level={3} style={{ marginBottom: 16 }}><ShoppingOutlined /> B2B·B2G 기관용 라이선스 관리</Title>
+         <Row gutter={[16, 16]}>
+            <Col xs={24} sm={12} md={12} lg={6}>
+              <Card title="계약 기관 현황">
+                <Statistic title="총 계약 기관 수" value={120} />
+                 <Button icon={<TeamOutlined />} style={{ marginTop: 16 }}>기관 목록 보기</Button>
+              </Card>
+            </Col>
+            <Col xs={24} sm={12} md={12} lg={6}>
+               <Card title="라이선스 이용 현황">
+                 <Descriptions column={1} size="small">
+                     <Descriptions.Item label="동시 접속 허용 초과">5건</Descriptions.Item>
+                     <Descriptions.Item label="만료 예정 (7일 이내)">12건</Descriptions.Item>
+                 </Descriptions>
+                 <Button icon={<UserOutlined />} type="link" style={{paddingLeft: 0}}>이용 현황 상세</Button>
+               </Card>
+            </Col>
+            <Col xs={24} sm={12} md={12} lg={6}>
+              <Card title="기관별 리포트">
+                 <Text type="secondary">최근 생성: OO대학교 (7/28)</Text><br />
+                 <Button icon={<FileTextOutlined />} style={{ marginTop: 8 }}>리포트 생성/조회</Button>
+              </Card>
+            </Col>
+             <Col xs={24} sm={12} md={12} lg={6}>
+               <Card title="정산 관리">
+                  <Statistic title="이번달 정산 예정" value={25} suffix="기관" />
+                 <Button icon={<CreditCardOutlined />} style={{ marginTop: 16 }}>정산 내역 확인</Button>
+               </Card>
+            </Col>
+         </Row>
+       </section>
+
+       <Divider />
+
+        {/* 8. DRM 및 보안 이슈 관리 (DRM & Security) */}
+       <section>
+         <Title level={3} style={{ marginBottom: 16 }}><SafetyCertificateOutlined /> DRM 및 보안 이슈 관리</Title>
+          <Row gutter={[16, 16]}>
+             <Col xs={24} md={12} lg={8}>
+                 <Card title="시스템 상태" style={{ height: '100%' }}>
+                     <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100%', minHeight: '150px' }}>
+                          <Tag color={systemStatus.serverStatus === '정상' ? 'success' : 'error'} style={{ padding: '8px 16px', fontSize: '1rem', marginBottom: 16 }}>
+                             {systemStatus.serverStatus}
+                         </Tag>
+                         <Text type="secondary">보안 경고: {systemStatus.securityAlerts} 건</Text>
+                     </div>
+                 </Card>
+             </Col>
+             <Col xs={24} md={12} lg={8}>
+                <Card title="DRM 적용 상태">
+                  <Descriptions column={1} size="small">
+                     <Descriptions.Item label="DRM 오류 의심">5건</Descriptions.Item>
+                     <Descriptions.Item label="미적용 콘텐츠">150건</Descriptions.Item>
+                   </Descriptions>
+                   <Button icon={<LockOutlined />} type="link" style={{paddingLeft: 0}}>상태 확인하기</Button>
+                </Card>
+             </Col>
+             <Col xs={24} md={12} lg={8}>
+                <Card title="보안 로그">
+                  <Statistic title="불법 다운로드 의심 로그 (24h)" value={8} suffix="건" />
+                  <Statistic title="API 비정상 접근 시도 (24h)" value={2} suffix="건" style={{marginTop: 16}} />
+                  <Button icon={<SecurityScanOutlined />} style={{ marginTop: 16 }}>로그 상세 보기</Button>
+                </Card>
+             </Col>
+          </Row>
+        </section>
+
+       <Divider />
+
+       {/* 9. 보고서 및 시각화 (Reports & Visualization) */}
+       <section>
+         <Title level={3} style={{ marginBottom: 16 }}><AreaChartOutlined /> 보고서 및 시각화</Title>
+         <Row gutter={[16, 16]}>
+             <Col xs={24} sm={12} md={8} lg={6}>
+                <Card title="리포트 생성">
+                   <Button icon={<SettingOutlined />} block>맞춤형 리포트 만들기</Button>
+                </Card>
+             </Col>
+             <Col xs={24} sm={12} md={8} lg={6}>
+                <Card title="정기 리포트">
+                   <Button icon={<DownloadOutlined />} block>월간/분기별 리포트 다운로드</Button>
+                 </Card>
+             </Col>
+         </Row>
+       </section>
+
+    </Space>
   );
 };
 

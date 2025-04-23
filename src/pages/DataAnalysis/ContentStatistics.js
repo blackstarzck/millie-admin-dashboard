@@ -1,88 +1,136 @@
 import React from 'react';
+import {
+    Typography,
+    Row,
+    Col,
+    Card,
+    Table,
+    Tag,
+    Space,
+    Statistic // Statistic 추가
+} from 'antd';
 // import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'; // Example using recharts
+
+const { Title, Text } = Typography;
 
 const ContentStatistics = () => {
   // 예시 데이터
   const topContentViews = [
-    { contentId: 'book001', title: 'React 마스터하기', views: 15200, likes: 350 },
-    { contentId: 'book005', title: '실용 데이터 분석', views: 12800, likes: 420 },
-    { contentId: 'course002', title: 'Node.js 백엔드 개발', views: 11500, likes: 280 },
-    { contentId: 'book003', title: 'UI/UX 디자인 원칙', views: 9800, likes: 150 },
+    { key: 'book001', contentId: 'book001', title: 'React 마스터하기', views: 15200, likes: 350 },
+    { key: 'book005', contentId: 'book005', title: '실용 데이터 분석', views: 12800, likes: 420 },
+    { key: 'course002', contentId: 'course002', title: 'Node.js 백엔드 개발', views: 11500, likes: 280 },
+    { key: 'book003', contentId: 'book003', title: 'UI/UX 디자인 원칙', views: 9800, likes: 150 },
   ];
 
   const categoryDistribution = [
-    { name: 'IT/기술', value: 450 },
-    { name: '문학', value: 250 },
-    { name: '자기계발', value: 300 },
-    { name: '기타', value: 100 },
+    { key: 'it', name: 'IT/기술', value: 450 },
+    { key: 'literature', name: '문학', value: 250 },
+    { key: 'self-dev', name: '자기계발', value: 300 },
+    { key: 'etc', name: '기타', value: 100 },
   ];
 
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 
+  // 인기 콘텐츠 테이블 컬럼 정의
+  const topContentColumns = [
+    { title: '콘텐츠 ID', dataIndex: 'contentId', key: 'contentId' },
+    { title: '제목', dataIndex: 'title', key: 'title' },
+    {
+      title: '조회수',
+      dataIndex: 'views',
+      key: 'views',
+      align: 'right',
+      sorter: (a, b) => a.views - b.views,
+      render: (views) => views.toLocaleString()
+    },
+    {
+      title: '좋아요 수',
+      dataIndex: 'likes',
+      key: 'likes',
+      align: 'right',
+      sorter: (a, b) => a.likes - b.likes,
+      render: (likes) => likes.toLocaleString()
+    },
+  ];
+
+  // 카테고리 분포 테이블 컬럼 정의
+   const categoryColumns = [
+     {
+       title: '카테고리',
+       dataIndex: 'name',
+       key: 'name',
+       render: (name, record, index) => (
+         <Space>
+           <Tag color={COLORS[index % COLORS.length]} style={{ marginRight: 0 }}> </Tag>
+           {name}
+         </Space>
+       )
+     },
+     {
+       title: '콘텐츠 수',
+       dataIndex: 'value',
+       key: 'value',
+       align: 'right',
+       render: (value) => value.toLocaleString()
+     },
+   ];
+
+
   return (
-    <div>
-      <h1>콘텐츠 통계 분석</h1>
+    <Space direction="vertical" style={{ width: '100%' }} size="large">
+      <Title level={4}>콘텐츠 통계 분석</Title>
 
       {/* 인기 콘텐츠 (조회수 기준) */}
-      <h2>인기 콘텐츠 (조회수 기준)</h2>
-      <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '1rem' }}>
-        <thead>
-          <tr style={{ borderBottom: '1px solid #ccc', backgroundColor: '#f8f8f8' }}>
-            <th style={{ padding: '8px', textAlign: 'left' }}>콘텐츠 ID</th>
-            <th style={{ padding: '8px', textAlign: 'left' }}>제목</th>
-            <th style={{ padding: '8px', textAlign: 'right' }}>조회수</th>
-            <th style={{ padding: '8px', textAlign: 'right' }}>좋아요 수</th>
-          </tr>
-        </thead>
-        <tbody>
-          {topContentViews.map((content) => (
-            <tr key={content.contentId} style={{ borderBottom: '1px solid #eee' }}>
-              <td style={{ padding: '8px' }}>{content.contentId}</td>
-              <td style={{ padding: '8px' }}>{content.title}</td>
-              <td style={{ padding: '8px', textAlign: 'right' }}>{content.views.toLocaleString()}</td>
-              <td style={{ padding: '8px', textAlign: 'right' }}>{content.likes.toLocaleString()}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <Card title="인기 콘텐츠 (조회수 기준)">
+         <Table
+           columns={topContentColumns}
+           dataSource={topContentViews}
+           rowKey="key"
+           pagination={{ pageSize: 5 }} // 페이지 사이즈 조절
+         />
+      </Card>
 
       {/* 카테고리별 콘텐츠 분포 */}
-      <h2 style={{ marginTop: '2rem' }}>카테고리별 콘텐츠 분포</h2>
-      <div style={{ display: 'flex', justifyContent: 'space-around', alignItems: 'center', marginTop: '1rem' }}>
-        <div style={{width: '50%'}}>
-          <p style={{textAlign: 'center'}}>(차트 라이브러리 연동 시 여기에 파이 차트 표시)</p>
-          {/*
-          <ResponsiveContainer width="100%" height={300}>
-            <PieChart>
-              <Pie
-                data={categoryDistribution}
-                cx="50%"
-                cy="50%"
-                labelLine={false}
-                outerRadius={100}
-                fill="#8884d8"
-                dataKey="value"
-                label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-              >
-                {categoryDistribution.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                ))}
-              </Pie>
-              <Tooltip />
-              <Legend />
-            </PieChart>
-          </ResponsiveContainer>
-          */}
-        </div>
-        <div style={{width: '40%'}}>
-           {/* 카테고리별 통계 테이블 등 추가 가능 */}
-           <p>카테고리별 상세 통계 테이블 영역</p>
-        </div>
-      </div>
+      <Card title="카테고리별 콘텐츠 분포">
+        <Row gutter={[16, 16]} align="middle">
+           <Col xs={24} md={12}>
+             <div style={{ height: 300, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Text type="secondary">(차트 라이브러리 연동 필요)</Text>
+             </div>
+              {/* Recharts 또는 Ant Design Charts 연동 영역 */}
+           </Col>
+           <Col xs={24} md={12}>
+              <Table
+                  columns={categoryColumns}
+                  dataSource={categoryDistribution}
+                  rowKey="key"
+                  pagination={false}
+                  size="small"
+               />
+           </Col>
+        </Row>
+      </Card>
 
-      {/* 추가적인 콘텐츠 통계 (유형별, 등록 추이 등) 표시 영역 */}
+      {/* 추가 통계 예시 */}
+      <Row gutter={[16, 16]}>
+          <Col xs={24} sm={12} md={8}>
+              <Card>
+                  <Statistic title="총 등록 콘텐츠 수" value={categoryDistribution.reduce((sum, item) => sum + item.value, 0)} />
+              </Card>
+          </Col>
+          <Col xs={24} sm={12} md={8}>
+              <Card>
+                  <Statistic title="평균 완독률" value={75} suffix="%" />
+              </Card>
+          </Col>
+           <Col xs={24} sm={12} md={8}>
+              <Card>
+                  <Statistic title="인기 검색 키워드" value="#React" />
+              </Card>
+           </Col>
+      </Row>
 
-    </div>
+    </Space>
   );
 };
 
