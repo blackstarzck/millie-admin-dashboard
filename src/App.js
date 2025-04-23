@@ -1,0 +1,125 @@
+import React from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import AppLayout from './components/Layout';
+
+// 페이지 컴포넌트 임포트
+import Dashboard from './pages/Dashboard';
+import BookManagement from './pages/ContentManagement/BookManagement';
+import CategoryManagement from './pages/ContentManagement/CategoryManagement';
+import ContentApproval from './pages/ContentManagement/ContentApproval';
+import MetadataManagement from './pages/ContentManagement/MetadataManagement';
+import NoticeList from './pages/NoticeManagement/NoticeList';
+import MemberInfo from './pages/UserManagement/MemberInfo';
+import UserGroup from './pages/UserManagement/UserGroup';
+import AccountSanctions from './pages/UserManagement/AccountSanctions';
+import UnsubscribeManagement from './pages/UserManagement/UnsubscribeManagement';
+import NotificationDispatch from './pages/NotificationManagement/NotificationDispatch';
+import NotificationTemplate from './pages/NotificationManagement/NotificationTemplate';
+import DispatchHistory from './pages/NotificationManagement/DispatchHistory';
+import EmergencyNotice from './pages/NotificationManagement/EmergencyNotice';
+import PopupCreation from './pages/PopupManagement/PopupCreation';
+import TemplateManagement from './pages/PopupManagement/TemplateManagement';
+import ExposureSettings from './pages/PopupManagement/ExposureSettings';
+import PopupAnalysis from './pages/PopupManagement/PopupAnalysis';
+import EventAnalysis from './pages/EventManagement/EventAnalysis';
+import InquiryLookup from './pages/InquiryManagement/InquiryLookup';
+import AnswerCreation from './pages/InquiryManagement/AnswerCreation';
+import InquiryFiltering from './pages/InquiryManagement/InquiryFiltering';
+import FaqManagement from './pages/InquiryManagement/FaqManagement';
+import UserStatistics from './pages/DataAnalysis/UserStatistics';
+import ContentStatistics from './pages/DataAnalysis/ContentStatistics';
+import CampaignEffect from './pages/DataAnalysis/CampaignEffect';
+import ReportGeneration from './pages/DataAnalysis/ReportGeneration';
+import PermissionManagement from './pages/SystemSettings/PermissionManagement';
+import ApiManagement from './pages/SystemSettings/ApiManagement';
+import SecuritySettings from './pages/SystemSettings/SecuritySettings';
+import ServicePolicy from './pages/SystemSettings/ServicePolicy';
+import PartnerAccount from './pages/PartnerManagement/PartnerAccount';
+import SettlementManagement from './pages/PartnerManagement/SettlementManagement';
+import InquiryManagementPartner from './pages/PartnerManagement/InquiryManagementPartner';
+import NoticeCreation from './pages/NoticeManagement/NoticeCreation';
+import CategorySettings from './pages/NoticeManagement/CategorySettings';
+import NoticeHistory from './pages/NoticeManagement/NoticeHistory';
+import ExposureHistory from './pages/PopupManagement/ExposureHistory';
+import EventRegistration from './pages/EventManagement/EventRegistration';
+import UrlGeneration from './pages/EventManagement/UrlGeneration';
+import EventStatus from './pages/EventManagement/EventStatus';
+
+function App() {
+  return (
+    <Routes>
+      <Route path="/" element={<AppLayout />}>
+        {/* 기본 경로를 /dashboard로 리디렉션 */}
+        <Route index element={<Navigate to="/dashboard" replace />} />
+
+        {/* 각 메뉴에 대한 라우트 설정 */}
+        <Route path="dashboard" element={<Dashboard />} />
+
+        {/* 콘텐츠 관리 */}
+        <Route path="content/books" element={<BookManagement />} />
+        <Route path="content/categories" element={<CategoryManagement />} />
+        <Route path="content/approval" element={<ContentApproval />} />
+        <Route path="content/metadata" element={<MetadataManagement />} />
+
+        {/* 사용자 관리 */}
+        <Route path="users/info" element={<MemberInfo />} />
+        <Route path="users/groups" element={<UserGroup />} />
+        <Route path="users/sanctions" element={<AccountSanctions />} />
+        <Route path="users/unsubscribe" element={<UnsubscribeManagement />} />
+
+        {/* 알림 관리 */}
+        <Route path="notifications/dispatch" element={<NotificationDispatch />} />
+        <Route path="notifications/templates" element={<NotificationTemplate />} />
+        <Route path="notifications/history" element={<DispatchHistory />} />
+        <Route path="notifications/emergency" element={<EmergencyNotice />} />
+
+        {/* 팝업 관리 */}
+        <Route path="popups/create" element={<PopupCreation />} />
+        <Route path="popups/templates" element={<TemplateManagement />} />
+        <Route path="popups/settings" element={<ExposureSettings />} />
+        <Route path="popups/analysis" element={<PopupAnalysis />} />
+        <Route path="popups/history" element={<ExposureHistory />} />
+
+        {/* 공지사항 관리 */}
+        <Route path="notices/create" element={<NoticeCreation />} />
+        <Route path="notices/manage" element={<NoticeList />} />
+        <Route path="notices/categories" element={<CategorySettings />} />
+        <Route path="notices/history" element={<NoticeHistory />} />
+
+        {/* 이벤트 관리 */}
+        <Route path="events/register" element={<EventRegistration />} />
+        <Route path="events/url" element={<UrlGeneration />} />
+        <Route path="events/status" element={<EventStatus />} />
+        <Route path="events/analysis" element={<EventAnalysis />} />
+
+        {/* 문의사항 관리 */}
+        <Route path="inquiries/list" element={<InquiryLookup />} />
+        <Route path="inquiries/answer" element={<AnswerCreation />} />
+        <Route path="inquiries/filter" element={<InquiryFiltering />} />
+        <Route path="inquiries/faq" element={<FaqManagement />} />
+
+        {/* 데이터 분석 */}
+        <Route path="analysis/users" element={<UserStatistics />} />
+        <Route path="analysis/content" element={<ContentStatistics />} />
+        <Route path="analysis/campaign" element={<CampaignEffect />} />
+        <Route path="analysis/reports" element={<ReportGeneration />} />
+
+        {/* 시스템 설정 */}
+        <Route path="settings/permissions" element={<PermissionManagement />} />
+        <Route path="settings/api" element={<ApiManagement />} />
+        <Route path="settings/security" element={<SecuritySettings />} />
+        <Route path="settings/policy" element={<ServicePolicy />} />
+
+        {/* 파트너 관리 */}
+        <Route path="partners/accounts" element={<PartnerAccount />} />
+        <Route path="partners/settlement" element={<SettlementManagement />} />
+        <Route path="partners/inquiries" element={<InquiryManagementPartner />} />
+
+        {/* 정의되지 않은 경로 처리 (옵션) */}
+        {/* <Route path="*" element={<NotFound />} /> */}
+      </Route>
+    </Routes>
+  );
+}
+
+export default App; 

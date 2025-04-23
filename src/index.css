@@ -1,0 +1,28 @@
+html,
+body,
+#root {
+  height: 100%; /* Ensure root elements take full height */
+  margin: 0; /* Remove default margin */
+}
+
+body {
+  /* margin: 0; */ /* Already set above */
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Remove styles related to the old layout system as AntD handles it now */
+/* .app { ... } */
+/* .sidebar { ... } */
+/* .sidebar h2 { ... } */
+/* .sidebar ul { ... } */
+/* .sidebar li { ... } */
+/* .sidebar a { ... } */
+/* .sidebar a:hover, .sidebar a.active { ... } */
+/* .sidebar .sub-menu { ... } */
+/* .sidebar .sub-menu li { ... } */
+/* .sidebar .sub-menu a { ... } */
+/* .content { ... } */ 
