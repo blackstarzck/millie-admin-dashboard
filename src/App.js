@@ -30,6 +30,8 @@ import UserStatistics from './pages/DataAnalysis/UserStatistics';
 import ContentStatistics from './pages/DataAnalysis/ContentStatistics';
 import CampaignEffect from './pages/DataAnalysis/CampaignEffect';
 import ReportGeneration from './pages/DataAnalysis/ReportGeneration';
+import VisitStatistics from './pages/DataAnalysis/VisitStatistics';
+import ReferrerPath from './pages/DataAnalysis/ReferrerPath';
 import PermissionManagement from './pages/SystemSettings/PermissionManagement';
 import ApiManagement from './pages/SystemSettings/ApiManagement';
 import SecuritySettings from './pages/SystemSettings/SecuritySettings';
@@ -103,6 +105,8 @@ function App() {
         <Route path="analysis/content" element={<ContentStatistics />} />
         <Route path="analysis/campaign" element={<CampaignEffect />} />
         <Route path="analysis/reports" element={<ReportGeneration />} />
+        <Route path="analysis/visits" element={<VisitStatistics />} />
+        <Route path="analysis/referrers" element={<ReferrerPath />} />
 
         {/* 시스템 설정 */}
         <Route path="settings/permissions" element={<PermissionManagement />} />

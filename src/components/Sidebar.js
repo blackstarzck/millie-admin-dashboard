@@ -123,6 +123,8 @@ const menuItems = [
     subMenu: [
       { key: '/analysis/users', path: '/analysis/users', name: '사용자 통계', icon: <UserOutlined /> },
       { key: '/analysis/content', path: '/analysis/content', name: '콘텐츠 통계', icon: <BookOutlined /> },
+      { key: '/analysis/visits', path: '/analysis/visits', name: '방문 통계', icon: <PieChartOutlined /> },
+      { key: '/analysis/referrers', path: '/analysis/referrers', name: '유입 경로', icon: <LinkOutlined /> },
       { key: '/analysis/campaign', path: '/analysis/campaign', name: '알림/팝업/이벤트 효과', icon: <FundViewOutlined /> },
       { key: '/analysis/reports', path: '/analysis/reports', name: '리포트 생성', icon: <FileTextOutlined /> },
     ],
