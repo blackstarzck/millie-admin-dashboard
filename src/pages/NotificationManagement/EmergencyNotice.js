@@ -11,11 +11,13 @@ import {
     Card,
     Alert,
     Popconfirm,
+    Tag,
 } from 'antd';
 import {
     NotificationOutlined, // 공지 아이콘
     SoundOutlined, // 긴급 발송 아이콘
     StopOutlined, // 비활성화 아이콘
+    WarningOutlined, // Add WarningOutlined import
 } from '@ant-design/icons';
 import moment from 'moment'; // To show timestamp of active notice
 
