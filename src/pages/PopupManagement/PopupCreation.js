@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     Form,
     Input,
@@ -15,6 +15,7 @@ import {
     Row,
     Col,
     Switch,
+    Modal,
 } from 'antd';
 import {
     PlusOutlined,
@@ -25,19 +26,23 @@ import {
     CheckCircleOutlined,
     FileImageOutlined, // Image content type
     ProfileOutlined, // Template content type
+    EyeOutlined, // Preview Icon
 } from '@ant-design/icons';
+import { usePopupTemplates } from '../../context/PopupTemplateContext'; // Import template context hook
 
-const { Title, Text } = Typography;
+const { Title, Text, Paragraph } = Typography;
 const { Option } = Select;
 const { TextArea } = Input;
 const { RangePicker } = DatePicker;
 
-// Sample Data (Replace with actual API data)
+// Sample Data (Replace with actual API data) - REMOVED
+/*
 const popupTemplates = [
-    { id: 'tpl001', name: '기본 공지 템플릿' },
-    { id: 'tpl002', name: '할인 안내 템플릿' },
-    { id: 'tpl003', name: '신규 기능 소개 템플릿' },
+    { id: 'tpl001', name: '기본 공지 템플릿', variables: [] }, // No variables needed
+    { id: 'tpl002', name: '할인 안내 템플릿', variables: [{ key: '[discount_rate]', label: '할인율 (%) ' }, { key: '[item_name]', label: '상품명' }] },
+    { id: 'tpl003', name: '신규 기능 소개 템플릿', variables: [{ key: '[feature_name]', label: '기능 이름' }, { key: '[link]', label: '기능 안내 링크' }] },
 ];
+*/
 
 const userSegments = [
     { id: 'all', name: '전체 사용자' },
@@ -53,6 +58,10 @@ const PopupCreation = () => {
     const [loading, setLoading] = useState(false);
     const [contentType, setContentType] = useState('image'); // 'image' or 'template'
     const [imageList, setImageList] = useState([]);
+    const [isPreviewModalVisible, setIsPreviewModalVisible] = useState(false);
+    const [previewData, setPreviewData] = useState(null);
+    const [selectedTemplateDetails, setSelectedTemplateDetails] = useState(null);
+    const { templates: contextTemplates } = usePopupTemplates(); // Get templates from context
 
     const onFinish = async (values) => {
         setLoading(true);
@@ -84,6 +93,12 @@ const PopupCreation = () => {
             formData.templateId = null;
         }
 
+        // Include template variables if present
+        if (contentType === 'template' && values.templateVariables) {
+            formData.variables = values.templateVariables;
+        }
+        delete formData.templateVariables; // Remove the wrapper from final data
+
         console.log('Popup Form Data:', formData);
 
         // TODO: Replace with actual API call to create/update popup
@@ -94,6 +109,7 @@ const PopupCreation = () => {
             form.resetFields();
             setImageList([]);
             setContentType('image'); // Reset content type
+            setSelectedTemplateDetails(null); // Reset selected template details
         } catch (error) {
             console.error('Error saving popup:', error);
             message.error({ content: '팝업 저장 중 오류가 발생했습니다.', key: 'popupSave' });
@@ -111,11 +127,21 @@ const PopupCreation = () => {
         setContentType(e.target.value);
         // Reset related fields when type changes
         if (e.target.value === 'image') {
-             form.setFieldsValue({ templateId: undefined });
+             form.setFieldsValue({ templateId: undefined, templateVariables: {} }); // Clear template fields
+             setSelectedTemplateDetails(null);
         } else {
              form.setFieldsValue({ imageUpload: undefined }); // Or imageUrl if storing directly
              setImageList([]);
          }
+    };
+
+    // Handle Template Selection
+    const handleTemplateChange = (templateId) => {
+        // Use contextTemplates to find the selected template
+        const selected = contextTemplates.find(t => t.id === templateId);
+        setSelectedTemplateDetails(selected);
+        // Clear any previous variable values when template changes
+        form.setFieldsValue({ templateVariables: {} });
     };
 
     // --- Upload Handlers ---
@@ -134,6 +160,59 @@ const PopupCreation = () => {
         }
         // Prevent default upload if handling manually
         return isJpgOrPng && isLt5M ? false : Upload.LIST_IGNORE;
+    };
+
+    // --- Preview Handlers ---
+    const showPreview = () => {
+        form.validateFields()
+            .then(values => {
+                 const previewContent = { ...values };
+                previewContent.contentType = contentType;
+
+                // Prepare processed content for template preview
+                let processedTemplateContent = null;
+
+                 // Handle image preview data (use file object if available)
+                 if (contentType === 'image' && imageList.length > 0) {
+                     previewContent.imageFile = imageList[0].originFileObj || imageList[0]; // Use originFileObj for FileReader
+                     previewContent.imageUrl = imageList[0].name; // Fallback/display name
+                 }
+
+                 // Find selected template name and process content for preview
+                 if (contentType === 'template' && values.templateId) {
+                     const selectedTemplate = contextTemplates.find(t => t.id === values.templateId);
+                    previewContent.templateName = selectedTemplate?.name || values.templateId;
+
+                    // Process template content with variables
+                    if (selectedTemplate?.content && values.templateVariables) {
+                        processedTemplateContent = selectedTemplate.content;
+                         Object.entries(values.templateVariables).forEach(([key, value]) => {
+                             // Need a robust way to replace placeholders, e.g., using RegExp
+                             // Basic replacement (might need improvement for edge cases):
+                            if (value !== undefined && value !== null) { // Only replace if value exists
+                                // Escape special characters in key for RegExp if key format is complex
+                                const placeholder = new RegExp(key.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), 'g'); // Basic escaping for placeholder key
+                                processedTemplateContent = processedTemplateContent.replace(placeholder, value);
+                            }
+                         });
+                     }
+                 }
+
+                previewContent.processedContent = processedTemplateContent; // Store processed content
+
+                 console.log("Preview Data:", previewContent);
+                setPreviewData(previewContent);
+                setIsPreviewModalVisible(true);
+            })
+            .catch(info => {
+                console.log('Validate Failed for Preview:', info);
+                message.warning('미리보기를 위해 필요한 항목(예: 콘텐츠 타입, 이미지/템플릿)을 입력/선택해주세요.');
+            });
+    };
+
+    const handlePreviewCancel = () => {
+        setIsPreviewModalVisible(false);
+        setPreviewData(null);
     };
 
     return (
@@ -162,12 +241,15 @@ const PopupCreation = () => {
                         <Input placeholder="예: 신규 기능 출시 안내 팝업" />
                     </Form.Item>
 
-                    <Form.Item
-                        name="title"
-                        label="팝업 제목 (사용자 노출용, 선택 사항)"
-                    >
-                        <Input placeholder="예: 놓치면 후회할 BIG SALE!" />
-                    </Form.Item>
+                    {/* Conditionally render Title field based on contentType */}
+                    {contentType === 'template' && (
+                        <Form.Item
+                            name="title"
+                            label="팝업 제목 (사용자 노출용, 선택 사항)"
+                        >
+                            <Input placeholder="예: 놓치면 후회할 BIG SALE!" />
+                        </Form.Item>
+                    )}
 
                      <Form.Item label="콘텐츠 타입" name="contentType">
                          <Radio.Group onChange={handleContentTypeChange} value={contentType}>
@@ -202,12 +284,30 @@ const PopupCreation = () => {
                             label="팝업 템플릿 선택"
                             rules={[{ required: true, message: '사용할 팝업 템플릿을 선택해주세요.' }]}
                         >
-                            <Select placeholder="팝업 템플릿 선택">
-                                {popupTemplates.map(tpl => (
+                            <Select placeholder="팝업 템플릿 선택" onChange={handleTemplateChange}>
+                                {/* Map over contextTemplates for options */}
+                                {contextTemplates.map(tpl => (
                                      <Option key={tpl.id} value={tpl.id}>{tpl.name}</Option>
                                  ))}
                              </Select>
                          </Form.Item>
+                     )}
+
+                    {/* Dynamically generated template variable inputs */}
+                    {contentType === 'template' && selectedTemplateDetails?.variables?.length > 0 && (
+                         <Card size="small" title="템플릿 변수 입력" style={{ marginBottom: '16px' }}>
+                            {selectedTemplateDetails.variables.map(variable => (
+                                <Form.Item
+                                    key={variable.key}
+                                    name={['templateVariables', variable.key]} // Store variables under templateVariables object
+                                    label={`${variable.label} (${variable.key})`}
+                                    rules={[{ required: true, message: `${variable.label} 값을 입력해주세요.` }]}
+                                    tooltip={`템플릿 내에서 ${variable.key}로 치환될 값입니다.`}
+                                >
+                                    <Input />
+                                </Form.Item>
+                            ))}
+                        </Card>
                      )}
 
                     <Form.Item
@@ -227,68 +327,133 @@ const PopupCreation = () => {
                                 <RangePicker showTime format="YYYY-MM-DD HH:mm" style={{ width: '100%' }} />
                             </Form.Item>
                         </Col>
-                         <Col xs={24} sm={12}>
-                            <Form.Item label="노출 빈도" required>
-                                <Input.Group compact>
-                                    <Form.Item name="frequencyType" noStyle rules={[{ required: true }]}>
-                                        <Select style={{ width: '60%' }}>
-                                             <Option value="once_per_session">세션당 한 번</Option>
-                                             <Option value="once_per_day">하루에 한 번</Option>
-                                             <Option value="every_time">매번 노출</Option>
-                                             <Option value="every_n_hours">N 시간마다</Option>
-                                        </Select>
-                                    </Form.Item>
-                                     <Form.Item name="frequencyValue" noStyle dependencies={['frequencyType']}>
-                                        {(formInstance) =>
-                                             formInstance.getFieldValue('frequencyType') === 'every_n_hours' ? (
-                                                 <Form.Item name="frequencyHours" noStyle rules={[{ required: true, message: '시간 입력'}]}>
-                                                     <InputNumber min={1} max={168} addonAfter="시간" style={{ width: '40%' }} placeholder="시간"/>
-                                                 </Form.Item>
-                                             ) : null
-                                        }
-                                    </Form.Item>
-                                </Input.Group>
-                            </Form.Item>
-                        </Col>
                     </Row>
 
                     <Row gutter={16}>
-                        <Col xs={24} sm={12}>
-                            <Form.Item
-                                name="targetAudience"
-                                label={<><UsergroupAddOutlined /> 대상 설정</>}
-                                rules={[{ required: true, message: '노출 대상을 선택해주세요.' }]}
-                            >
-                                 <Select placeholder="팝업 노출 대상 선택">
-                                     {userSegments.map(seg => (
-                                         <Option key={seg.id} value={seg.id}>{seg.name}</Option>
-                                     ))}
-                                 </Select>
-                             </Form.Item>
-                         </Col>
-                         <Col xs={24} sm={12}>
+                         {/* Removed Col containing '대상 설정' */}
+                         {/* <Col xs={24} sm={12}> ... </Col> */}
+                         {/* Remove the Col containing '상태' */}
+                         {/* <Col xs={24} sm={12}>
                              <Form.Item name="status" label="상태" valuePropName="checked">
                                  <Switch checkedChildren="활성" unCheckedChildren="비활성" defaultChecked />
                              </Form.Item>
-                         </Col>
+                         </Col> */}
                      </Row>
 
                     {/* Add fields for priority, device type targeting, page targeting if needed */}
 
                     <Form.Item>
-                        <Button
-                            type="primary"
-                            htmlType="submit"
-                            icon={<CheckCircleOutlined />}
-                            loading={loading}
-                        >
-                            팝업 저장
-                        </Button>
+                         <Space>
+                            <Button
+                                type="primary"
+                                htmlType="submit"
+                                icon={<CheckCircleOutlined />}
+                                loading={loading}
+                            >
+                                팝업 저장
+                            </Button>
+                             <Button
+                                 icon={<EyeOutlined />}
+                                 onClick={showPreview}
+                             >
+                                 미리보기
+                             </Button>
+                         </Space>
                     </Form.Item>
                 </Form>
             </Card>
+
+            {/* Preview Modal - Styled to resemble actual popup */}
+            <Modal
+                // title="팝업 미리보기" // Removed title
+                open={isPreviewModalVisible}
+                onCancel={handlePreviewCancel}
+                footer={null} // Removed footer
+                closable={false} // Removed close button (optional, click outside to close)
+                width={previewData?.contentType === 'image' ? 'auto' : 400} // Adjust width based on content, maybe auto for image?
+                bodyStyle={{ padding: 0, backgroundColor: 'transparent' }} // Ensure body padding is zero
+                styles={{ content: { padding: 0 } }} // Override .ant-modal-content padding
+                centered // Center the modal
+                maskClosable={true} // Allow closing by clicking the mask
+            >
+                 {previewData && (
+                     // Outer div acts as the popup container
+                    <div style={{ textAlign: 'center', padding: 0 /* Explicitly set padding to 0 */ }}>
+                         {/* Title is now part of the content, not modal header */}
+                        {previewData.title && <Title level={4} style={{ marginBottom: '10px' }}>{previewData.title}</Title>}
+
+                        {previewData.contentType === 'image' && previewData.imageFile && (
+                             // Pass linkUrl to RenderImageFile for click handling
+                             <RenderImageFile file={previewData.imageFile} linkUrl={previewData.linkUrl} />
+                        )}
+                        {previewData.contentType === 'image' && !previewData.imageFile && (
+                             <Text type="secondary">[이미지 표시 영역 ({previewData.imageUrl || '선택된 이미지 없음'})]</Text>
+                         )}
+
+                        {previewData.contentType === 'template' && (
+                             <Card size="small" style={{ marginTop: '10px', width: '100%' }}>
+                                 <Text strong>템플릿 사용:</Text> {previewData.templateName || '선택된 템플릿 없음'}
+                                 <br />
+                                 <Text type="secondary">[템플릿 콘텐츠 영역]</Text>
+                                 {/* TODO: Optionally render template content preview */}
+                             </Card>
+                         )}
+
+                         {/* Render processed template content */}
+                         {previewData.contentType === 'template' && previewData.processedContent && (
+                             <div
+                                 // WARNING: Ensure template content and variable values are trusted
+                                 // to avoid XSS vulnerabilities.
+                                dangerouslySetInnerHTML={{ __html: previewData.processedContent }}
+                             />
+                         )}
+                         {previewData.contentType === 'template' && !previewData.processedContent && (
+                              <Text type="secondary">[템플릿 미리보기 영역 (처리된 내용 없음)]</Text>
+                         )}
+
+                         {/* Clickable link handling might need reconsideration depending on template structure */}
+                     </div>
+                 )}
+             </Modal>
         </Space>
     );
 };
+
+// Helper component to render image from file object and make it clickable
+const RenderImageFile = ({ file, linkUrl }) => { // Added linkUrl prop
+     const [imageSrc, setImageSrc] = useState(null);
+
+     useEffect(() => {
+         if (file instanceof File) {
+             const reader = new FileReader();
+             reader.onload = (e) => {
+                 setImageSrc(e.target.result);
+             };
+             reader.readAsDataURL(file);
+         } else if (file && file.url) { // Handle case where file object has url pre-filled (e.g., from Upload component state)
+             setImageSrc(file.url);
+         }
+         return () => {
+            // Cleanup if needed
+         }
+     }, [file]);
+
+     if (!imageSrc) {
+        return <Text type="secondary">이미지 로딩 중...</Text>;
+    }
+
+     const imgElement = <img src={imageSrc} alt="팝업 이미지 미리보기" style={{ maxWidth: '100%', maxHeight: '50vh', display: 'block' /* Ensure img is block for link */ }} />;
+
+     // Wrap image with link if linkUrl exists
+    if (linkUrl) {
+         return (
+             <a href={linkUrl} target="_blank" rel="noopener noreferrer" onClick={(e) => { e.preventDefault(); message.info(`Link clicked: ${linkUrl} (Preview Only)`); /* Prevent actual navigation in preview? Or allow? Let's allow for now */ }}>
+                 {imgElement}
+             </a>
+         );
+     } else {
+         return imgElement; // Return just the image if no link
+     }
+ };
 
 export default PopupCreation; 

@@ -36,11 +36,12 @@ const { RangePicker } = DatePicker;
 
 // --- Sample Data ---
 const initialHistory = [
-    { key: 'h1', id: 'N20240730-001', title: '7월 신간 알림', channel: 'push', targetType: 'group', targetValue: 'G003', status: 'sent', dispatchTime: '2024-07-30 10:00:00', successCount: 315, failureCount: 5 },
-    { key: 'h2', id: 'N20240729-003', title: '클린 코드 (개정판) 출간!', channel: 'email', targetType: 'all', targetValue: null, status: 'sent', dispatchTime: '2024-07-29 14:30:00', successCount: 12530, failureCount: 120 },
-    { key: 'h3', id: 'N20240728-001', title: 'React Hooks 심층 분석 리뷰 이벤트', channel: 'push', targetType: 'individual', targetValue: 'user001', status: 'failed', dispatchTime: '2024-07-28 11:00:00', successCount: 0, failureCount: 1, failureReason: 'Invalid device token' },
-    { key: 'h4', id: 'N20240801-001', title: '8월 특별 할인 쿠폰', channel: 'sms', targetType: 'group', targetValue: 'G001', status: 'scheduled', dispatchTime: '2024-08-01 09:00:00', successCount: 0, failureCount: 0 },
-    { key: 'h5', id: 'N20240725-002', title: '서비스 점검 안내 (취소됨)', channel: 'email', targetType: 'all', targetValue: null, status: 'cancelled', dispatchTime: '2024-07-25 18:00:00', successCount: 0, failureCount: 0 },
+    { key: 'h1', id: 'N20240730-001', title: '7월 신간 알림', channel: 'push', targetType: 'group', targetValue: 'G003', status: 'sent', dispatchTime: '2024-07-30 10:00:00', successCount: 315, failureCount: 5, noticeType: 'regular' },
+    { key: 'h2', id: 'N20240729-003', title: '클린 코드 (개정판) 출간!', channel: 'email', targetType: 'all', targetValue: null, status: 'sent', dispatchTime: '2024-07-29 14:30:00', successCount: 12530, failureCount: 120, noticeType: 'regular' },
+    { key: 'h3', id: 'N20240728-001', title: 'React Hooks 심층 분석 리뷰 이벤트', channel: 'push', targetType: 'individual', targetValue: 'user001', status: 'failed', dispatchTime: '2024-07-28 11:00:00', successCount: 0, failureCount: 1, failureReason: 'Invalid device token', noticeType: 'regular' },
+    { key: 'h4', id: 'N20240801-001', title: '8월 특별 할인 쿠폰', channel: 'sms', targetType: 'group', targetValue: 'G001', status: 'scheduled', dispatchTime: '2024-08-01 09:00:00', successCount: 0, failureCount: 0, noticeType: 'regular' },
+    { key: 'h5', id: 'N20240725-002', title: '서비스 점검 안내 (취소됨)', channel: 'email', targetType: 'all', targetValue: null, status: 'cancelled', dispatchTime: '2024-07-25 18:00:00', successCount: 0, failureCount: 0, noticeType: 'regular' },
+    { key: 'h6', id: 'E20240731-001', title: '긴급 서버 점검 안내', channel: 'push', targetType: 'all', targetValue: null, status: 'sent', dispatchTime: '2024-07-31 08:00:00', successCount: 15000, failureCount: 0, noticeType: 'emergency', level: 'critical' },
 ];
 
 // --- Helper Functions ---
@@ -129,6 +130,19 @@ const NotificationHistory = () => {
     const columns = [
         { title: '발송 ID', dataIndex: 'id', key: 'id', width: 150, sorter: (a, b) => a.id.localeCompare(b.id) },
         { title: '알림 제목', dataIndex: 'title', key: 'title', ellipsis: true },
+        {
+            title: '알림 종류', dataIndex: 'noticeType', key: 'noticeType', width: 120, align: 'center',
+            render: (type, record) => {
+                if (type === 'emergency') {
+                    let tagColor = 'volcano'; // Default for critical
+                    if (record.level === 'warning') tagColor = 'warning';
+                    if (record.level === 'info') tagColor = 'processing';
+                    return <Tag color={tagColor}>긴급 공지</Tag>;
+                } else {
+                    return '일반 알림';
+                }
+            },
+        },
         {
             title: '채널', dataIndex: 'channel', key: 'channel', width: 120, align: 'center',
             render: getChannelTag,

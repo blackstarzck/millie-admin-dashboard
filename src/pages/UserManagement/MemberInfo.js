@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
     Table,
     Input,
@@ -15,7 +16,8 @@ import {
     Avatar,
     Tooltip,
     Dropdown,
-    Menu
+    Menu,
+    Switch,
 } from 'antd';
 import {
     UserOutlined,
@@ -28,10 +30,12 @@ import {
     StopOutlined,
     EyeOutlined,
     EditOutlined,
-    LockOutlined, // For suspend/sanction
-    UnlockOutlined, // For unsuspend
+    LockOutlined,
+    UnlockOutlined,
     MoreOutlined,
     ClockCircleOutlined,
+    MobileOutlined,
+    MessageOutlined,
 } from '@ant-design/icons';
 import Highlighter from 'react-highlight-words';
 
@@ -41,16 +45,16 @@ const { RangePicker } = DatePicker;
 
 // Sample Data
 const initialUsers = [
-    { key: '1', userId: 'user001', name: '홍길동', email: 'gildong@example.com', phone: '010-1234-5678', signupDate: '2024-07-01 10:30:00', lastLogin: '2024-07-25 15:00:00', status: 'active', userGroup: ' 일반', purchaseAmount: 50000 },
-    { key: '2', userId: 'user002', name: '김철수', email: 'chulsoo@example.com', phone: '010-9876-5432', signupDate: '2024-06-15 09:00:00', lastLogin: '2024-07-20 11:20:00', status: 'active', userGroup: 'VIP', purchaseAmount: 250000 },
-    { key: '3', userId: 'user003', name: '박영희', email: 'younghee@example.com', phone: '010-1111-2222', signupDate: '2024-05-20 14:00:00', lastLogin: '2024-06-10 08:00:00', status: 'dormant', userGroup: '일반', purchaseAmount: 10000 },
-    { key: '4', userId: 'user004', name: '이지은', email: 'jieun@test.net', phone: '010-5555-4444', signupDate: '2024-07-10 11:00:00', lastLogin: '2024-07-15 10:00:00', status: 'suspended', userGroup: '일반', purchaseAmount: 0 },
+    { key: '1', userId: 'user001', name: '홍길동', email: 'gildong@example.com', phone: '010-1234-5678', signupDate: '2024-07-01 10:30:00', lastLogin: '2024-07-25 15:00:00', status: 'active', userGroup: ' 일반', purchaseAmount: 50000, suspensionReason: null, birthdate: '1990-05-15', gender: 'male', notifications: { appPush: true, sms: true, email: false } },
+    { key: '2', userId: 'user002', name: '김철수', email: 'chulsoo@example.com', phone: '010-9876-5432', signupDate: '2024-06-15 09:00:00', lastLogin: '2024-07-20 11:20:00', status: 'active', userGroup: 'VIP', purchaseAmount: 250000, suspensionReason: null, birthdate: '1985-11-20', gender: 'male', notifications: { appPush: true, sms: false, email: true } },
+    { key: '3', userId: 'user003', name: '박영희', email: 'younghee@example.com', phone: '010-1111-2222', signupDate: '2024-05-20 14:00:00', lastLogin: '2024-06-10 08:00:00', status: 'dormant', userGroup: '일반', purchaseAmount: 10000, suspensionReason: null, birthdate: null, gender: 'female', notifications: { appPush: false, sms: false, email: false } },
+    { key: '5', userId: 'user005', name: '강민준', email: 'minjun@example.co.kr', phone: '010-3333-7777', signupDate: '2024-07-22 16:00:00', lastLogin: '2024-07-26 09:10:00', status: 'active', userGroup: '일반', purchaseAmount: 30000, suspensionReason: null, birthdate: '2001-08-25', gender: null, notifications: { appPush: true, sms: false, email: false } },
+    { key: '6', userId: 'user006', name: '오서아', email: 'seoa@email.com', phone: '010-6666-9999', signupDate: '2024-04-01 12:00:00', lastLogin: '2024-05-15 18:30:00', status: 'dormant', userGroup: '일반', purchaseAmount: 0, suspensionReason: null, birthdate: null, gender: null, notifications: { appPush: false, sms: true, email: true } },
 ];
 
 const statusMap = {
     active: { color: 'success', text: '활성', icon: <CheckCircleOutlined /> },
     dormant: { color: 'default', text: '휴면', icon: <StopOutlined /> },
-    suspended: { color: 'error', text: '정지', icon: <LockOutlined /> },
     pending: { color: 'warning', text: '대기', icon: <ClockCircleOutlined /> },
 };
 
@@ -62,6 +66,9 @@ const MemberInfo = () => {
     const [searchedColumn, setSearchedColumn] = useState('');
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
+    const [isEditMode, setIsEditMode] = useState(false);
+    const [editedUser, setEditedUser] = useState(null);
+    const navigate = useNavigate();
     let searchInput = null;
 
     useEffect(() => {
@@ -176,48 +183,124 @@ const MemberInfo = () => {
 
     // --- Modal Logic ---
     const showDetailModal = (user) => {
-        setSelectedUser(user);
+        // Add sample subscription history - replace with actual data fetching
+        const userWithHistory = {
+            ...user,
+            subscriptionHistory: [
+                { key: 'sub1', startDate: '2024-01-15', plan: '연간', amount: 99000, status: 'active' },
+                { key: 'sub2', startDate: '2024-07-01', plan: '월간', amount: 9900, status: 'active' },
+                { key: 'sub3', startDate: '2023-12-01', plan: '월간', amount: 9900, status: 'expired' },
+            ]
+        };
+        setSelectedUser(userWithHistory);
+        setEditedUser({ ...userWithHistory }); // Initialize editedUser with history too
         setIsModalVisible(true);
+        setIsEditMode(false); // Always start in view mode
     };
 
     const handleModalClose = () => {
         setIsModalVisible(false);
         setSelectedUser(null);
+        setEditedUser(null);
+        setIsEditMode(false);
+    };
+
+    const handleEditModeToggle = () => {
+        setIsEditMode(!isEditMode);
+        if (!isEditMode) {
+            setEditedUser({ ...selectedUser });
+        } else {
+            setEditedUser({ ...selectedUser });
+        }
+    };
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setEditedUser(prev => ({ ...prev, [name]: value }));
+    };
+
+    // Handle Switch changes for notifications
+    const handleNotificationChange = (type, checked) => {
+        setEditedUser(prev => ({
+            ...prev,
+            notifications: {
+                ...(prev.notifications || {}), // Ensure notifications object exists
+                [type]: checked
+            }
+        }));
+    };
+
+    const handleSelectChange = (value) => {
+        setEditedUser(prev => ({ ...prev, userGroup: value }));
+    };
+
+    const handleSaveChanges = () => {
+        console.log("Saving changes for user:", editedUser);
+        message.loading({ content: `'${editedUser.userId}' 정보 업데이트 중...`, key: editedUser.userId });
+
+        // Ensure notifications object exists before saving
+        const userToSave = {
+            ...editedUser,
+            notifications: editedUser.notifications || { appPush: false, sms: false, email: false } // Default if somehow missing
+        };
+
+        setTimeout(() => {
+            setUsers(prevUsers => prevUsers.map(u => u.userId === userToSave.userId ? { ...userToSave } : u));
+            setSelectedUser({ ...userToSave }); // Update the selected user state as well
+            setIsEditMode(false);
+            message.success({ content: `'${userToSave.userId}' 정보가 업데이트되었습니다.`, key: userToSave.userId });
+        }, 500);
     };
 
     // --- Action Logic ---
-    const handleChangeStatus = (userId, currentStatus, newStatus) => {
-        console.log(`Change status for ${userId} from ${currentStatus} to ${newStatus}`);
+    const handleChangeStatus = (userId, currentStatus, newStatus, reason = null) => {
+        console.log(`Change status for ${userId} from ${currentStatus} to ${newStatus} with reason: ${reason}`);
         // TODO: API Call to change status
          message.loading({ content: `'${userId}' 상태 변경 중...`, key: userId });
          setTimeout(() => {
-            setUsers(prevUsers => prevUsers.map(u => u.userId === userId ? { ...u, status: newStatus } : u));
+             setUsers(prevUsers => prevUsers.map(u =>
+                 u.userId === userId
+                     ? {
+                         ...u,
+                         status: newStatus,
+                         suspensionReason: newStatus === 'suspended' ? reason : null
+                     }
+                     : u
+             ));
+             // Update selected user details if modal is open for this user
+             if (selectedUser && selectedUser.userId === userId) {
+                 setSelectedUser(prev => ({
+                     ...prev,
+                     status: newStatus,
+                     suspensionReason: newStatus === 'suspended' ? reason : null
+                 }));
+             }
             message.success({ content: `'${userId}' 상태가 '${statusMap[newStatus]?.text || newStatus}' (으)로 변경되었습니다.`, key: userId });
          }, 500);
     };
 
     const handleMenuClick = (e, record) => {
+        // Add sample subscription history - This should ideally come from the record or fetched
+        const userWithHistory = {
+            ...record,
+            subscriptionHistory: [
+                { key: 'sub1', startDate: '2024-01-15', plan: '연간', amount: 99000, status: 'active' },
+                { key: 'sub2', startDate: '2024-07-01', plan: '월간', amount: 9900, status: 'active' },
+                { key: 'sub3', startDate: '2023-12-01', plan: '월간', amount: 9900, status: 'expired' },
+            ]
+        };
+
         switch(e.key) {
             case 'detail':
-                showDetailModal(record);
+                showDetailModal(record); // Keep using original record for view
                 break;
             case 'edit':
-                message.info(`Edit function for ${record.userId} needs implementation.`);
-                // navigate(`/users/edit/${record.userId}`); // Example navigation
+                // Open modal directly in edit mode
+                setSelectedUser(userWithHistory);
+                setEditedUser({ ...userWithHistory });
+                setIsModalVisible(true);
+                setIsEditMode(true);
                 break;
-            case 'suspend':
-                handleChangeStatus(record.userId, record.status, 'suspended');
-                break;
-            case 'activate':
-                 handleChangeStatus(record.userId, record.status, 'active');
-                 break;
-            case 'unsuspend': // Handle unsuspending to active
-                 handleChangeStatus(record.userId, record.status, 'active');
-                 break;
-             case 'sanction':
-                 message.info(`Sanction page/modal for ${record.userId} needs implementation.`);
-                 // navigate(`/users/sanctions/${record.userId}`); // Example navigation
-                 break;
             default:
                 break;
         }
@@ -225,7 +308,7 @@ const MemberInfo = () => {
 
     const columns = [
         {
-            title: '사용자 ID',
+            title: 'ID',
             dataIndex: 'userId',
             key: 'userId',
             width: 120,
@@ -238,6 +321,13 @@ const MemberInfo = () => {
             key: 'name',
             width: 100,
              ...getColumnSearchProps('name', '이름'),
+             render: (text) => {
+                 if (!text) return '-';
+                 if (text.length > 2) {
+                     return `${text[0]}*${text.substring(text.length - 1)}`;
+                 }
+                 return text; // Return original for names with 2 or less chars
+             }
         },
         {
             title: '이메일',
@@ -252,8 +342,59 @@ const MemberInfo = () => {
              dataIndex: 'phone',
              key: 'phone',
              width: 150,
-             render: (text) => <><PhoneOutlined style={{ marginRight: 8 }} />{text}</>
+             render: (text) => {
+                 if (!text) return '-';
+                 const parts = text.split('-');
+                 if (parts.length === 3 && parts[1].length === 4) {
+                     return `${parts[0]}-****-${parts[2]}`;
+                 }
+                 return text; // Return original if format is unexpected
+             }
          },
+        {
+            title: '생년월일',
+            dataIndex: 'birthdate',
+            key: 'birthdate',
+            width: 120,
+            render: (text) => {
+                if (!text) return '-';
+                const parts = text.split('-');
+                if (parts.length === 3) {
+                    return `${parts[0]}-${parts[1]}-**`;
+                }
+                return text; // Return original if format is unexpected
+            },
+        },
+        {
+            title: '성별',
+            dataIndex: 'gender',
+            key: 'gender',
+            width: 80,
+            render: (text) => {
+                if (!text) return '-';
+                return text === 'male' ? '남' : text === 'female' ? '여' : '-';
+            },
+        },
+        {
+            title: '알림 수신',
+            dataIndex: 'notifications',
+            key: 'notifications',
+            width: 120,
+            align: 'center',
+            render: (notifications) => (
+                <Space size="small">
+                    <Tooltip title={`앱 푸시: ${notifications?.appPush ? '수신' : '미수신'}`}>
+                        <MobileOutlined style={{ color: notifications?.appPush ? '#1890ff' : '#bfbfbf' }} />
+                    </Tooltip>
+                    <Tooltip title={`SMS: ${notifications?.sms ? '수신' : '미수신'}`}>
+                        <MessageOutlined style={{ color: notifications?.sms ? '#1890ff' : '#bfbfbf' }} />
+                    </Tooltip>
+                    <Tooltip title={`이메일: ${notifications?.email ? '수신' : '미수신'}`}>
+                        <MailOutlined style={{ color: notifications?.email ? '#1890ff' : '#bfbfbf' }} />
+                    </Tooltip>
+                </Space>
+            ),
+        },
         {
             title: '가입일',
             dataIndex: 'signupDate',
@@ -266,20 +407,14 @@ const MemberInfo = () => {
             dataIndex: 'status',
             key: 'status',
             width: 100,
-            filters: Object.entries(statusMap).map(([key, { text }]) => ({ text, value: key })),
+            filters: Object.entries(statusMap)
+                         .map(([key, { text }]) => ({ text, value: key })),
             onFilter: (value, record) => record.status === value,
             render: (status) => {
                 const statusInfo = statusMap[status] || { color: 'default', text: status, icon: null };
                 return <Tag color={statusInfo.color} icon={statusInfo.icon}>{statusInfo.text}</Tag>;
             },
         },
-         {
-             title: '사용자 그룹',
-             dataIndex: 'userGroup',
-             key: 'userGroup',
-             width: 100,
-             // Add filtering if needed
-         },
         {
             title: '관리',
             key: 'action',
@@ -290,18 +425,6 @@ const MemberInfo = () => {
                     <Menu onClick={(e) => handleMenuClick(e, record)}>
                         <Menu.Item key="detail" icon={<EyeOutlined />}>상세 보기</Menu.Item>
                         <Menu.Item key="edit" icon={<EditOutlined />}>정보 수정</Menu.Item>
-                        <Menu.Divider />
-                        {record.status !== 'suspended' && (
-                             <Menu.Item key="suspend" icon={<LockOutlined />} danger>계정 정지</Menu.Item>
-                         )}
-                         {record.status === 'suspended' && (
-                             <Menu.Item key="unsuspend" icon={<UnlockOutlined />}>정지 해제</Menu.Item>
-                         )}
-                         {record.status === 'dormant' && (
-                             <Menu.Item key="activate" icon={<CheckCircleOutlined />}>활성 전환</Menu.Item>
-                         )}
-                         {/* Add more actions like force password reset, view sanctions, etc. */}
-                         <Menu.Item key="sanction" icon={<StopOutlined/>}>제재 관리 이동</Menu.Item>
                     </Menu>
                 );
                 return (
@@ -320,15 +443,14 @@ const MemberInfo = () => {
 
             <Card>
                 <Space style={{ marginBottom: 16 }} wrap>
-                    {/* Replace Input.Search with getColumnSearchProps usage if preferred */}
-                     <Input.Search
-                         placeholder="ID, 이름, 이메일 검색"
-                         allowClear
-                         onSearch={(value) => handleFilterChange('search', value)}
-                         onChange={(e) => !e.target.value && handleFilterChange('search', '')}
-                         style={{ width: 250 }}
-                         value={filters.search || ''} // Bind value for controlled component
-                     />
+                    <Input.Search
+                        placeholder="ID, 이름, 이메일 검색"
+                        allowClear
+                        onSearch={(value) => handleFilterChange('search', value)}
+                        onChange={(e) => !e.target.value && handleFilterChange('search', '')}
+                        style={{ width: 250 }}
+                        value={filters.search || ''}
+                    />
                     <Select
                         placeholder="상태 필터"
                         allowClear
@@ -336,17 +458,17 @@ const MemberInfo = () => {
                         onChange={(value) => handleFilterChange('status', value)}
                          value={filters.status || undefined}
                     >
-                         {Object.entries(statusMap).map(([key, { text }]) => (
-                             <Option key={key} value={key}>{text}</Option>
-                         ))}
+                        {Object.entries(statusMap)
+                            .map(([key, { text }]) => (
+                                <Option key={key} value={key}>{text}</Option>
+                            ))}
                     </Select>
-                     <Text>가입일:</Text>
-                     <RangePicker
-                         onChange={(dates) => handleFilterChange('signupDateRange', dates)}
-                         value={filters.signupDateRange || null}
-                     />
+                    <Text>가입일:</Text>
+                    <RangePicker
+                        onChange={(dates) => handleFilterChange('signupDateRange', dates)}
+                        value={filters.signupDateRange || null}
+                    />
                     <Button icon={<ReloadOutlined />} onClick={handleResetFilters}>초기화</Button>
-                    {/* <Button type="primary" icon={<SearchOutlined />} onClick={fetchData}>검색</Button> */}
                 </Space>
 
                 <Table
@@ -362,37 +484,115 @@ const MemberInfo = () => {
             </Card>
 
             <Modal
-                title="회원 상세 정보"
+                title={isEditMode ? "회원 정보 수정" : "회원 상세 정보"}
                 open={isModalVisible}
                 onCancel={handleModalClose}
                 footer={[
                     <Button key="close" onClick={handleModalClose}>
-                        닫기
+                        {isEditMode ? "취소" : "닫기"}
                     </Button>,
-                    // Add Edit button if needed
-                    <Button key="edit" icon={<EditOutlined />} onClick={() => message.info('Edit function needs implementation')} >
-                         정보 수정
-                     </Button>,
-                ]}
+                    isEditMode && (
+                        <Button
+                            key="save"
+                            type="primary"
+                            onClick={handleSaveChanges}
+                        >
+                             저장
+                         </Button>
+                    )
+                ].filter(Boolean)}
                 width={600}
             >
                 {selectedUser && (
-                    <Descriptions bordered column={1} size="small">
-                        <Descriptions.Item label="사용자 ID">{selectedUser.userId}</Descriptions.Item>
-                        <Descriptions.Item label="이름">{selectedUser.name}</Descriptions.Item>
-                        <Descriptions.Item label="이메일">{selectedUser.email}</Descriptions.Item>
-                        <Descriptions.Item label="연락처">{selectedUser.phone}</Descriptions.Item>
-                        <Descriptions.Item label="가입일시">{selectedUser.signupDate}</Descriptions.Item>
-                        <Descriptions.Item label="최근 로그인">{selectedUser.lastLogin}</Descriptions.Item>
-                         <Descriptions.Item label="상태">
-                             <Tag color={statusMap[selectedUser.status]?.color} icon={statusMap[selectedUser.status]?.icon}>
-                                 {statusMap[selectedUser.status]?.text || selectedUser.status}
-                             </Tag>
-                         </Descriptions.Item>
-                        <Descriptions.Item label="사용자 그룹">{selectedUser.userGroup}</Descriptions.Item>
-                        <Descriptions.Item label="총 구매액">{selectedUser.purchaseAmount.toLocaleString()} 원</Descriptions.Item>
-                         {/* Add more relevant details */}
-                    </Descriptions>
+                    <>
+                        <Descriptions bordered column={1} size="small" style={{ marginBottom: 16 }}>
+                            <Descriptions.Item label="사용자 ID">{selectedUser.userId}</Descriptions.Item>
+                            <Descriptions.Item label="이름">
+                                {isEditMode ? (
+                                    <Input name="name" value={editedUser?.name || ''} onChange={handleInputChange} />
+                                ) : (
+                                    selectedUser.name ? (
+                                        selectedUser.name.length > 2
+                                        ? `${selectedUser.name[0]}*${selectedUser.name.substring(selectedUser.name.length - 1)}`
+                                        : selectedUser.name
+                                    ) : '-'
+                                )}
+                            </Descriptions.Item>
+                            <Descriptions.Item label="이메일">
+                                 {isEditMode ? (
+                                    <Input name="email" value={editedUser?.email || ''} onChange={handleInputChange} />
+                                ) : (
+                                    selectedUser.email
+                                )}
+                            </Descriptions.Item>
+                            <Descriptions.Item label="연락처">
+                                 {isEditMode ? (
+                                    <Input name="phone" value={editedUser?.phone || ''} onChange={handleInputChange} />
+                                ) : (
+                                    selectedUser.phone ? (
+                                        selectedUser.phone.split('-').length === 3 && selectedUser.phone.split('-')[1].length === 4
+                                        ? `${selectedUser.phone.split('-')[0]}-****-${selectedUser.phone.split('-')[2]}`
+                                        : selectedUser.phone
+                                    ) : '-'
+                                )}
+                            </Descriptions.Item>
+                            <Descriptions.Item label="생년월일">
+                                {isEditMode ? (
+                                    <Input name="birthdate" value={editedUser?.birthdate || ''} onChange={handleInputChange} placeholder="YYYY-MM-DD" />
+                                ) : (
+                                    selectedUser.birthdate ? (
+                                        selectedUser.birthdate.split('-').length === 3
+                                        ? `${selectedUser.birthdate.split('-')[0]}-${selectedUser.birthdate.split('-')[1]}-**`
+                                        : selectedUser.birthdate
+                                    ) : '-'
+                                )}
+                            </Descriptions.Item>
+                            <Descriptions.Item label="성별">
+                                 {isEditMode ? (
+                                     <Select
+                                        name="gender"
+                                        value={editedUser?.gender || ''}
+                                        onChange={(value) => setEditedUser(prev => ({ ...prev, gender: value }))}
+                                        style={{ width: '100%' }}
+                                        allowClear
+                                        placeholder="선택 안함"
+                                    >
+                                         <Option value="male">남</Option>
+                                         <Option value="female">여</Option>
+                                     </Select>
+                                ) : (
+                                    selectedUser.gender === 'male' ? '남' : selectedUser.gender === 'female' ? '여' : '-'
+                                )}
+                            </Descriptions.Item>
+                            <Descriptions.Item label="가입일시">{selectedUser.signupDate}</Descriptions.Item>
+                            <Descriptions.Item label="마지막 접속">{selectedUser.lastLogin}</Descriptions.Item>
+                             <Descriptions.Item label="상태">
+                                 <Tag color={statusMap[selectedUser.status]?.color} icon={statusMap[selectedUser.status]?.icon}>
+                                     {statusMap[selectedUser.status]?.text || selectedUser.status}
+                                 </Tag>
+                             </Descriptions.Item>
+                             {selectedUser.status === 'suspended' && !isEditMode && (
+                                 <Descriptions.Item label="정지 사유">
+                                     {selectedUser.suspensionReason || '사유 없음'}
+                                 </Descriptions.Item>
+                             )}
+                            <Descriptions.Item label="앱 푸시 수신" span={1}>
+                                <Tag color={selectedUser.notifications?.appPush ? 'blue' : 'default'}>
+                                    {selectedUser.notifications?.appPush ? '수신' : '미수신'}
+                                </Tag>
+                            </Descriptions.Item>
+                            <Descriptions.Item label="SMS 수신" span={1}>
+                                <Tag color={selectedUser.notifications?.sms ? 'blue' : 'default'}>
+                                    {selectedUser.notifications?.sms ? '수신' : '미수신'}
+                                </Tag>
+                            </Descriptions.Item>
+                            <Descriptions.Item label="이메일 수신" span={1}>
+                                <Tag color={selectedUser.notifications?.email ? 'blue' : 'default'}>
+                                    {selectedUser.notifications?.email ? '수신' : '미수신'}
+                                </Tag>
+                            </Descriptions.Item>
+                        </Descriptions>
+                    </>
                 )}
             </Modal>
         </Space>

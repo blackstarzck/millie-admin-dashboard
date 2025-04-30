@@ -11,6 +11,8 @@ import {
     Input,
     Select,
     DatePicker, // For filtering by request date
+    Modal,
+    Descriptions,
 } from 'antd';
 import {
     CheckCircleOutlined,
@@ -21,6 +23,9 @@ import {
     ClockCircleOutlined, // 승인대기 아이콘
     CheckSquareOutlined, // 승인 아이콘
     CloseSquareOutlined, // 반려 아이콘
+    FileOutlined,
+    FileImageOutlined, // JPG 아이콘
+    FilePdfOutlined,   // PDF 아이콘
 } from '@ant-design/icons';
 import moment from 'moment';
 
@@ -31,12 +36,10 @@ const { RangePicker } = DatePicker;
 
 // --- Sample Data ---
 const initialApprovals = [
-    { key: '1', id: 1, contentType: '도서', title: 'React Hooks 심층 분석', requester: '김현수', requestDate: '2024-07-28', status: 'pending' }, // pending, approved, rejected
-    { key: '2', id: 2, contentType: '오디오북', title: '성공하는 사람들의 7가지 습관 (오디오)', requester: '박지민', requestDate: '2024-07-27', status: 'pending' },
-    { key: '3', id: 3, contentType: '이북', title: '미움받을 용기 (요약본)', requester: '최다희', requestDate: '2024-07-26', status: 'approved' },
-    { key: '4', id: 4, contentType: '도서', title: '알고리즘 문제 해결 전략', requester: '이정훈', requestDate: '2024-07-25', status: 'rejected', rejectReason: '표지 이미지 품질 미달' },
-    { key: '5', id: 5, contentType: '도서', title: '클린 코드 (개정판)', requester: '김현수', requestDate: '2024-07-29', status: 'pending' },
-    { key: '6', id: 6, contentType: '웹소설', title: '회귀했더니 재벌 3세', requester: '소설작가1', requestDate: '2024-07-30', status: 'pending' },
+    { key: '1', id: 1, contentType: '종이책', title: 'React Hooks 심층 분석', subtitle: '상태 관리부터 최적화까지', requester: '김현수', requestDate: '2024-07-28', status: 'pending', categoryName: 'g29', isAdult: 'all', productionPurpose: 'external', fileName: 'React_Hooks_Deep_Dive.pdf', coverFile: 'react_hooks_cover.jpg' }, // 과학·IT
+    { key: '3', id: 3, contentType: '전자책', title: '미움받을 용기', subtitle: '(요약본)', requester: '최다희', requestDate: '2024-07-26', status: 'approved', categoryName: 'g21', isAdult: 'all', productionPurpose: 'external', fileName: 'Courage_to_be_Disliked_Summary.epub', coverFile: 'courage_cover.pdf' }, // 인문사회
+    { key: '4', id: 4, contentType: '종이책', title: '알고리즘 문제 해결 전략', subtitle: '종합편', requester: '이정훈', requestDate: '2024-07-25', status: 'rejected', rejectReason: '표지 이미지 품질 미달', categoryName: 'g29', isAdult: 'all', productionPurpose: 'external', fileName: null, coverFile: null }, // 과학·IT - No file, No cover
+    { key: '5', id: 5, contentType: '종이책', title: '클린 코드', subtitle: '(개정판)', requester: '김현수', requestDate: '2024-07-29', status: 'pending', categoryName: 'g29', isAdult: 'all', productionPurpose: 'external', fileName: 'CleanCode_Revised.pdf', coverFile: 'clean_code_cover.jpg' }, // 과학·IT
 ];
 
 // --- Helper Functions ---
@@ -49,14 +52,53 @@ const getStatusTag = (status) => {
     }
 };
 
+// --- Category Mapping ---
+const categoryMap = {
+    'g1': '시·에세이',
+    'g2': '　 시집',
+    'g3': '　 에세이',
+    'g4': '　 기타도서',
+    'g5': '소설',
+    'g6': '　 일반',
+    'g7': '　 로맨스',
+    'g8': '　 판타지',
+    'g9': '　 BL',
+    'g10': '　 무협',
+    'g11': '　 추리·스릴러·미스터리',
+    'g12': '　 기타',
+    'g13': '　 SF소설',
+    'g14': '전기·회고록',
+    'g15': '　 자서전',
+    'g16': '　 기타',
+    'g17': '경영·경제·자기계발',
+    'g18': '　 경영',
+    'g19': '　 경제',
+    'g20': '　 기타',
+    'g21': '인문사회',
+    'g22': '　 인문',
+    'g23': '　 정치·사회',
+    'g24': '　 역사',
+    'g25': '　 종교',
+    'g26': '　 예술·문화·기타',
+    'g27': '　 SF장르',
+    'g28': '기타',
+    'g29': '　 과학·IT',
+    'g30': '　 어린이·청소년',
+    'g31': '　 진학·진로',
+    'g32': '　 여행',
+    'g33': '　 가정·생활',
+    'g34': '　 교재·참고서',
+    'g35': '무료·체험판',
+};
+
 // --- Component ---
 const ContentApproval = () => {
     const [approvals, setApprovals] = useState(initialApprovals);
     const [searchText, setSearchText] = useState('');
-    const [filters, setFilters] = useState({ status: null, contentType: null, dateRange: null });
-    // Add state for detail modal if needed
-    // const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
-    // const [selectedItem, setSelectedItem] = useState(null);
+    const [filters, setFilters] = useState({ status: null, contentType: null, dateRange: null, categoryName: null });
+    // Added state for detail modal
+    const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+    const [selectedItem, setSelectedItem] = useState(null);
 
     // --- Event Handlers ---
     const handleSearch = (value) => {
@@ -86,16 +128,21 @@ const ContentApproval = () => {
             prev.map(item => item.key === key ? { ...item, status: 'rejected', rejectReason: reason } : item)
         );
         message.error('콘텐츠가 반려되었습니다.');
+        handleModalClose(); // Close modal after action
         // TODO: API Call to update status
         console.log(`Rejected item key: ${key}, Reason: ${reason}`);
     };
 
     const handleViewDetails = (item) => {
-        message.info(`콘텐츠 상세 보기 (${item.title}) - 구현 필요`);
-        // Example: Open a modal with item details
-        // setSelectedItem(item);
-        // setIsDetailModalOpen(true);
+        setSelectedItem(item);
+        setIsDetailModalOpen(true);
         console.log('View details for:', item);
+    };
+
+    // Added function to close modal
+    const handleModalClose = () => {
+        setIsDetailModalOpen(false);
+        setSelectedItem(null);
     };
 
     // --- Filtering Logic ---
@@ -105,41 +152,99 @@ const ContentApproval = () => {
                 ? item.title.toLowerCase().includes(searchText) || item.requester.toLowerCase().includes(searchText)
                 : true;
             const matchesStatus = filters.status ? item.status === filters.status : true;
-            const matchesContentType = filters.contentType ? item.contentType === filters.contentType : true;
+            const matchesCategory = filters.categoryName ? item.categoryName === filters.categoryName : true;
             const matchesDate = filters.dateRange
                 ? moment(item.requestDate).isBetween(filters.dateRange[0], filters.dateRange[1], 'day', '[]')
                 : true;
-            return matchesSearch && matchesStatus && matchesContentType && matchesDate;
+            return matchesSearch && matchesStatus && matchesCategory && matchesDate;
         });
     }, [approvals, searchText, filters]);
 
     // --- Table Columns Definition ---
     const columns = [
-        { title: 'ID', dataIndex: 'id', key: 'id', width: 80, sorter: (a, b) => a.id - b.id },
+        { title: 'ID', dataIndex: 'id', key: 'id', sorter: (a, b) => a.id - b.id },
         {
-            title: '타입', dataIndex: 'contentType', key: 'contentType', width: 100,
+            title: '카테고리',
+            dataIndex: 'categoryName',
+            key: 'categoryName',
             filters: [
-                { text: '도서', value: '도서' },
-                { text: '오디오북', value: '오디오북' },
-                { text: '이북', value: '이북' },
-                { text: '웹소설', value: '웹소설' },
+                { text: '시·에세이', value: 'g1' },
+                { text: '\u3000 시집', value: 'g2' },
+                { text: '\u3000 에세이', value: 'g3' },
+                { text: '\u3000 기타도서', value: 'g4' },
+                { text: '소설', value: 'g5' },
+                { text: '\u3000 일반', value: 'g6' },
+                { text: '\u3000 로맨스', value: 'g7' },
+                { text: '\u3000 판타지', value: 'g8' },
+                { text: '\u3000 BL', value: 'g9' },
+                { text: '\u3000 무협', value: 'g10' },
+                { text: '\u3000 추리·스릴러·미스터리', value: 'g11' },
+                { text: '\u3000 기타', value: 'g12' },
+                { text: '\u3000 SF소설', value: 'g13' },
+                { text: '전기·회고록', value: 'g14' },
+                { text: '\u3000 자서전', value: 'g15' },
+                { text: '\u3000 기타', value: 'g16' },
+                { text: '경영·경제·자기계발', value: 'g17' },
+                { text: '\u3000 경영', value: 'g18' },
+                { text: '\u3000 경제', value: 'g19' },
+                { text: '\u3000 기타', value: 'g20' },
+                { text: '인문사회', value: 'g21' },
+                { text: '\u3000 인문', value: 'g22' },
+                { text: '\u3000 정치·사회', value: 'g23' },
+                { text: '\u3000 역사', value: 'g24' },
+                { text: '\u3000 종교', value: 'g25' },
+                { text: '\u3000 예술·문화·기타', value: 'g26' },
+                { text: '\u3000 SF장르', value: 'g27' },
+                { text: '기타', value: 'g28' },
+                { text: '\u3000 과학·IT', value: 'g29' },
+                { text: '\u3000 어린이·청소년', value: 'g30' },
+                { text: '\u3000 진학·진로', value: 'g31' },
+                { text: '\u3000 여행', value: 'g32' },
+                { text: '\u3000 가정·생활', value: 'g33' },
+                { text: '\u3000 교재·참고서', value: 'g34' },
+                { text: '무료·체험판', value: 'g35' },
             ],
-            onFilter: (value, record) => record.contentType === value,
+            onFilter: (value, record) => record.categoryName === value,
+            render: (categoryValue) => categoryMap[categoryValue] || categoryValue || '-',
         },
-        { title: '제목', dataIndex: 'title', key: 'title', ellipsis: true, render: (text) => <Link onClick={() => message.info('콘텐츠 상세 링크 클릭 (구현 필요)')}>{text}</Link> }, // Link to content detail?
-        { title: '요청자', dataIndex: 'requester', key: 'requester', width: 100 },
+        { title: '콘텐츠 타입', dataIndex: 'contentType', key: 'contentType' },
+        { title: '제목', dataIndex: 'title', key: 'title', ellipsis: true, render: (text) => <Link onClick={() => message.info('콘텐츠 상세 링크 클릭 (구현 필요)')}>{text}</Link> },
+        { title: '부제', dataIndex: 'subtitle', key: 'subtitle', ellipsis: true },
+        { title: '작가', dataIndex: 'requester', key: 'requester' },
         {
-            title: '요청일', dataIndex: 'requestDate', key: 'requestDate', width: 120,
+            title: '표지',
+            dataIndex: 'coverFile',
+            key: 'coverFile',
+            align: 'center',
+            render: (coverFile) => {
+                if (!coverFile) return '-';
+                const extension = coverFile.split('.').pop()?.toLowerCase();
+                let icon = '-';
+                if (extension === 'jpg' || extension === 'jpeg') {
+                    icon = <FileImageOutlined style={{ fontSize: '16px', color: '#1890ff' }} />;
+                } else if (extension === 'pdf') {
+                    icon = <FilePdfOutlined style={{ fontSize: '16px', color: '#f5222d' }} />;
+                }
+                return <Tooltip title={coverFile}>{icon}</Tooltip>; // Wrap icon with Tooltip
+            },
+        },
+        {
+            title: '파일',
+            dataIndex: 'fileName',
+            key: 'fileName',
+            align: 'center',
+            render: (fileName) => fileName 
+                ? <Tooltip title={fileName}><FileOutlined style={{ fontSize: '16px' }} /></Tooltip> // Wrap icon with Tooltip
+                : '-',
+        },
+        {
+            title: '요청일', dataIndex: 'requestDate', key: 'requestDate',
             sorter: (a, b) => moment(a.requestDate).unix() - moment(b.requestDate).unix(),
             defaultSortOrder: 'descend'
         },
         {
-            title: '상태', dataIndex: 'status', key: 'status', width: 120, align: 'center',
-            render: (status, record) => (
-                record.status === 'rejected' && record.rejectReason
-                    ? <Tooltip title={`반려사유: ${record.rejectReason}`}>{getStatusTag(status)}</Tooltip>
-                    : getStatusTag(status)
-            ),
+            title: '상태', dataIndex: 'status', key: 'status', align: 'center',
+            render: (status) => getStatusTag(status),
              filters: [
                 { text: '승인대기', value: 'pending' },
                 { text: '승인완료', value: 'approved' },
@@ -148,54 +253,30 @@ const ContentApproval = () => {
             onFilter: (value, record) => record.status === value,
         },
         {
-            title: '관리',
-            key: 'action',
-            width: 150,
+            title: '성인도서', 
+            dataIndex: 'isAdult', 
+            key: 'isAdult', 
             align: 'center',
-            render: (_, record) => (
-                <Space size="small">
-                    <Tooltip title="상세 보기">
-                        <Button icon={<EyeOutlined />} onClick={() => handleViewDetails(record)} size="small" />
-                    </Tooltip>
-                    {record.status === 'pending' && (
-                        <>
-                            <Popconfirm
-                                title="이 콘텐츠를 승인하시겠습니까?"
-                                onConfirm={() => handleApprove(record.key)}
-                                okText="승인"
-                                cancelText="취소"
-                            >
-                                <Tooltip title="승인">
-                                    <Button icon={<CheckCircleOutlined style={{ color: '#52c41a' }}/>} size="small" />
-                                </Tooltip>
-                            </Popconfirm>
-                            <Popconfirm
-                                title="이 콘텐츠를 반려하시겠습니까?"
-                                description="반려 사유는 시스템에 기록됩니다."
-                                onConfirm={() => handleReject(record.key)} // Add reason input later if needed
-                                okText="반려"
-                                cancelText="취소"
-                            >
-                                <Tooltip title="반려">
-                                    <Button icon={<CloseCircleOutlined style={{ color: '#ff4d4f' }}/>} danger size="small" />
-                                </Tooltip>
-                            </Popconfirm>
-                        </>
-                    )}
-                </Space>
-            ),
+            render: (isAdult) => isAdult === 'adult' ? <Tag color="red">성인</Tag> : <Tag color="blue">전연령</Tag>
+        },
+        {
+            title: '제작목적', 
+            dataIndex: 'productionPurpose', 
+            key: 'productionPurpose', 
+            ellipsis: true,
+            render: (purpose) => purpose === 'external' ? 'ISBN 판매용' : (purpose === 'internal' ? '일반 판매용' : '-')
         },
     ];
 
     return (
         <Space direction="vertical" size="large" style={{ display: 'flex' }}>
-            <Title level={2}>콘텐츠 승인 관리</Title>
+            <Title level={2}>심사 관리</Title>
             <Text type="secondary">등록 요청된 콘텐츠를 검토하고 승인 또는 반려합니다.</Text>
 
             {/* Search and Filter Controls */}
             <Space wrap style={{ marginBottom: 16 }}>
                 <Search
-                    placeholder="제목 또는 요청자 검색"
+                    placeholder="제목 또는 작가 검색"
                     allowClear
                     enterButton={<><SearchOutlined /> 검색</>}
                     onSearch={handleSearch}
@@ -217,14 +298,11 @@ const ContentApproval = () => {
                     defaultValue="all"
                     style={{ width: 120 }}
                     onChange={(value) => handleFilterChange('contentType', value)}
-                    aria-label="타입 필터"
+                    aria-label="콘텐츠 타입 필터"
                 >
                     <Option value="all">전체 타입</Option>
-                    <Option value="도서">도서</Option>
-                    <Option value="오디오북">오디오북</Option>
-                    <Option value="이북">이북</Option>
-                    <Option value="웹소설">웹소설</Option>
-                    {/* Add more content types as needed */}
+                    <Option value="종이책">종이책</Option>
+                    <Option value="전자책">전자책</Option>
                 </Select>
                 <RangePicker onChange={handleDateChange} placeholder={['요청 시작일', '요청 종료일']} />
             </Space>
@@ -235,26 +313,51 @@ const ContentApproval = () => {
                 dataSource={filteredApprovals}
                 pagination={{ pageSize: 10 }}
                 rowKey="key"
-                scroll={{ x: 1000 }}
+                onRow={(record) => {
+                    return {
+                        onClick: () => {
+                            handleViewDetails(record);
+                        },
+                    };
+                }}
             />
 
-            {/* Detail Modal (Example Structure) */}
-            {/* // REMOVED the commented out Modal block below to fix JSX error */}
-            {/* The following lines containing the problematic multi-line comment are removed:
+            {/* Detail Modal Implementation */}
             <Modal
                 title="콘텐츠 상세 정보"
-                ...
+                open={isDetailModalOpen}
+                onCancel={handleModalClose}
+                footer={
+                    selectedItem && selectedItem.status === 'pending' ? [
+                        <Button key="reject" danger onClick={() => handleReject(selectedItem.key)} icon={<CloseCircleOutlined />}>
+                            반려
+                        </Button>,
+                        <Button key="approve" type="primary" onClick={() => handleApprove(selectedItem.key)} icon={<CheckCircleOutlined />}>
+                            승인
+                        </Button>,
+                    ] : null
+                }
+                width={600}
             >
                 {selectedItem && (
-                    <div>
-                        ...
-                        /*  <-- Start of problematic comment
-                        <p>...</p>
-                    </div>
+                    <Descriptions bordered column={1} size="small">
+                        <Descriptions.Item label="ID">{selectedItem.id}</Descriptions.Item>
+                        <Descriptions.Item label="제목">{selectedItem.title}</Descriptions.Item>
+                        <Descriptions.Item label="부제">{selectedItem.subtitle || '-'}</Descriptions.Item>
+                        <Descriptions.Item label="작가">{selectedItem.requester}</Descriptions.Item>
+                        <Descriptions.Item label="카테고리">{categoryMap[selectedItem.categoryName] || selectedItem.categoryName || '-'}</Descriptions.Item>
+                        <Descriptions.Item label="콘텐츠 타입">{selectedItem.contentType}</Descriptions.Item>
+                        <Descriptions.Item label="파일명">{selectedItem.fileName || '첨부파일 없음'}</Descriptions.Item>
+                        <Descriptions.Item label="성인도서">{selectedItem.isAdult === 'adult' ? '성인' : '전연령'}</Descriptions.Item>
+                        <Descriptions.Item label="제작목적">{selectedItem.productionPurpose === 'external' ? 'ISBN 판매용' : '일반 판매용'}</Descriptions.Item>
+                        <Descriptions.Item label="요청일">{selectedItem.requestDate}</Descriptions.Item>
+                        <Descriptions.Item label="상태">{getStatusTag(selectedItem.status)}</Descriptions.Item>
+                        {selectedItem.status === 'rejected' && selectedItem.rejectReason && (
+                            <Descriptions.Item label="반려사유">{selectedItem.rejectReason}</Descriptions.Item>
+                        )}
+                    </Descriptions>
                 )}
             </Modal>
-            */}
-         {/* This closing tag should be correctly parsed now */}
         </Space>
     );
 };

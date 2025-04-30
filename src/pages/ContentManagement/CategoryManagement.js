@@ -14,7 +14,6 @@ import {
 import {
     PlusOutlined,
     EditOutlined,
-    DeleteOutlined,
     AppstoreAddOutlined, // 카테고리 관련 아이콘
 } from '@ant-design/icons';
 
@@ -100,13 +99,6 @@ const CategoryManagement = () => {
             });
     };
 
-    // --- Delete Handling ---
-    const handleDelete = (key) => {
-        setCategories(prevCategories => prevCategories.filter(cat => cat.key !== key));
-        message.success('카테고리가 삭제되었습니다.');
-        // Consider re-ordering logic if needed after deletion
-    };
-
     // --- Table Columns Definition ---
     const columns = [
         { title: 'ID', dataIndex: 'id', key: 'id', width: 80 },
@@ -123,17 +115,6 @@ const CategoryManagement = () => {
                     <Tooltip title="수정">
                         <Button icon={<EditOutlined />} onClick={() => showEditModal(record)} size="small" />
                     </Tooltip>
-                    <Popconfirm
-                        title="이 카테고리를 삭제하시겠습니까? 하위 카테고리나 연관된 도서가 있을 경우 주의하세요."
-                        onConfirm={() => handleDelete(record.key)}
-                        okText="삭제"
-                        cancelText="취소"
-                        placement="topRight"
-                    >
-                        <Tooltip title="삭제">
-                            <Button icon={<DeleteOutlined />} danger size="small" />
-                        </Tooltip>
-                    </Popconfirm>
                     {/* Add drag-and-drop handle for reordering if using a Tree or specific Table setup */}
                 </Space>
             ),

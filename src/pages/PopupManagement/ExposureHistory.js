@@ -8,26 +8,31 @@ import {
     Input,
     Button,
     Tooltip,
-    Tag
+    Tag,
+    Modal,
+    Descriptions,
+    Switch
 } from 'antd';
 import {
     EyeOutlined,
     CalendarOutlined,
     UserOutlined,
     SearchOutlined,
-    ReloadOutlined
+    ReloadOutlined,
+    EyeInvisibleOutlined
 } from '@ant-design/icons';
 import Highlighter from 'react-highlight-words';
+import moment from 'moment';
 
 const { Title, Text } = Typography;
 const { RangePicker } = DatePicker;
 
 // Sample Data
 const initialExposureHistory = [
-    { key: '1', popupId: 'pop001', popupName: '신규 기능 출시 안내', exposureTime: '2023-11-10 09:00:05', userId: 'user123', device: 'PC Web', pageUrl: '/main' },
-    { key: '2', popupId: 'pop002', popupName: '블랙프라이데이 할인', exposureTime: '2023-11-10 09:01:15', userId: 'user456', device: 'Mobile App', pageUrl: '/products/sale' },
-    { key: '3', popupId: 'pop001', popupName: '신규 기능 출시 안내', exposureTime: '2023-11-10 09:02:30', userId: 'user789', device: 'Mobile Web', pageUrl: '/main' },
-    { key: '4', popupId: 'pop003', popupName: '긴급 시스템 점검', exposureTime: '2023-11-09 18:00:00', userId: 'admin01', device: 'PC Web', pageUrl: '/admin' },
+    { key: '1', popupId: 'pop001', popupName: '신규 기능 출시 안내', exposureTime: '2023-11-10 09:00:05', userId: 'user123', device: 'PC Web', pageUrl: '/main', priority: 1, creationDate: '2024-06-30', status: true, startDate: '2024-07-01 00:00', endDate: '2024-07-31 23:59' },
+    { key: '2', popupId: 'pop002', popupName: '블랙프라이데이 할인', exposureTime: '2023-11-10 09:01:15', userId: 'user456', device: 'Mobile App', pageUrl: '/products/sale', priority: 5, creationDate: '2024-11-01', status: false, startDate: '2024-11-20 00:00', endDate: '2024-11-30 23:59' },
+    { key: '3', popupId: 'pop001', popupName: '신규 기능 출시 안내', exposureTime: '2023-11-10 09:02:30', userId: 'user789', device: 'Mobile Web', pageUrl: '/main', priority: 1, creationDate: '2024-06-30', status: true, startDate: '2024-07-01 00:00', endDate: '2024-07-31 23:59' },
+    { key: '4', popupId: 'pop003', popupName: '긴급 시스템 점검', exposureTime: '2023-11-09 18:00:00', userId: 'admin01', device: 'PC Web', pageUrl: '/admin', priority: 10, creationDate: '2024-07-28', status: true, startDate: '2024-07-28 18:00', endDate: '2024-07-29 06:00' },
     // ... more data
 ];
 
@@ -37,6 +42,8 @@ const ExposureHistory = () => {
     const [filters, setFilters] = useState({});
     const [searchText, setSearchText] = useState('');
     const [searchedColumn, setSearchedColumn] = useState('');
+    const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
+    const [selectedHistoryItem, setSelectedHistoryItem] = useState(null);
     let searchInput = null;
 
     // Fetch data based on filters
@@ -154,57 +161,85 @@ const ExposureHistory = () => {
              ),
      });
 
+    // --- Preview Modal Logic ---
+    const showPreviewModal = (item) => {
+        setSelectedHistoryItem(item);
+        setIsPreviewModalOpen(true);
+    };
+
+    const handlePreviewCancel = () => {
+        setIsPreviewModalOpen(false);
+        setSelectedHistoryItem(null);
+    };
+
     // --- Table Columns ---
     const columns = [
         {
-            title: '팝업 ID',
+            title: 'ID',
             dataIndex: 'popupId',
             key: 'popupId',
              ...getColumnSearchProps('popupId', '팝업 ID'),
+            width: 100,
         },
         {
-            title: '팝업명',
+            title: '팝업 이름',
             dataIndex: 'popupName',
             key: 'popupName',
+            width: 200,
             ellipsis: true,
         },
         {
-            title: '노출 시각',
-            dataIndex: 'exposureTime',
-            key: 'exposureTime',
-            sorter: (a, b) => new Date(a.exposureTime) - new Date(b.exposureTime),
-            defaultSortOrder: 'descend',
-            width: 180,
+            title: '등록일',
+            dataIndex: 'creationDate',
+            key: 'creationDate',
+            width: 120,
+            render: (date) => moment(date).isValid() ? moment(date).format('YYYY-MM-DD') : '-',
+            sorter: (a, b) => moment(a.creationDate).unix() - moment(b.creationDate).unix(),
         },
         {
-            title: '노출 사용자 ID',
-            dataIndex: 'userId',
-            key: 'userId',
-             ...getColumnSearchProps('userId', '사용자 ID'),
-             render: (text) => <><UserOutlined style={{ marginRight: 5 }} />{text}</>
+            title: '상태',
+            dataIndex: 'status',
+            key: 'status',
+            width: 80,
+            align: 'center',
+            render: (isActive) => (
+                 <Switch
+                     checked={isActive}
+                     disabled
+                     size="small"
+                     checkedChildren={<EyeOutlined />}
+                     unCheckedChildren={<EyeInvisibleOutlined />}
+                 />
+            ),
         },
         {
-            title: '디바이스',
-            dataIndex: 'device',
-            key: 'device',
-            filters: [
-                 { text: 'PC Web', value: 'PC Web' },
-                 { text: 'Mobile Web', value: 'Mobile Web' },
-                 { text: 'Mobile App', value: 'Mobile App' },
-            ],
-            onFilter: (value, record) => record.device.indexOf(value) === 0,
-             render: (device) => {
-                let color = 'geekblue';
-                if (device === 'Mobile App') color = 'volcano';
-                if (device === 'Mobile Web') color = 'green';
-                return <Tag color={color}>{device}</Tag>;
-            }
+            title: '노출 기간',
+            key: 'period',
+            width: 220,
+            render: (_, record) => (
+                record.startDate && record.endDate
+                 ? `${moment(record.startDate).format('YY/MM/DD HH:mm')} ~ ${moment(record.endDate).format('YY/MM/DD HH:mm')}`
+                 : '-'
+            )
         },
         {
-            title: '노출 페이지 URL',
-            dataIndex: 'pageUrl',
-            key: 'pageUrl',
-            ellipsis: true,
+            title: '우선순위',
+            dataIndex: 'priority',
+            key: 'priority',
+            width: 80,
+            align: 'right',
+            sorter: (a, b) => (a.priority || 0) - (b.priority || 0),
+        },
+        {
+            title: '관리',
+            key: 'action',
+            width: 80,
+            align: 'center',
+            render: (_, record) => (
+                <Tooltip title="팝업 정보 보기">
+                    <Button icon={<EyeOutlined />} onClick={() => showPreviewModal(record)} size="small" />
+                </Tooltip>
+            ),
         },
     ];
 
@@ -249,11 +284,38 @@ const ExposureHistory = () => {
                     dataSource={data}
                     loading={loading}
                     pagination={{ pageSize: 15 }}
-                    scroll={{ x: 1000 }}
+                    scroll={{ x: 1600 }}
                     bordered
                     size="small"
+                    rowKey="key"
                 />
             </Card>
+
+            {/* Preview Modal Definition */}
+            <Modal
+                title="팝업 노출 상세 정보 (참고용)"
+                open={isPreviewModalOpen}
+                onCancel={handlePreviewCancel}
+                footer={[
+                    <Button key="close" onClick={handlePreviewCancel}>
+                        닫기
+                    </Button>,
+                ]}
+                width={600}
+            >
+                {selectedHistoryItem && (
+                    <Descriptions bordered column={1} size="small">
+                        <Descriptions.Item label="노출 시각">{selectedHistoryItem.exposureTime}</Descriptions.Item>
+                        <Descriptions.Item label="노출 사용자 ID">{selectedHistoryItem.userId}</Descriptions.Item>
+                        <Descriptions.Item label="팝업 ID">{selectedHistoryItem.popupId}</Descriptions.Item>
+                        <Descriptions.Item label="팝업 이름">{selectedHistoryItem.popupName}</Descriptions.Item>
+                        <Descriptions.Item label="팝업 우선순위">{selectedHistoryItem.priority ?? '-'}</Descriptions.Item>
+                        <Descriptions.Item label="디바이스">{selectedHistoryItem.device}</Descriptions.Item>
+                        <Descriptions.Item label="노출 페이지 URL">{selectedHistoryItem.pageUrl}</Descriptions.Item>
+                        {/* Add more details if needed */}
+                    </Descriptions>
+                )}
+            </Modal>
         </Space>
     );
 };

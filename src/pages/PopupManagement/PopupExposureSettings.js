@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useCallback } from 'react';
 import {
     Table,
     Tag,
@@ -27,6 +27,9 @@ import {
     StopOutlined,
 } from '@ant-design/icons';
 import moment from 'moment';
+import { DndProvider, useDrag, useDrop } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
+import update from 'immutability-helper';
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -64,6 +67,45 @@ const formatTargetAudience = (target) => {
         default: return target;
     }
 }
+
+// --- Draggable Row Setup ---
+const type = 'DraggableBodyRow';
+
+const DraggableBodyRow = ({ index, moveRow, className, style, ...restProps }) => {
+    const ref = useRef(null);
+    const [{ isOver, dropClassName }, drop] = useDrop({
+        accept: type,
+        collect: (monitor) => {
+            const { index: dragIndex } = monitor.getItem() || {};
+            if (dragIndex === index) {
+                return {};
+            }
+            return {
+                isOver: monitor.isOver(),
+                dropClassName: dragIndex < index ? ' drop-over-downward' : ' drop-over-upward',
+            };
+        },
+        drop: (item) => {
+            moveRow(item.index, index);
+        },
+    });
+    const [, drag] = useDrag({
+        type,
+        item: { index },
+        collect: (monitor) => ({
+            isDragging: monitor.isDragging(),
+        }),
+    });
+    drop(drag(ref));
+    return (
+        <tr
+            ref={ref}
+            className={`${className}${isOver ? dropClassName : ''}`}
+            style={{ cursor: 'move', ...style }}
+            {...restProps}
+        />
+    );
+};
 
 // --- Component ---
 const PopupExposureSettings = () => {
@@ -147,6 +189,25 @@ const PopupExposureSettings = () => {
             });
     };
 
+    // --- Row Move Logic ---
+    const moveRow = useCallback(
+        (dragIndex, hoverIndex) => {
+            const dragRow = popups[dragIndex];
+            setPopups(
+                update(popups, {
+                    $splice: [
+                        [dragIndex, 1],
+                        [hoverIndex, 0, dragRow],
+                    ],
+                }),
+            );
+            // TODO: API call to save the new order/priorities
+            console.log('Moved popup:', dragRow.id, 'from index', dragIndex, 'to index', hoverIndex);
+             message.info(`팝업 순서가 변경되었습니다. (저장 필요)`, 0.5);
+        },
+        [popups],
+    );
+
      // --- Direct Status Toggle --- 
      const handleStatusToggle = (key, checked) => {
         setPopups(prevPopups =>
@@ -187,9 +248,8 @@ const PopupExposureSettings = () => {
             ),
              sorter: (a, b) => moment(a.startDate || 0).unix() - moment(b.startDate || 0).unix(),
         },
-        { title: '노출 빈도', dataIndex: 'frequency', key: 'frequency', width: 120, render: formatFrequency },
         { title: '노출 대상', dataIndex: 'targetAudience', key: 'targetAudience', width: 150, render: formatTargetAudience }, // Simplify display
-        { title: '우선순위', dataIndex: 'priority', key: 'priority', width: 100, align: 'right', sorter: (a,b)=> a.priority - b.priority },
+        { title: '우선순위', dataIndex: 'priority', key: 'priority', width: 100, align: 'right', sorter: (a,b)=> (a.priority || 0) - (b.priority || 0) },
         {
             title: '설정 관리',
             key: 'action',
@@ -205,110 +265,121 @@ const PopupExposureSettings = () => {
     ];
 
     return (
-        <Space direction="vertical" size="large" style={{ display: 'flex' }}>
-            <Title level={2}>팝업 노출 설정</Title>
-            <Text type="secondary">생성된 팝업들의 노출 기간, 빈도, 대상 등 상세 규칙을 설정하고 관리합니다.</Text>
+        <DndProvider backend={HTML5Backend}>
+            <Space direction="vertical" size="large" style={{ display: 'flex' }}>
+                <Title level={2}>팝업 노출 설정</Title>
+                <Text type="secondary">생성된 팝업들의 노출 기간, 빈도, 대상 등 상세 규칙을 설정하고 관리합니다. (행을 드래그하여 우선순위 변경)</Text>
 
-             {/* Search and Filter Controls */}
-            <Space wrap style={{ marginBottom: 16 }}>
-                 <Search
-                    placeholder="팝업 이름 검색"
-                    allowClear
-                    enterButton={<><SearchOutlined /> 검색</>}
-                    onSearch={handleSearch}
-                    style={{ width: 300 }}
-                 />
-                <FilterOutlined style={{ marginLeft: 8, color: '#888' }} />
-                 <Select
-                    defaultValue="all"
-                    style={{ width: 120 }}
-                    onChange={(value) => handleFilterChange('status', value)}
-                    aria-label="상태 필터"
-                >
-                    <Option value="all">전체 상태</Option>
-                    <Option value="true">활성</Option>
-                    <Option value="false">비활성</Option>
-                </Select>
-                {/* Add more filters if needed (e.g., by target audience) */}
-            </Space>
-
-            <Table
-                columns={columns}
-                dataSource={filteredPopups}
-                pagination={{ pageSize: 10 }}
-                rowKey="key"
-                scroll={{ x: 1000 }}
-            />
-
-            {/* Edit Settings Modal */}
-            <Modal
-                title={`'${editingPopup?.name}' 팝업 설정 수정`}
-                open={isModalOpen}
-                onOk={handleOk}
-                onCancel={handleCancel}
-                okText="저장"
-                cancelText="취소"
-                destroyOnClose
-                width={700}
-            >
-                <Form
-                    form={form}
-                    layout="vertical"
-                    name="popup_settings_form"
-                >
-                     {/* Include fields editable here - mirroring some from PopupCreate */}
-                     <Form.Item name="status" label="상태" valuePropName="checked">
-                         <Switch checkedChildren="활성" unCheckedChildren="비활성" />
-                    </Form.Item>
-
-                     <Form.Item
-                        name="exposurePeriod"
-                        label="노출 기간"
-                        rules={[{ required: true, message: '노출 시작일과 종료일을 선택해주세요!' }]}
+                 {/* Search and Filter Controls */}
+                <Space wrap style={{ marginBottom: 16 }}>
+                     <Search
+                        placeholder="팝업 이름 검색"
+                        allowClear
+                        enterButton={<><SearchOutlined /> 검색</>}
+                        onSearch={handleSearch}
+                        style={{ width: 300 }}
+                     />
+                    <FilterOutlined style={{ marginLeft: 8, color: '#888' }} />
+                     <Select
+                        defaultValue="all"
+                        style={{ width: 120 }}
+                        onChange={(value) => handleFilterChange('status', value)}
+                        aria-label="상태 필터"
                     >
-                        <RangePicker
-                             showTime
-                             format="YYYY-MM-DD HH:mm:ss"
-                             style={{ width: '100%' }}
-                        />
-                    </Form.Item>
+                        <Option value="all">전체 상태</Option>
+                        <Option value="true">활성</Option>
+                        <Option value="false">비활성</Option>
+                    </Select>
+                    {/* Add more filters if needed (e.g., by target audience) */}
+                </Space>
 
-                    <Form.Item
-                        name="frequency"
-                        label="노출 빈도"
-                        rules={[{ required: true }]}
-                     >
-                         <Select>
-                             <Option value="daily"><ClockCircleOutlined /> 하루에 한 번</Option>
-                             <Option value="once"><StopOutlined /> 다시 보지 않음</Option>
-                             <Option value="session"><ClockCircleOutlined /> 세션 당 한 번</Option>
-                             <Option value="always"><WarningOutlined /> 매번 (주의)</Option>
-                         </Select>
-                     </Form.Item>
+                <Table
+                    columns={columns}
+                    dataSource={popups}
+                    pagination={false}
+                    rowKey="key"
+                    scroll={{ x: 1000 }}
+                    components={{
+                        body: {
+                            row: DraggableBodyRow,
+                        },
+                    }}
+                    onRow={(record, index) => ({
+                         index,
+                        moveRow,
+                     })}
+                />
 
-                    <Form.Item name="targetAudience" label="노출 대상" rules={[{ required: true }]}>
-                         <Radio.Group>
-                             <Radio value="all"><UserOutlined /> 전체 사용자</Radio>
-                             <Radio value="loggedIn"><UserOutlined /> 로그인 사용자</Radio>
-                             {/* Add more options if needed, potentially fetching from backend */}
-                              <Radio value="loggedIn_non_marketing_agreed"><UserOutlined /> 로그인 (마케팅 미동의)</Radio>
-                         </Radio.Group>
-                     </Form.Item>
-                    {/* Add more detailed targeting: OS, Device, User Groups etc. */}
-                     {/* <Form.Item name="targetOS" label="Target OS"><Checkbox.Group options={['iOS', 'Android']} /></Form.Item> */} 
+                {/* Edit Settings Modal */}
+                <Modal
+                    title={`'${editingPopup?.name}' 팝업 설정 수정`}
+                    open={isModalOpen}
+                    onOk={handleOk}
+                    onCancel={handleCancel}
+                    okText="저장"
+                    cancelText="취소"
+                    destroyOnClose
+                    width={700}
+                >
+                    <Form
+                        form={form}
+                        layout="vertical"
+                        name="popup_settings_form"
+                    >
+                         {/* Include fields editable here - mirroring some from PopupCreate */}
+                         <Form.Item name="status" label="상태" valuePropName="checked">
+                             <Switch checkedChildren="활성" unCheckedChildren="비활성" />
+                        </Form.Item>
 
-                     <Form.Item
-                         name="priority"
-                         label="우선순위"
-                         tooltip="숫자가 낮을수록 우선 노출됩니다 (동시에 여러 팝업 조건 충족 시)"
-                         rules={[{ required: true, type: 'number', min: 1, message:'우선순위는 1 이상의 숫자여야 합니다.'}]}
-                     >
-                         <InputNumber min={1} style={{ width: 100 }} />
-                     </Form.Item>
+                         <Form.Item
+                            name="exposurePeriod"
+                            label="노출 기간"
+                            rules={[{ required: true, message: '노출 시작일과 종료일을 선택해주세요!' }]}
+                        >
+                            <RangePicker
+                                 showTime
+                                 format="YYYY-MM-DD HH:mm:ss"
+                                 style={{ width: '100%' }}
+                            />
+                        </Form.Item>
 
-                </Form>
-            </Modal>
-        </Space>
+                        <Form.Item
+                            name="frequency"
+                            label="노출 빈도"
+                            rules={[{ required: true }]}
+                         >
+                             <Select>
+                                 <Option value="daily"><ClockCircleOutlined /> 하루에 한 번</Option>
+                                 <Option value="once"><StopOutlined /> 다시 보지 않음</Option>
+                                 <Option value="session"><ClockCircleOutlined /> 세션 당 한 번</Option>
+                                 <Option value="always"><WarningOutlined /> 매번 (주의)</Option>
+                             </Select>
+                         </Form.Item>
+
+                        <Form.Item name="targetAudience" label="노출 대상" rules={[{ required: true }]}>
+                             <Radio.Group>
+                                 <Radio value="all"><UserOutlined /> 전체 사용자</Radio>
+                                 <Radio value="loggedIn"><UserOutlined /> 로그인 사용자</Radio>
+                                 {/* Add more options if needed, potentially fetching from backend */}
+                                  <Radio value="loggedIn_non_marketing_agreed"><UserOutlined /> 로그인 (마케팅 미동의)</Radio>
+                             </Radio.Group>
+                         </Form.Item>
+                        {/* Add more detailed targeting: OS, Device, User Groups etc. */}
+                         {/* <Form.Item name="targetOS" label="Target OS"><Checkbox.Group options={['iOS', 'Android']} /></Form.Item> */} 
+
+                         <Form.Item
+                             name="priority"
+                             label="우선순위"
+                             tooltip="숫자가 낮을수록 우선 노출됩니다 (동시에 여러 팝업 조건 충족 시)"
+                             rules={[{ required: true, type: 'number', min: 1, message:'우선순위는 1 이상의 숫자여야 합니다.'}]}
+                         >
+                             <InputNumber min={1} style={{ width: 100 }} />
+                         </Form.Item>
+
+                    </Form>
+                </Modal>
+            </Space>
+        </DndProvider>
     );
 };
 

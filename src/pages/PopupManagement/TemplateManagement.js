@@ -15,20 +15,26 @@ import {
     EditOutlined,
     DeleteOutlined,
     EyeOutlined, // For Preview
+    MinusCircleOutlined, // For Form.List remove button
 } from '@ant-design/icons';
 import moment from 'moment';
+import { usePopupTemplates } from '../../context/PopupTemplateContext'; // Import the hook
 
 const { Title } = Typography;
 const { TextArea } = Input;
 
-// Initial Data
+// Initial Data - Removed, now managed by Context
+/*
 const initialTemplates = [
-    { key: 'popupTpl001', id: 'popupTpl001', name: '긴급 공지 팝업 템플릿', description: '화면 중앙에 표시되는 긴급 공지 스타일', lastModified: '2024-07-21', content: '<div class="popup-urgent"><h1>긴급 공지</h1><p>{content}</p><button>닫기</button></div>' },
-    { key: 'popupTpl002', id: 'popupTpl002', name: '이벤트 홍보 팝업 템플릿', description: '이미지와 버튼이 포함된 이벤트 안내 스타일', lastModified: '2024-07-22', content: '<div class="popup-event"><img src="{imageUrl}" alt="Event"><p>{text}</p><button>자세히 보기</button><button>닫기</button></div>' },
+    { key: 'popupTpl001', id: 'popupTpl001', name: '긴급 공지 팝업 템플릿', description: '화면 중앙에 표시되는 긴급 공지 스타일', lastModified: '2024-07-21', content: '<div class="popup-urgent"><h1>긴급 공지</h1><p>{content}</p><button>닫기</button></div>', variables: [{ key: '{content}', label: '공지 내용' }] }, // Example variable
+    { key: 'popupTpl002', id: 'popupTpl002', name: '이벤트 홍보 팝업 템플릿', description: '이미지와 버튼이 포함된 이벤트 안내 스타일', lastModified: '2024-07-22', content: '<div class="popup-event"><img src="{imageUrl}" alt="Event"><p>{text}</p><button>자세히 보기</button><button>닫기</button></div>', variables: [{ key: '{imageUrl}', label: '이미지 URL' }, { key: '{text}', label: '이벤트 문구' }] }, // Example variables
 ];
+*/
 
 const TemplateManagement = () => {
-    const [templates, setTemplates] = useState(initialTemplates);
+    // Use context instead of local state
+    const { templates, addTemplate, updateTemplate, deleteTemplate } = usePopupTemplates();
+    // const [templates, setTemplates] = useState(initialTemplates); // Removed local state
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingTemplate, setEditingTemplate] = useState(null);
     const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
@@ -59,27 +65,14 @@ const TemplateManagement = () => {
         form
             .validateFields()
             .then((values) => {
-                const processedValues = {
-                    ...values,
-                    lastModified: moment().format('YYYY-MM-DD'), // Update last modified date
-                };
-
                 if (editingTemplate) {
-                    const updatedTemplates = templates.map(tpl =>
-                        tpl.key === editingTemplate.key ? { ...tpl, ...processedValues } : tpl
-                    );
-                    setTemplates(updatedTemplates);
+                    // Call context update function
+                    updateTemplate(editingTemplate.key, values);
                     message.success('템플릿이 수정되었습니다.');
-                    console.log('Updating template:', editingTemplate.key, processedValues);
                 } else {
-                    const newTemplate = {
-                        key: `popupTpl${(templates.length + 1).toString().padStart(3, '0')}`, // Simple key generation
-                        id: `popupTpl${(templates.length + 1).toString().padStart(3, '0')}`,
-                        ...processedValues,
-                    };
-                    setTemplates([newTemplate, ...templates]);
+                    // Call context add function
+                    addTemplate(values);
                     message.success('새 템플릿이 추가되었습니다.');
-                    console.log('Adding new template:', processedValues);
                 }
                 form.resetFields();
                 setIsModalOpen(false);
@@ -93,9 +86,8 @@ const TemplateManagement = () => {
 
     // --- Delete Handling ---
     const handleDelete = (key) => {
-        setTemplates(templates.filter(tpl => tpl.key !== key));
+        deleteTemplate(key);
         message.success('템플릿이 삭제되었습니다.');
-        console.log('Deleting template key:', key);
     };
 
      // --- Preview Handling ---
@@ -191,12 +183,48 @@ const TemplateManagement = () => {
                     </Form.Item>
                     <Form.Item
                         name="content"
-                        label="템플릿 내용 (HTML/CSS, 변수 사용 가능: {content}, {imageUrl} 등)"
+                        label="템플릿 내용 (HTML/CSS, 아래 정의된 변수 사용 가능)"
                         rules={[{ required: true, message: '템플릿 내용을 입력해주세요!' }]}
                     >
-                        {/* In a real app, consider a dedicated code editor like Monaco Editor */}
                         <TextArea rows={15} placeholder='<div>...팝업 HTML 구조...</div>' />
                     </Form.Item>
+
+                    {/* Variables Management Section */}
+                    <Title level={5} style={{ marginTop: '20px' }}>템플릿 변수 정의</Title>
+                     <Form.List name="variables">
+                         {(fields, { add, remove }) => (
+                             <>
+                                 {fields.map(({ key, name, ...restField }) => (
+                                    <Space key={key} style={{ display: 'flex', marginBottom: 8 }} align="baseline">
+                                        <Form.Item
+                                            {...restField}
+                                            name={[name, 'key']}
+                                            label="변수 키"
+                                            rules={[{ required: true, message: '변수 키를 입력하세요 (예: {variable_name})' }]}
+                                            style={{ flex: 1 }}
+                                        >
+                                             <Input placeholder="{variable_name}" />
+                                        </Form.Item>
+                                        <Form.Item
+                                            {...restField}
+                                            name={[name, 'label']}
+                                            label="변수 설명"
+                                            rules={[{ required: true, message: '팝업 생성 시 표시될 변수 설명을 입력하세요' }]}
+                                            style={{ flex: 2 }}
+                                        >
+                                            <Input placeholder="예: 상품명" />
+                                        </Form.Item>
+                                         <MinusCircleOutlined onClick={() => remove(name)} />
+                                    </Space>
+                                 ))}
+                                 <Form.Item>
+                                     <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />}>
+                                         변수 추가
+                                     </Button>
+                                 </Form.Item>
+                             </>
+                         )}
+                     </Form.List>
                 </Form>
             </Modal>
 

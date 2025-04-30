@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Menu } from 'antd';
 import { Link, useLocation } from 'react-router-dom';
 // 아이콘 임포트 (예시 - 필요에 따라 추가/변경)
@@ -33,7 +33,10 @@ import {
   SolutionOutlined,
   LinkOutlined,
   FilterOutlined,
-  QuestionCircleOutlined
+  QuestionCircleOutlined,
+  EditOutlined,
+  TrophyOutlined,
+  UsergroupAddOutlined
 } from '@ant-design/icons';
 
 // 메뉴 데이터 구조화 (key 추가, 아이콘 추가)
@@ -46,19 +49,27 @@ const menuItems = [
     subMenu: [
       { key: '/content/books', path: '/content/books', name: '도서 관리', icon: <BookOutlined /> },
       { key: '/content/categories', path: '/content/categories', name: '카테고리 관리', icon: <AppstoreOutlined /> },
-      { key: '/content/approval', path: '/content/approval', name: '콘텐츠 승인', icon: <CheckSquareOutlined /> },
       { key: '/content/metadata', path: '/content/metadata', name: '메타데이터 관리', icon: <DatabaseOutlined /> },
     ],
   },
   {
+    key: '/self-publishing',
+    name: '자가출판',
+    icon: <EditOutlined />,
+    subMenu: [
+      { key: '/self-publishing/approval', path: '/self-publishing/approval', name: '심사', icon: <CheckSquareOutlined /> },
+      { key: '/self-publishing/authors', path: '/self-publishing/authors', name: '작가 정보 관리', icon: <SolutionOutlined /> },
+    ],
+  },
+  {
     key: '/users',
-    name: '사용자 관리',
+    name: '회원 관리',
     icon: <UserOutlined />,
     subMenu: [
       { key: '/users/info', path: '/users/info', name: '회원 정보', icon: <ProfileOutlined /> },
-      { key: '/users/groups', path: '/users/groups', name: '사용자 그룹', icon: <TeamOutlined /> },
-      { key: '/users/unsubscribe', path: '/users/unsubscribe', name: '수신거부 관리', icon: <MailOutlined /> },
+      { key: '/users/subscriptions', path: '/users/subscriptions', name: '구독 내역', icon: <HistoryOutlined /> },
       { key: '/users/sanctions', path: '/users/sanctions', name: '계정 제재', icon: <WarningOutlined /> },
+      { key: '/users/badges', path: '/users/badges', name: '회원 배지 관리', icon: <TrophyOutlined /> }
     ],
   },
   {
@@ -69,7 +80,7 @@ const menuItems = [
       { key: '/notifications/dispatch', path: '/notifications/dispatch', name: '알림 발송', icon: <BellOutlined /> },
       { key: '/notifications/templates', path: '/notifications/templates', name: '알림 템플릿', icon: <FileTextOutlined /> },
       { key: '/notifications/history', path: '/notifications/history', name: '발송 내역', icon: <HistoryOutlined /> },
-      { key: '/notifications/emergency', path: '/notifications/emergency', name: '긴급 공지', icon: <WarningOutlined /> },
+      { key: '/notifications/groups', path: '/notifications/groups', name: '발송 대상 그룹 관리', icon: <UsergroupAddOutlined /> },
     ],
   },
   {
@@ -111,7 +122,6 @@ const menuItems = [
     icon: <MessageOutlined />,
     subMenu: [
       { key: '/inquiries/list', path: '/inquiries/list', name: '문의 조회', icon: <OrderedListOutlined /> },
-      { key: '/inquiries/answer', path: '/inquiries/answer', name: '답변 작성', icon: <FormOutlined /> },
       { key: '/inquiries/filter', path: '/inquiries/filter', name: '문의 필터링', icon: <FilterOutlined /> },
       { key: '/inquiries/faq', path: '/inquiries/faq', name: 'FAQ 관리', icon: <QuestionCircleOutlined /> },
     ],
@@ -175,8 +185,8 @@ const Sidebar = () => {
   const location = useLocation(); // 현재 위치 정보 가져오기
   const currentPath = location.pathname;
 
-  // 현재 경로에 맞는 SubMenu 키 찾기 (예: /content/books -> /content)
-  const findOpenKeys = (path) => {
+  // 현재 경로에 맞는 SubMenu 키 찾기
+  const findInitialOpenKeys = (path) => {
     for (const item of menuItems) {
       if (item.subMenu) {
         const foundSubItem = item.subMenu.find(sub => path.startsWith(sub.path));
@@ -188,14 +198,36 @@ const Sidebar = () => {
     return []; // 해당 없으면 빈 배열
   };
 
-  const openKeys = findOpenKeys(currentPath);
+  // 열린 메뉴 상태 관리
+  const [openKeys, setOpenKeys] = useState(findInitialOpenKeys(currentPath));
+
+  // SubMenu 열림/닫힘 핸들러 (아코디언 동작)
+  const handleOpenChange = (keys) => {
+    // menuItems에서 최상위 SubMenu 키 목록 생성
+    const rootSubmenuKeys = menuItems
+      .filter(item => item.subMenu && item.subMenu.length > 0)
+      .map(item => item.key);
+
+    const latestOpenKey = keys.find(key => openKeys.indexOf(key) === -1);
+
+    // 최신으로 열린 키가 rootSubmenuKeys에 포함되어 있다면 해당 키만 열린 상태로 설정
+    if (rootSubmenuKeys.indexOf(latestOpenKey) !== -1) {
+      setOpenKeys([latestOpenKey]);
+    } else {
+      // 그렇지 않으면 (예: 하위 메뉴 클릭 또는 메뉴 닫기) 현재 keys 배열 사용 (Ant Design 기본 동작 유지 또는 수정 가능)
+      // 여기서는 마지막으로 열린 키만 유지하도록 설정 (아코디언 효과)
+      // 만약 모든 메뉴가 닫혔다면 빈 배열로 설정
+      setOpenKeys(latestOpenKey ? [latestOpenKey] : []);
+    }
+  };
 
   return (
     <Menu
       theme="dark" // 다크 테마 적용
       mode="inline"
       selectedKeys={[currentPath]} // 현재 경로를 selectedKeys로 설정
-      defaultOpenKeys={openKeys} // 현재 경로에 해당하는 SubMenu 열기
+      openKeys={openKeys} // 상태로 관리되는 열린 키
+      onOpenChange={handleOpenChange} // 열림/닫힘 변경 핸들러 연결
       style={{ height: 'calc(100% - 64px)', borderRight: 0 }} // 로고 높이만큼 빼기
     >
       {renderMenuItems(menuItems)}

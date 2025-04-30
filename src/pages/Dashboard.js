@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Chart from 'chart.js/auto';
 import {
     Row,
@@ -13,6 +13,7 @@ import {
     List,
     Descriptions,
     Divider,
+    Radio,
 } from 'antd';
 import {
     ArrowUpOutlined,
@@ -73,6 +74,8 @@ const ChartComponent = ({ chartId, type, data, options }) => {
 
 const Dashboard = () => {
 
+  const [visitorChartRange, setVisitorChartRange] = useState('daily');
+
   // --- Dummy Data (Slightly adjusted for AntD components) ---
   const coreMetrics = {
     todayReaders: { title: '오늘의 독서 인원', value: 12500, change: 1200, changeType: 'increase', link: '/analysis/users', icon: <UserOutlined/> },
@@ -101,6 +104,44 @@ const Dashboard = () => {
   const emotionTagData = {
     labels: ['힐링', '성장', '스릴', '로맨스', '지식'],
     datasets: [{ label: '인기 감성 태그', data: [38, 25, 15, 12, 10], backgroundColor: ['#1890ff', '#52c41a', '#ffadd2', '#faad14', '#bfbfbf'], borderWidth: 0, }]
+  };
+
+  // --- Popular Search Terms Data for Table ---
+  const popularSearchTermsData = [
+    { key: '1', rank: 1, term: '로맨스 소설', count: 152 },
+    { key: '2', rank: 2, term: '베스트셀러', count: 118 },
+    { key: '3', rank: 3, term: '자기계발 책 추천', count: 95 },
+    { key: '4', rank: 4, term: '판타지 웹소설', count: 77 },
+    { key: '5', rank: 5, term: '신간 알림', count: 61 },
+  ];
+
+  const popularSearchTermsColumns = [
+    { title: '순위', dataIndex: 'rank', key: 'rank' },
+    { title: '검색어', dataIndex: 'term', key: 'term' },
+    { title: '검색 수', dataIndex: 'count', key: 'count', align: 'right', render: (count) => <strong>{count}</strong> },
+  ];
+
+  // --- Dummy Visitor Data ---
+  const generateHourlyData = (base) => Array.from({ length: 24 }, (_, i) => Math.max(0, base + Math.floor(Math.random() * 20 - 10 + (i > 6 && i < 22 ? i : 0))));
+  const generateDailyData = (base) => Array.from({ length: 7 }, (_, i) => Math.max(0, base + Math.floor(Math.random() * 500 - 250)));
+  const generateMonthlyData = (base) => Array.from({ length: 30 }, (_, i) => Math.max(0, base + Math.floor(Math.random() * 500 - 250)));
+
+  const visitorData = {
+    daily: {
+      labels: Array.from({ length: 24 }, (_, i) => `${String(i).padStart(2, '0')}:00`),
+      datasets: [
+        { label: '오늘', data: generateHourlyData(150), borderColor: '#1890ff', tension: 0.1, pointRadius: 0 },
+        { label: '어제', data: generateHourlyData(140), borderColor: '#52c41a', tension: 0.1, pointRadius: 0 },
+      ]
+    },
+    weekly: {
+      labels: ['7일 전', '6일 전', '5일 전', '4일 전', '3일 전', '어제', '오늘'],
+      datasets: [{ label: '주간 접속자', data: generateDailyData(3000), borderColor: '#faad14', tension: 0.1, backgroundColor: 'rgba(250, 173, 20, 0.1)', fill: true }]
+    },
+    monthly: {
+      labels: Array.from({ length: 30 }, (_, i) => `${i + 1}일`), // Simplified label
+      datasets: [{ label: '월간 접속자', data: generateMonthlyData(3500), borderColor: '#ff4d4f', tension: 0.1, backgroundColor: 'rgba(255, 77, 79, 0.1)', fill: true }]
+    }
   };
 
   // Data for AntD Table
@@ -236,10 +277,14 @@ const Dashboard = () => {
                </Card>
            </Col>
            <Col xs={24} md={12} lg={8}>
-               <Card title="인기 감성 태그">
-                   <div style={{ height: '300px', position: 'relative' }}>
-                     <ChartComponent chartId="emotionTagChart" type="doughnut" data={emotionTagData} options={doughnutChartOptions} />
-                   </div>
+               <Card title="인기 검색어" bodyStyle={{ padding: '0 16px 16px' }}>
+                 <Table
+                   columns={popularSearchTermsColumns}
+                   dataSource={popularSearchTermsData}
+                   pagination={false}
+                   size="small"
+                   style={{ marginTop: 8 }}
+                 />
                </Card>
            </Col>
            <Col xs={24} md={24} lg={8}>
@@ -255,6 +300,50 @@ const Dashboard = () => {
            </Col>
         </Row>
       </section>
+
+       {/* NEW: 이용자 분석 섹션 추가 (원래 뷰어 & 독서 인사이트 아래에 추가) */}
+       <section>
+         <Title level={4} style={{ marginBottom: 16 }}>이용자 분석</Title>
+         <Row gutter={[16, 16]}>
+            <Col xs={24} lg={16}>
+                 <Card title="접속자 수 추이">
+                    <Radio.Group
+                       onChange={(e) => setVisitorChartRange(e.target.value)}
+                       value={visitorChartRange}
+                       style={{ marginBottom: 16 }}
+                    >
+                      <Radio.Button value="daily">일간</Radio.Button>
+                      <Radio.Button value="weekly">주간</Radio.Button>
+                      <Radio.Button value="monthly">월간</Radio.Button>
+                    </Radio.Group>
+                    <div style={{ height: '300px', position: 'relative' }}>
+                       <ChartComponent
+                           chartId="visitorCountChart"
+                           type="line"
+                           data={visitorData[visitorChartRange]}
+                           options={{
+                             ...commonChartOptions,
+                             scales: {
+                               y: {
+                                 beginAtZero: true
+                               }
+                             },
+                             interaction: { intersect: false, mode: 'index' }, // 툴팁 향상
+                             plugins: {
+                               tooltip: {
+                                 enabled: true,
+                                 mode: 'index',
+                                 intersect: false,
+                               }
+                             }
+                           }}
+                       />
+                    </div>
+                 </Card>
+            </Col>
+            {/* 여기에 추가적인 이용자 분석 카드(예: 재방문율, 이탈률 등) 추가 가능 */}
+         </Row>
+       </section>
 
        {/* 4. 마케팅 & 커뮤니티 */}
        <section>
