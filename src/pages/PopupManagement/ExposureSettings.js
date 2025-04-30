@@ -407,35 +407,6 @@ const PopupExposureSettings = () => {
                          <RangePicker showTime format="YYYY-MM-DD HH:mm" style={{ width: '100%' }} />
                      </Form.Item>
 
-                     <Form.Item label="노출 빈도" required>
-                        <Input.Group compact>
-                            <Form.Item name="frequencyType" noStyle rules={[{ required: true }]}>
-                                <Select style={{ width: '60%' }}>
-                                    {Object.entries(frequencyMap).map(([key, text]) => (
-                                         <Option key={key} value={key}>{text}</Option>
-                                     ))}
-                                </Select>
-                            </Form.Item>
-                            <Form.Item noStyle dependencies={['frequencyType']}>
-                                {(formInstance) =>
-                                    formInstance.getFieldValue('frequencyType') === 'every_n_hours' ? (
-                                        <Form.Item name="frequencyHours" noStyle rules={[{ required: true, message: '시간 입력'}]}>
-                                            <InputNumber min={1} max={168} addonAfter="시간" style={{ width: '40%' }} placeholder="시간"/>
-                                        </Form.Item>
-                                    ) : null
-                                }
-                            </Form.Item>
-                        </Input.Group>
-                     </Form.Item>
-
-                     <Form.Item
-                         name="targetAudience"
-                         label="대상 설정"
-                         rules={[{ required: true, message: '대상을 선택해주세요.' }]}
-                     >
-                         <Checkbox.Group options={userSegments} />
-                     </Form.Item>
-
                      <Form.Item
                          name="targetPages"
                          label="노출 페이지 (쉼표로 구분)"
