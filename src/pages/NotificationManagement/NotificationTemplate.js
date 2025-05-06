@@ -10,6 +10,7 @@ import {
     message,
     Popconfirm,
     Tooltip,
+    Tag,
 } from 'antd';
 import {
     PlusOutlined,
@@ -25,7 +26,6 @@ const { TextArea } = Input;
 // Initial Data
 const initialTemplates = [
     { key: 'tpl001', id: 'tpl001', name: '환영 메시지', title: '회원가입을 환영합니다!', content: '[이름]님, 밀리의 서재에 오신 것을 환영합니다! 지금 바로 첫 달 무료 혜택을 확인해보세요.', lastModified: '2024-07-20' },
-    { key: 'tpl002', id: 'tpl002', name: '이벤트 안내 (신간)', title: '[신간 제목] 출간 기념 이벤트! ', content: '독자님의 취향을 저격할 [신간 제목]이 출간되었습니다! 지금 바로 특별 이벤트에 참여하고 혜택을 받아가세요. [링크]', lastModified: '2024-07-25' },
     { key: 'tpl003', id: 'tpl003', name: '독서 루틴 알림', title: '오늘의 독서, 시작하셨나요? 📚', content: '[이름]님, 잠시 밀리의 서재와 함께 마음의 양식을 쌓아보는 건 어때요? 꾸준한 독서는 성장의 밑거름이 됩니다.', lastModified: '2024-07-28' },
 ];
 
@@ -152,7 +152,7 @@ const NotificationTemplate = () => {
     return (
         <Space direction="vertical" size="large" style={{ display: 'flex' }}>
             <Title level={2}>알림 템플릿 관리</Title>
-            <Text type="secondary">사용자에게 발송될 알림 메시지의 템플릿을 관리합니다. 변수(예: [이름], [신간 제목])를 사용하여 개인화된 메시지를 작성할 수 있습니다.</Text>
+            <Text type="secondary">사용자에게 발송될 알림 메시지의 템플릿을 관리합니다. 변수(예: [이름], [이메일])를 사용하여 개인화된 메시지를 작성할 수 있습니다.</Text>
              <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
                 <Button
                     type="primary"
@@ -177,7 +177,7 @@ const NotificationTemplate = () => {
                 onOk={handleOk}
                 onCancel={handleCancel}
                 okText={editingTemplate ? "수정" : "추가"}
-                cancelText="취소"
+                cancelButtonProps={{ style: { display: 'none' } }}
                 width={720}
                 destroyOnClose
             >
@@ -206,9 +206,17 @@ const NotificationTemplate = () => {
                         name="content"
                         label="알림 내용"
                         rules={[{ required: true, message: '알림 내용을 입력해주세요!' }]}
-                        tooltip="실제 발송될 메시지 내용입니다. 사용 가능한 변수: [이름], [도서제목], [이벤트명], [링크] 등"
+                        tooltip="실제 발송될 메시지 내용입니다. 아래 변수를 사용하여 개인화할 수 있습니다."
+                        extra={
+                            <Text type="secondary" style={{ fontSize: '12px', display: 'block', marginTop: '8px', textAlign: 'right' }}>
+                                사용 가능한 변수: {' '}
+                                <Tag>[이름]</Tag>
+                                <Tag>[이메일]</Tag>
+                                {/* Add more user/related data variable tags here */}
+                            </Text>
+                        }
                     >
-                        <TextArea rows={6} placeholder="예: [이름]님, 즐거운 독서 경험을 위해 밀리의 서재가 특별한 이벤트를 준비했어요! 지금 확인해보세요. [링크]" />
+                        <TextArea rows={6} placeholder="예: [이름]님, 즐거운 독서 경험을 위해 밀리의 서재가 특별한 이벤트를 준비했어요! 지금 확인해보세요." />
                     </Form.Item>
                     {/* Add template type selection (Push, Email, SMS, Kakao...) if needed */}
                      {/* <Form.Item name="type" label="템플릿 타입"><Select><Option value="push">푸시 알림</Option>...</Select></Form.Item> */}

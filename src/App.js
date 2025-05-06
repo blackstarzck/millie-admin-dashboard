@@ -21,9 +21,8 @@ import NotificationTemplate from './pages/NotificationManagement/NotificationTem
 import DispatchHistory from './pages/NotificationManagement/DispatchHistory';
 import TargetGroupManagement from './pages/NotificationManagement/TargetGroupManagement';
 import PopupCreation from './pages/PopupManagement/PopupCreation';
-import TemplateManagement from './pages/PopupManagement/TemplateManagement';
-import ExposureSettings from './pages/PopupManagement/ExposureSettings';
-import PopupAnalysis from './pages/PopupManagement/PopupAnalysis';
+import PopupTemplateManagement from './pages/PopupManagement/TemplateManagement';
+import PopupExposureSettings from './pages/PopupManagement/ExposureSettings';
 import EventAnalysis from './pages/EventManagement/EventAnalysis';
 import InquiryLookup from './pages/InquiryManagement/InquiryLookup';
 import InquiryFiltering from './pages/InquiryManagement/InquiryFiltering';
@@ -41,7 +40,6 @@ import ServicePolicy from './pages/SystemSettings/ServicePolicy';
 import PartnerAccount from './pages/PartnerManagement/PartnerAccount';
 import SettlementManagement from './pages/PartnerManagement/SettlementManagement';
 import InquiryManagementPartner from './pages/PartnerManagement/InquiryManagementPartner';
-import NoticeCreation from './pages/NoticeManagement/NoticeCreation';
 import CategorySettings from './pages/NoticeManagement/CategorySettings';
 import NoticeHistory from './pages/NoticeManagement/NoticeHistory';
 import ExposureHistory from './pages/PopupManagement/ExposureHistory';
@@ -87,13 +85,11 @@ function App() {
 
               {/* 팝업 관리 */}
               <Route path="popups/create" element={<PopupCreation />} />
-              <Route path="popups/templates" element={<TemplateManagement />} />
-              <Route path="popups/settings" element={<ExposureSettings />} />
-              <Route path="popups/analysis" element={<PopupAnalysis />} />
+              <Route path="popups/templates" element={<PopupTemplateManagement />} />
+              <Route path="popups/settings" element={<PopupExposureSettings />} />
               <Route path="popups/history" element={<ExposureHistory />} />
 
               {/* 공지사항 관리 */}
-              <Route path="notices/create" element={<NoticeCreation />} />
               <Route path="notices/manage" element={<NoticeList />} />
               <Route path="notices/categories" element={<CategorySettings />} />
               <Route path="notices/history" element={<NoticeHistory />} />

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useContext } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useContext } from 'react';
 import {
     Table,
     Tag,
@@ -11,11 +11,11 @@ import {
     Form,
     DatePicker,
     Select,
-    Checkbox,
     InputNumber,
     Input,
     message,
     Tooltip,
+    Badge,
 } from 'antd';
 import {
     SettingOutlined,
@@ -26,9 +26,15 @@ import {
     ReloadOutlined,
     CalendarOutlined,
     HolderOutlined,
+    FolderOpenOutlined,
+    FileImageOutlined,
+    ProfileOutlined,
+    DownOutlined,
+    RightOutlined,
+    DeleteOutlined,
 } from '@ant-design/icons';
 import moment from 'moment';
-import { DndContext } from '@dnd-kit/core';
+import { DndContext, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 import {
     arrayMove,
@@ -37,65 +43,77 @@ import {
     verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { usePopupTemplates } from '../../context/PopupTemplateContext';
 
 const { Title, Text } = Typography;
 const { RangePicker } = DatePicker;
 const { Option } = Select;
 const { TextArea } = Input;
 
-// Sample Data
-const initialPopups = [
-    { key: 'p1', id: 'pop001', name: '신규 기능 안내', status: true, startDate: '2024-07-01 00:00', endDate: '2024-07-31 23:59', frequencyType: 'once_per_day', frequencyValue: null, targetAudience: ['all'], targetPages: ['/dashboard'], priority: 1, creationDate: '2024-06-30' },
-    { key: 'p2', id: 'pop002', name: '블랙프라이데이 할인', status: false, startDate: '2024-11-20 00:00', endDate: '2024-11-30 23:59', frequencyType: 'once_per_session', frequencyValue: null, targetAudience: ['vip', 'group_A'], targetPages: ['/products', '/sale'], priority: 5, creationDate: '2024-11-01' },
-    { key: 'p3', id: 'pop003', name: '긴급 시스템 점검', status: true, startDate: '2024-07-28 18:00', endDate: '2024-07-29 06:00', frequencyType: 'every_time', frequencyValue: null, targetAudience: ['all'], targetPages: ['/'], priority: 10, creationDate: '2024-07-28' },
-    { key: 'p4', id: 'pop004', name: 'N시간마다 노출 테스트', status: true, startDate: '2024-07-01 00:00', endDate: '2024-08-31 23:59', frequencyType: 'every_n_hours', frequencyValue: 3, targetAudience: ['tester_group'], targetPages: ['/test'], priority: 2, creationDate: '2024-06-15' },
+const initialPopupsRaw = [
+    { key: 'p1', id: 'pop001', name: '신규 기능 안내 (D-39 고정 표시)', status: true, startDate: '2024-08-10 00:00', endDate: '2024-08-22 10:00', frequencyType: 'once_per_day', frequencyValue: null, targetAudience: ['all'], targetPages: ['/dashboard'], priority: 1, creationDate: '2024-06-30', contentType: 'template', templateId: '신규 기능 안내 템플릿', linkUrl: 'https://example.com/new-feature', displayRemainingTime: 'D-39' },
+    { key: 'p2', id: 'pop002', name: '블랙프라이데이 할인 (종료 예시)', status: false, startDate: '2023-11-20 00:00', endDate: '2023-11-30 23:59', frequencyType: 'once_per_session', frequencyValue: null, targetAudience: ['vip', 'group_A'], targetPages: ['/products', '/sale'], priority: 5, creationDate: '2023-11-01', contentType: 'image', imageUrl: 'https://via.placeholder.com/300x200.png?text=Black+Friday', linkUrl: 'https://example.com/sale' },
+    { key: 'p3', id: 'pop003', name: '긴급 시스템 점검 (D-1 고정 표시)', status: true, startDate: '2024-08-14 18:00', endDate: '2024-08-15 12:00', frequencyType: 'every_time', frequencyValue: null, targetAudience: ['all'], targetPages: ['/'], priority: 10, creationDate: '2024-07-28', contentType: 'template', templateId: '긴급 공지 팝업 템플릿', displayRemainingTime: 'D-1' },
+    { key: 'p4', id: 'pop004', name: 'N시간마다 노출 테스트 (기본 표시)', status: true, startDate: '2024-08-01 00:00', endDate: '2024-09-14 14:00', frequencyType: 'every_n_hours', frequencyValue: 3, targetAudience: ['tester_group'], targetPages: ['/test'], priority: 2, creationDate: '2024-06-15', contentType: 'template', templateId: '할인 안내 템플릿' },
+    { key: 'p5', id: 'pop005', name: '대시보드 전용 공지 (162분 고정 표시)', status: true, startDate: '2024-08-01 00:00', endDate: '2024-08-10 23:59', frequencyType: 'once_per_day', frequencyValue: null, targetAudience: ['all'], targetPages: ['/dashboard'], priority: 3, creationDate: '2024-07-31', contentType: 'template', templateId: '긴급 공지 팝업 템플릿', displayRemainingTime: '162분' },
+    {
+        key: 'p6', id: 'pop006', name: '오늘 오후 11시 종료 이벤트 (기본 표시)', status: true,
+        startDate: '2024-08-15 00:00',
+        endDate: '2024-08-15 23:00',
+        frequencyType: 'once_per_day', frequencyValue: null, targetAudience: ['all'], targetPages: ['/events'],
+        priority: 4, creationDate: '2024-08-15', contentType: 'image',
+        imageUrl: 'https://via.placeholder.com/300x150.png?text=Ends+Today+11PM', linkUrl: 'https://example.com/event-11pm'
+    },
+    {
+        key: 'p7', id: 'pop007', name: '내일 오후 1시 종료 설문 (기본 표시)', status: true,
+        startDate: '2024-08-15 10:00',
+        endDate: '2024-08-16 13:00',
+        frequencyType: 'once_per_session', frequencyValue: null, targetAudience: ['loggedIn'], targetPages: ['/survey'],
+        priority: 1, creationDate: '2024-08-16', contentType: 'template',
+        templateId: '설문 참여 독려 템플릿'
+    },
 ];
 
-// Mock data for Select options
-const userSegments = [
-    { value: 'all', label: '전체 사용자' },
-    { value: 'new_7d', label: '신규 가입자 (7일)' },
-    { value: 'vip', label: 'VIP 등급' },
-    { value: 'group_A', label: '사용자 그룹 A' },
-    { value: 'tester_group', label: '테스터 그룹' },
-];
+const groupPopupsByPage = (popups) => {
+    const groups = {};
+    popups.forEach(popup => {
+        const pageKey = (Array.isArray(popup.targetPages) && popup.targetPages.length > 0) ? popup.targetPages[0] : '/';
+        if (!groups[pageKey]) {
+            groups[pageKey] = {
+                key: pageKey,
+                pagePath: pageKey,
+                popups: [],
+            };
+        }
+        groups[pageKey].popups.push({ ...popup, priority: groups[pageKey].popups.length + 1 });
+    });
 
-const frequencyMap = {
-    once_per_session: '세션당 한 번',
-    once_per_day: '하루에 한 번',
-    every_time: '매번 노출',
-    every_n_hours: 'N 시간마다',
+    Object.values(groups).forEach(group => {
+         group.popups.sort((a, b) => (a.priority || 0) - (b.priority || 0) || moment(b.creationDate).unix() - moment(a.creationDate).unix());
+         group.popups = group.popups.map((p, index) => ({ ...p, priority: index + 1 }));
+    });
+
+    return Object.values(groups).sort((a, b) => a.pagePath.localeCompare(b.pagePath));
 };
 
-// --- @dnd-kit Row Components (Moved outside PopupExposureSettings) ---
-// Ensure RowContext is defined before Row component that uses it
 const RowContext = React.createContext({});
 
-// Corrected DragHandle component
 const DragHandle = () => {
-  const { setActivatorNodeRef, listeners } = useContext(RowContext);
-  // ... existing code ... // This placeholder was incorrect
+  const { attributes, listeners, setActivatorNodeRef } = useContext(RowContext);
   return (
-    // DragHandle should return only the button
     <Button
       type="text"
       size="small"
       icon={<HolderOutlined />}
-      style={{ cursor: 'move' }}
+      style={{ cursor: 'grab' }}
       ref={setActivatorNodeRef}
       {...listeners}
+      {...attributes}
     />
-    /* Incorrect return from previous step removed
-    // Ensure RowContext.Provider uses the correctly defined RowContext
-    <RowContext.Provider value={contextValue}>
-      <tr {...props} ref={setNodeRef} style={style} {...attributes} />
-    </RowContext.Provider>
-    */
   );
 };
 
-// Re-added and corrected Row component
-const Row = (props) => {
+const SortableRow = (props) => {
   const {
     attributes,
     listeners,
@@ -110,92 +128,101 @@ const Row = (props) => {
     ...props.style,
     transform: CSS.Translate.toString(transform),
     transition,
-    ...(isDragging ? { position: 'relative', zIndex: 9999, cursor: 'grabbing' } : {}),
+    ...(isDragging ? { position: 'relative', zIndex: 9999, backgroundColor: '#f0f0f0', cursor: 'grabbing' } : {}),
   };
 
   const contextValue = useMemo(
-    () => ({ setActivatorNodeRef, listeners }),
-    [setActivatorNodeRef, listeners],
+    () => ({ attributes, listeners, setActivatorNodeRef }),
+    [attributes, listeners, setActivatorNodeRef],
   );
 
   return (
     <RowContext.Provider value={contextValue}>
-      <tr {...props} ref={setNodeRef} style={style} {...attributes} />
+      <tr {...props} ref={setNodeRef} style={style} />
     </RowContext.Provider>
   );
 };
 
-// --- Component ---
 const PopupExposureSettings = () => {
-    const [popups, setPopups] = useState(initialPopups);
+    const { templates } = usePopupTemplates();
+
+    const [groupedPopups, setGroupedPopups] = useState(() => groupPopupsByPage(initialPopupsRaw));
     const [loading, setLoading] = useState(false);
-    const [filters, setFilters] = useState({});
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingPopup, setEditingPopup] = useState(null);
+    const [editingPopupPageKey, setEditingPopupPageKey] = useState(null);
+    const [isPreviewModalVisible, setIsPreviewModalVisible] = useState(false);
+    const [previewData, setPreviewData] = useState(null);
     const [form] = Form.useForm();
+    const [expandedRowKeys, setExpandedRowKeys] = useState([]);
+    const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
+    const [deletingPopupInfo, setDeletingPopupInfo] = useState(null);
 
-    // Fetch data based on filters - Temporarily disabled for DND testing
-    /*
-    useEffect(() => {
-        fetchData();
-    }, [filters]);
-    */
+    const sensors = useSensors(
+      useSensor(PointerSensor, {
+        activationConstraint: {
+          distance: 5,
+        },
+      })
+    );
 
-    // Temporarily disable fetchData content
-    const fetchData = () => {
-        /*
-        setLoading(true);
-        console.log("Fetching popups with filters:", filters);
-        // TODO: Replace with API call
-        setTimeout(() => { // Simulate API delay
-            let filteredData = initialPopups;
-            if (filters.status !== undefined && filters.status !== 'all') {
-                filteredData = filteredData.filter(p => p.status === (filters.status === 'active'));
-            }
-            if (filters.search) {
-                const term = filters.search.toLowerCase();
-                filteredData = filteredData.filter(p =>
-                    p.id.toLowerCase().includes(term) ||
-                    p.name.toLowerCase().includes(term)
-                );
-            }
-            setPopups(filteredData);
-            setLoading(false);
-        }, 300);
-        */
-         console.log("fetchData temporarily disabled for DND testing.");
-         // Ensure loading is false if fetchData is called elsewhere unexpectedly
-         setLoading(false);
+    const pagePathOptions = useMemo(() => {
+        const uniquePaths = new Set(groupedPopups.map(g => g.pagePath));
+        if (!uniquePaths.has('/')) {
+            uniquePaths.add('/');
+        }
+        return Array.from(uniquePaths).sort();
+    }, [groupedPopups]);
+
+    const handleToggleExpandAll = () => {
+        const expandableGroups = groupedPopups.filter(g => g.popups?.length > 0);
+        if (expandedRowKeys.length === expandableGroups.length) {
+            setExpandedRowKeys([]);
+        } else {
+            const allExpandableKeys = expandableGroups.map(group => group.key);
+            setExpandedRowKeys(allExpandableKeys);
+        }
     };
 
-    const handleFilterChange = (type, value) => {
-        setFilters(prev => ({ ...prev, [type]: value }));
+    const handleExpandedRowsChange = (keys) => {
+        setExpandedRowKeys(keys);
     };
 
-    const handleResetFilters = () => {
-        setFilters({});
-        // Refetch - handled by useEffect
-    };
+    const handleStatusChange = (popupKey, pageKey, checked) => {
+        const popupId = groupedPopups.find(g => g.key === pageKey)?.popups.find(p => p.key === popupKey)?.id;
+        if (!popupId) return;
 
-    // --- Status Toggle --- 
-    const handleStatusChange = (popupId, checked) => {
         message.loading({ content: `'${popupId}' 상태 변경 중...`, key: popupId });
-        // TODO: API call to update status
-        console.log(`Changing status for ${popupId} to ${checked}`);
+
+        console.log(`Changing status for ${popupId} in page group ${pageKey} to ${checked}`);
         setTimeout(() => {
-            setPopups(prev => prev.map(p => p.id === popupId ? { ...p, status: checked } : p));
+            setGroupedPopups(prevGroups =>
+                prevGroups.map(group => {
+                    if (group.key === pageKey) {
+                        return {
+                            ...group,
+                            popups: group.popups.map(p =>
+                                p.key === popupKey ? { ...p, status: checked } : p
+                            ),
+                        };
+                    }
+                    return group;
+                })
+            );
             message.success({ content: `'${popupId}' 팝업 상태가 ${checked ? '활성' : '비활성'}(으)로 변경되었습니다.`, key: popupId });
         }, 500);
     };
 
-    // --- Edit Modal --- 
-    const showEditModal = (popup) => {
+    const showEditModal = (popup, pageKey) => {
         setEditingPopup(popup);
+        setEditingPopupPageKey(pageKey);
         form.setFieldsValue({
             ...popup,
+            name: popup.name,
+            contentType: popup.contentType,
+            templateId: popup.templateId,
             exposurePeriod: [moment(popup.startDate), moment(popup.endDate)],
-            frequencyHours: popup.frequencyType === 'every_n_hours' ? popup.frequencyValue : undefined,
-             targetPages: Array.isArray(popup.targetPages) ? popup.targetPages.join(', ') : popup.targetPages, // Join array for TextArea
+            targetPages: Array.isArray(popup.targetPages) && popup.targetPages.length > 0 ? popup.targetPages[0] : undefined,
         });
         setIsModalOpen(true);
     };
@@ -203,202 +230,356 @@ const PopupExposureSettings = () => {
     const handleModalCancel = () => {
         setIsModalOpen(false);
         setEditingPopup(null);
+        setEditingPopupPageKey(null);
         form.resetFields();
     };
 
     const handleModalOk = () => {
+        if (!editingPopup || !editingPopupPageKey) return;
+
         form.validateFields()
             .then(values => {
                 setLoading(true);
-                message.loading({ content: `'${editingPopup?.name}' 설정 저장 중...`, key: 'popupEdit' });
+                message.loading({ content: `'${editingPopup.name}' 설정 저장 중...`, key: 'popupEdit' });
 
-                const updatedData = { ...editingPopup, ...values };
+                const { priority, ...formValues } = values;
+                const updatedPopupData = { ...editingPopup, ...formValues };
 
-                if (values.exposurePeriod) {
-                    updatedData.startDate = values.exposurePeriod[0].toISOString();
-                    updatedData.endDate = values.exposurePeriod[1].toISOString();
-                    delete updatedData.exposurePeriod;
+                if (formValues.exposurePeriod) {
+                    updatedPopupData.startDate = formValues.exposurePeriod[0].toISOString();
+                    updatedPopupData.endDate = formValues.exposurePeriod[1].toISOString();
+                    delete updatedPopupData.exposurePeriod;
                 }
-                if (values.frequencyType === 'every_n_hours') {
-                    updatedData.frequencyValue = values.frequencyHours;
+
+                if (typeof formValues.targetPages === 'string') {
+                     updatedPopupData.targetPages = [formValues.targetPages];
                  } else {
-                     updatedData.frequencyValue = null;
-                 }
-                 delete updatedData.frequencyHours;
-
-                 // Convert targetPages string back to array if needed by backend
-                 if (typeof values.targetPages === 'string') {
-                     updatedData.targetPages = values.targetPages.split(',').map(s => s.trim()).filter(Boolean);
+                     updatedPopupData.targetPages = [];
                  }
 
-                 console.log('Updated Popup Data:', updatedData);
+                console.log('Updated Popup Data (from modal):', updatedPopupData);
 
-                 // TODO: API call to update popup settings
-                 setTimeout(() => { // Simulate API delay
-                     setPopups(prev => prev.map(p => p.key === editingPopup.key ? updatedData : p));
-                     message.success({ content: `'${editingPopup?.name}' 팝업 설정이 저장되었습니다.`, key: 'popupEdit' });
-                     handleModalCancel();
-                     setLoading(false);
-                 }, 800);
+                setTimeout(() => {
+                     setGroupedPopups(prevGroups =>
+                         prevGroups.map(group => {
+                             if (group.key === editingPopupPageKey) {
+                                 return {
+                                     ...group,
+                                     popups: group.popups.map(p =>
+                                         p.key === editingPopup.key ? updatedPopupData : p
+                                     ),
+                                 };
+                             }
+                             return group;
+                         })
+                     );
+
+                    message.success({ content: `'${editingPopup.name}' 팝업 설정이 저장되었습니다.`, key: 'popupEdit' });
+                    handleModalCancel();
+                    setLoading(false);
+                }, 800);
             })
             .catch(info => {
                 console.log('Validate Failed:', info);
-                setLoading(false); // Ensure loading indicator stops on validation failure
-             });
+                setLoading(false);
+            });
     };
 
-    // --- Table Columns ---
-    const columns = [
-        { key: 'sort', align: 'center', width: 60, render: () => <DragHandle /> },
+    const showPreviewModal = (popup) => {
+        console.log("Showing preview for:", popup);
+        setPreviewData({
+            name: popup.name,
+            contentType: popup.contentType,
+            imageUrl: popup.imageUrl,
+            templateId: popup.templateId,
+            linkUrl: popup.linkUrl,
+        });
+        setIsPreviewModalVisible(true);
+    };
+
+    const handlePreviewCancel = () => {
+        setIsPreviewModalVisible(false);
+        setPreviewData(null);
+    };
+
+    const showDeleteConfirm = (popup, pageKey) => {
+        setDeletingPopupInfo({ key: popup.key, id: popup.id, name: popup.name, pageKey });
+        setIsDeleteModalVisible(true);
+    };
+
+    const handleDeleteCancel = () => {
+        setIsDeleteModalVisible(false);
+        setDeletingPopupInfo(null);
+    };
+
+    const handleDeletePopup = () => {
+        if (!deletingPopupInfo) return;
+
+        const { key: popupKey, pageKey, name } = deletingPopupInfo;
+        message.loading({ content: `'${name}' 팝업 삭제 중...`, key: 'popupDelete' });
+
+        setTimeout(() => {
+            setGroupedPopups(prevGroups =>
+                prevGroups.map(group => {
+                    if (group.key === pageKey) {
+                        const updatedPopups = group.popups.filter(p => p.key !== popupKey);
+                        const finalPopups = updatedPopups.map((p, index) => ({ ...p, priority: index + 1 }));
+                        return { ...group, popups: finalPopups };
+                    }
+                    return group;
+                }).filter(group => group.popups.length > 0)
+            );
+            message.success({ content: `'${name}' 팝업이 삭제되었습니다.`, key: 'popupDelete' });
+            handleDeleteCancel();
+        }, 500);
+    };
+
+    const onDragEnd = useCallback((event, pageKey) => {
+        const { active, over } = event;
+        console.log(`onDragEnd triggered for page ${pageKey}:`, { active, over });
+
+        if (active.id !== over?.id) {
+            setGroupedPopups((prevGroups) => {
+                const groupIndex = prevGroups.findIndex(group => group.key === pageKey);
+                if (groupIndex === -1) return prevGroups;
+
+                const targetGroup = prevGroups[groupIndex];
+                const oldIndex = targetGroup.popups.findIndex((item) => item.key === active.id);
+                const newIndex = targetGroup.popups.findIndex((item) => item.key === over?.id);
+
+                if (oldIndex === -1 || newIndex === -1) return prevGroups;
+
+                console.log(`Moving popup in group ${pageKey} from index ${oldIndex} to ${newIndex}`);
+
+                let reorderedPopups = arrayMove(targetGroup.popups, oldIndex, newIndex);
+
+                reorderedPopups = reorderedPopups.map((popup, index) => ({
+                    ...popup,
+                    priority: index + 1,
+                }));
+
+                const newGroups = [...prevGroups];
+                newGroups[groupIndex] = { ...targetGroup, popups: reorderedPopups };
+
+                console.log(`New popup order for page ${pageKey}:`, reorderedPopups);
+                message.success(`'${pageKey}' 페이지의 팝업 순서가 변경되었습니다. (저장 필요)`);
+
+                return newGroups;
+            });
+        }
+    }, []);
+
+    const ExpandedPopupTable = ({ popups: subPopups, pageKey }) => {
+        const popupColumns = [
+             { key: 'sort', align: 'center', render: () => <DragHandle /> },
+             { title: 'ID', dataIndex: 'id', key: 'id' },
+             { title: '팝업 이름', dataIndex: 'name', key: 'name', ellipsis: true },
+             {
+                title: '콘텐츠 타입',
+                dataIndex: 'contentType',
+                key: 'contentType',
+                align: 'center',
+                render: (type, record) => {
+                    if (type === 'image') {
+                        return <><FileImageOutlined /> 이미지</>;
+                    }
+                    if (type === 'template') {
+                        const templateName = templates.find(t => t.id === record.templateId)?.name;
+                        return <><ProfileOutlined /> {templateName || record.templateId || '템플릿'}</>;
+                    }
+                    return '-';
+                }
+             },
+             {
+                title: '상태', dataIndex: 'status', key: 'status', align: 'center',
+                render: (isActive, record) => (
+                    <Switch
+                        checked={isActive}
+                         onChange={(checked) => handleStatusChange(record.key, pageKey, checked)}
+                        checkedChildren={<EyeOutlined />}
+                        unCheckedChildren={<EyeInvisibleOutlined />}
+                        size="small"
+                    />
+                )
+            },
+            {
+                title: '노출 기간', key: 'period',
+                render: (_, record) => {
+                    const start = moment(record.startDate);
+                    const end = moment(record.endDate);
+                    let dateString = '-';
+
+                    if (start.isValid() && end.isValid()) {
+                        const duration = end.diff(start, 'days') + 1;
+                        dateString = `${start.format('YY/MM/DD HH:mm')} ~ ${end.format('YY/MM/DD HH:mm')} (총 ${duration}일)`;
+                    } else if (start.isValid()) {
+                        dateString = `${start.format('YY/MM/DD HH:mm')} ~ ?`;
+                    } else if (end.isValid()) {
+                        dateString = `? ~ ${end.format('YY/MM/DD HH:mm')}`;
+                    }
+                    return dateString;
+                },
+            },
+            {
+                title: '남은 기간',
+                key: 'status',
+                align: 'center',
+                render: (_, record) => {
+                    if (record.displayRemainingTime) {
+                        let color = 'default';
+                        if (record.displayRemainingTime.startsWith('D-')) {
+                            color = 'blue';
+                        } else if (record.displayRemainingTime.endsWith('분')) {
+                            color = 'orange';
+                        }
+                        return <Tag color={color}>{record.displayRemainingTime}</Tag>;
+                    } else {
+                        return <Tag color="default">종료</Tag>;
+                    }
+                },
+            },
+             { title: '우선순위', dataIndex: 'priority', key: 'priority', align: 'right' },
+             {
+                title: '관리',
+                key: 'action',
+                align: 'center',
+                render: (_, record) => (
+                     <Space size="small">
+                        <Tooltip title="팝업 상세 설정 수정">
+                             <Button size="small" icon={<EditOutlined />} onClick={() => showEditModal(record, pageKey)} />
+                        </Tooltip>
+                         <Tooltip title="팝업 미리보기">
+                             <Button size="small" icon={<EyeOutlined />} onClick={() => showPreviewModal(record)} />
+                         </Tooltip>
+                         <Tooltip title="팝업 삭제">
+                             <Button danger size="small" icon={<DeleteOutlined />} onClick={() => showDeleteConfirm(record, pageKey)} />
+                         </Tooltip>
+                     </Space>
+                ),
+            },
+        ];
+
+        return (
+             <DndContext sensors={sensors} modifiers={[restrictToVerticalAxis]} onDragEnd={(e) => onDragEnd(e, pageKey)}>
+                 <SortableContext items={subPopups.map(i => i.key)} strategy={verticalListSortingStrategy}>
+                     <Table
+                         columns={popupColumns}
+                         dataSource={subPopups}
+                         rowKey="key"
+                         pagination={false}
+                         size="small"
+                         components={{ body: { row: SortableRow } }}
+                         showHeader={subPopups.length > 0}
+                         style={{ margin: '-16px' }}
+                     />
+                 </SortableContext>
+             </DndContext>
+        );
+    };
+
+    const pageGroupColumns = [
         {
-            title: 'ID',
-            dataIndex: 'id',
-            key: 'id',
-            width: 100,
+            title: '노출 페이지 경로',
+            dataIndex: 'pagePath',
+            key: 'pagePath',
+            render: (path) => <><FolderOpenOutlined /> {path === '/' ? '전체 페이지 (루트)' : path}</>
         },
         {
-            title: '팝업 이름',
-            dataIndex: 'name',
-            key: 'name',
-            ellipsis: true,
-        },
-        {
-            title: '등록일',
-            dataIndex: 'creationDate',
-            key: 'creationDate',
-            width: 120,
-            render: (date) => moment(date).isValid() ? moment(date).format('YYYY-MM-DD') : '-', // Format date
-            sorter: (a, b) => moment(a.creationDate).unix() - moment(b.creationDate).unix(),
-        },
-        {
-            title: '상태',
-            dataIndex: 'status',
-            key: 'status',
-            width: 80,
-            align: 'center',
-            render: (isActive, record) => (
-                <Switch
-                    checked={isActive}
-                    onChange={(checked) => handleStatusChange(record.id, checked)}
-                    checkedChildren={<EyeOutlined />}
-                    unCheckedChildren={<EyeInvisibleOutlined />}
-                />
-            )
-        },
-        {
-            title: '노출 기간',
-            key: 'period',
-            width: 220,
-            render: (_, record) => (
-                 `${moment(record.startDate).format('YY/MM/DD HH:mm')} ~ ${moment(record.endDate).format('YY/MM/DD HH:mm')}`
-            ),
-            sorter: (a, b) => moment(a.startDate || 0).unix() - moment(b.startDate || 0).unix(),
-        },
-        {
-            title: '우선순위',
-            dataIndex: 'priority',
-            key: 'priority',
+            title: '팝업 수',
+            key: 'count',
             width: 100,
             align: 'right',
-            sorter: (a,b)=> (a.priority || 0) - (b.priority || 0)
-        },
-        {
-            title: '설정 관리',
-            key: 'action',
-            width: 100,
-            align: 'center',
-            render: (_, record) => (
-                <Tooltip title="노출 설정 수정">
-                    <Button icon={<EditOutlined />} onClick={() => showEditModal(record)} />
-                </Tooltip>
-            ),
+            render: (_, record) => <Badge count={record.popups?.length || 0} showZero color="#1890ff" />
         },
     ];
 
-    const onDragEnd = ({ active, over }) => {
-        console.log('onDragEnd triggered:', { active, over }); // Log drag end event
-        if (active.id !== over?.id) {
-            setPopups((prevPopups) => {
-                const activeIndex = prevPopups.findIndex((record) => record.key === active.id);
-                const overIndex = prevPopups.findIndex((record) => record.key === over?.id);
-                console.log(`Moving from index ${activeIndex} to ${overIndex}`); // Log indices
-                if (activeIndex !== -1 && overIndex !== -1) {
-                    let newOrder = arrayMove(prevPopups, activeIndex, overIndex);
-                    // Update the priority based on the new order
-                    newOrder = newOrder.map((popup, index) => ({
-                        ...popup,
-                        priority: index + 1, // Assign priority based on 0-based index + 1
-                    }));
-
-                    // TODO: Add API call here to save the new order and priorities
-                    console.log('New popup order with updated priorities:', newOrder);
-                    message.success('팝업 순서 및 우선순위가 변경되었습니다. (저장 필요)');
-                    return newOrder;
-                } else {
-                    return prevPopups;
-                }
-            });
-        }
-    };
-
     return (
         <Space direction="vertical" size="large" style={{ display: 'flex' }}>
-            <Title level={2}><SettingOutlined /> 팝업 노출 설정</Title>
-            <Text>생성된 팝업들의 노출 기간, 빈도, 대상 등 상세 설정을 관리합니다.</Text>
+            <Title level={2}><SettingOutlined /> 팝업 노출 설정 (페이지별 우선순위)</Title>
+            <Text>페이지별로 팝업 목록을 확인하고 드래그하여 노출 우선순위를 설정합니다.</Text>
 
             <Card>
                 <Space style={{ marginBottom: 16 }} wrap>
-                    <Input.Search
-                        placeholder="팝업 ID 또는 이름 검색"
-                        allowClear
-                        onSearch={(value) => handleFilterChange('search', value)}
-                         onChange={(e) => !e.target.value && handleFilterChange('search', '')}
-                        style={{ width: 250 }}
-                    />
-                    <Select
-                        placeholder="상태 필터"
-                        allowClear
-                        style={{ width: 100 }}
-                        onChange={(value) => handleFilterChange('status', value)}
-                         value={filters.status !== undefined ? filters.status : 'all'} // Control Select value
-                     >
-                         <Option value="all">전체 상태</Option>
-                         <Option value="active">활성</Option>
-                         <Option value="inactive">비활성</Option>
-                     </Select>
-                    <Button icon={<ReloadOutlined />} onClick={handleResetFilters}>초기화</Button>
+
+                    <Button
+                         icon={expandedRowKeys.length === groupedPopups.filter(g => g.popups?.length > 0).length ? <DownOutlined /> : <RightOutlined />}
+                         onClick={handleToggleExpandAll}
+                    >
+                         {expandedRowKeys.length === groupedPopups.filter(g => g.popups?.length > 0).length ? '전체 접기' : '전체 펼치기'}
+                     </Button>
                 </Space>
 
-                <DndContext modifiers={[restrictToVerticalAxis]} onDragEnd={onDragEnd}>
-                    <SortableContext items={popups.map(i => i.key)} strategy={verticalListSortingStrategy}>
-                        <Table
-                            columns={columns}
-                            dataSource={popups}
-                            loading={loading}
-                            pagination={{ pageSize: 10 }}
-                            scroll={{ x: 1100 }}
-                            bordered
-                            size="small"
-                            rowKey="key"
-                            components={{ body: { row: Row } }}
-                        />
-                    </SortableContext>
-                </DndContext>
+                <Table
+                    columns={pageGroupColumns}
+                    dataSource={groupedPopups}
+                    rowKey="key"
+                    loading={loading}
+                    pagination={false}
+                    expandable={{
+                        expandedRowRender: (record) => <ExpandedPopupTable popups={record.popups} pageKey={record.key} />,
+                        rowExpandable: (record) => record.popups && record.popups.length > 0,
+                        expandedRowKeys: expandedRowKeys,
+                        onExpandedRowsChange: handleExpandedRowsChange,
+                    }}
+                    size="middle"
+                />
             </Card>
 
-            {/* Edit Settings Modal */}
             <Modal
-                title={`팝업 설정 수정: ${editingPopup?.name}`}
+                title="팝업 설정 수정"
                 open={isModalOpen}
                 onOk={handleModalOk}
                 onCancel={handleModalCancel}
                 okText="저장"
                 cancelText="취소"
-                confirmLoading={loading} // Show loading state on OK button
-                 width={600}
-                 destroyOnClose
+                cancelButtonProps={{ style: { display: 'none' } }}
+                confirmLoading={loading}
+                width={600}
+                destroyOnClose
             >
                 <Form form={form} layout="vertical" name="popup_settings_form">
+                     <Form.Item
+                         name="targetPages"
+                         label="노출 페이지"
+                         tooltip="팝업을 노출할 페이지 경로를 선택하세요. 이 경로를 기준으로 목록이 그룹화됩니다."
+                         rules={[{ required: true, message: '노출 페이지를 선택해주세요.'}]}
+                     >
+                         <Select
+                             style={{ width: '100%' }}
+                             placeholder="노출 페이지 경로 선택"
+                             allowClear
+                             disabled
+                         >
+                             {pagePathOptions.map(path => (
+                                 <Option key={path} value={path}>{path}</Option>
+                             ))}
+                         </Select>
+                     </Form.Item>
+
+                     <Form.Item
+                         label="팝업 이름 (관리용)"
+                         name="name"
+                     >
+                         <Input disabled />
+                     </Form.Item>
+
+                     <Form.Item
+                         label="콘텐츠 타입"
+                     >
+                         {(() => {
+                             const type = form.getFieldValue('contentType');
+                             const tplId = form.getFieldValue('templateId');
+                             if (type === 'image') {
+                                 return <Text><FileImageOutlined /> 이미지</Text>;
+                             }
+                             if (type === 'template') {
+                                 const templateName = templates.find(t => t.id === tplId)?.name;
+                                 return <Text><ProfileOutlined /> {templateName || tplId || '템플릿'}</Text>;
+                             }
+                             return <Text type="secondary">알 수 없음</Text>;
+                         })()}
+                     </Form.Item>
+
                      <Form.Item
                          name="exposurePeriod"
                          label={<><CalendarOutlined /> 노출 기간</>}
@@ -408,18 +589,22 @@ const PopupExposureSettings = () => {
                      </Form.Item>
 
                      <Form.Item
-                         name="targetPages"
-                         label="노출 페이지 (쉼표로 구분)"
+                         label="남은 기간"
                      >
-                         <TextArea rows={2} placeholder="/, /dashboard, /products/*"/>
-                     </Form.Item>
-
-                     <Form.Item
-                         name="priority"
-                         label="우선순위 (높을수록 먼저 노출)"
-                         rules={[{ required: true, type: 'number', message: '숫자를 입력하세요.' }]}
-                     >
-                         <InputNumber min={0} style={{ width: 100 }} />
+                         {(() => {
+                            if (editingPopup?.displayRemainingTime) {
+                                let color = 'default';
+                                if (editingPopup.displayRemainingTime.startsWith('D-')) {
+                                    color = 'blue';
+                                } else if (editingPopup.displayRemainingTime.endsWith('분')) {
+                                    color = 'orange';
+                                }
+                                return <Tag color={color}>{editingPopup.displayRemainingTime}</Tag>;
+                            } else {
+                                // displayRemainingTime 값이 없는 경우, "종료" 표시
+                                return <Tag color="default">종료</Tag>;
+                            }
+                         })()}
                      </Form.Item>
 
                      <Form.Item name="status" label="활성 상태" valuePropName="checked">
@@ -427,8 +612,50 @@ const PopupExposureSettings = () => {
                      </Form.Item>
                  </Form>
              </Modal>
+
+             <Modal
+                 title={`미리보기: ${previewData?.name || ''}`}
+                 open={isPreviewModalVisible}
+                 onCancel={handlePreviewCancel}
+                 footer={null}
+                 width={400}
+             >
+                 {previewData && (
+                     <Space direction="vertical" style={{ width: '100%' }}>
+                         <Text><strong>콘텐츠 타입:</strong> {previewData.contentType === 'image' ? '이미지' : (previewData.contentType === 'template' ? '템플릿' : 'N/A')}</Text>
+                         {previewData.contentType === 'image' && previewData.imageUrl && (
+                             <div>
+                                 <Text strong>이미지:</Text><br/>
+                                 <img src={previewData.imageUrl} alt="팝업 이미지" style={{ maxWidth: '100%', maxHeight: '300px', marginTop: '8px' }} />
+                             </div>
+                         )}
+                         {previewData.contentType === 'template' && previewData.templateId && (
+                              <Text><strong>템플릿 ID:</strong> {previewData.templateId}</Text>
+                          )}
+                          {previewData.linkUrl && (
+                              <Text><strong>연결 URL:</strong> <a href={previewData.linkUrl} target="_blank" rel="noopener noreferrer">{previewData.linkUrl}</a></Text>
+                          )}
+                     </Space>
+                 )}
+             </Modal>
+
+             <Modal
+                 title="팝업 삭제 확인"
+                 open={isDeleteModalVisible}
+                 onOk={handleDeletePopup}
+                 onCancel={handleDeleteCancel}
+                 okText="삭제"
+                 cancelText="취소"
+                 okButtonProps={{ danger: true }}
+             >
+                 <p>
+                     정말로 '<strong>{deletingPopupInfo?.name}</strong>' (ID: {deletingPopupInfo?.id}) 팝업을
+                     '<strong>{deletingPopupInfo?.pageKey}</strong>' 페이지 그룹에서 삭제하시겠습니까?
+                 </p>
+                 <p style={{ color: 'red' }}>이 작업은 되돌릴 수 없습니다.</p>
+             </Modal>
         </Space>
     );
 };
 
-export default PopupExposureSettings; 
+export default PopupExposureSettings;

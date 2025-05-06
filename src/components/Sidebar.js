@@ -91,7 +91,6 @@ const menuItems = [
       { key: '/popups/create', path: '/popups/create', name: '팝업 생성', icon: <FormOutlined /> },
       { key: '/popups/templates', path: '/popups/templates', name: '템플릿 관리', icon: <FileTextOutlined /> },
       { key: '/popups/settings', path: '/popups/settings', name: '노출 설정', icon: <SettingOutlined /> },
-      { key: '/popups/analysis', path: '/popups/analysis', name: '팝업 분석', icon: <FundViewOutlined /> },
     ],
   },
   {
@@ -99,7 +98,6 @@ const menuItems = [
     name: '공지사항 관리',
     icon: <MessageOutlined />, // 아이콘 변경 가능
     subMenu: [
-      { key: '/notices/create', path: '/notices/create', name: '공지사항 작성', icon: <FormOutlined /> },
       { key: '/notices/manage', path: '/notices/manage', name: '게시 관리', icon: <OrderedListOutlined /> },
       { key: '/notices/categories', path: '/notices/categories', name: '카테고리 설정', icon: <AppstoreOutlined /> },
       { key: '/notices/history', path: '/notices/history', name: '노출 내역', icon: <HistoryOutlined /> },

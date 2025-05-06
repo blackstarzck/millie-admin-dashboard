@@ -38,10 +38,10 @@ const { Search } = Input;
 
 // --- Sample Data (Popups created via PopupCreate) ---
 const initialPopups = [
-    { key: 'pop1', id: 'P001', name: '여름맞이 특별 이벤트 팝업', type: 'image', status: true, startDate: '2024-07-20 00:00:00', endDate: '2024-08-31 23:59:59', frequency: 'daily', targetAudience: 'all', priority: 1 },
-    { key: 'pop2', id: 'P002', name: '신규 기능 안내 (템플릿)', type: 'template', status: true, startDate: '2024-07-25 10:00:00', endDate: '2024-08-10 23:59:59', frequency: 'once', targetAudience: 'loggedIn', priority: 5 },
-    { key: 'pop3', id: 'P003', name: '마케팅 수신 동의 팝업', type: 'template', status: false, startDate: '2024-06-01 00:00:00', endDate: '2024-12-31 23:59:59', frequency: 'session', targetAudience: 'loggedIn_non_marketing_agreed', priority: 10 }, // Example complex target
-    { key: 'pop4', id: 'P004', name: '서버 점검 안내', type: 'image', status: false, startDate: '2024-07-30 22:00:00', endDate: '2024-07-31 06:00:00', frequency: 'always', targetAudience: 'all', priority: 100 },
+    { key: 'pop1', id: 'P001', name: '여름맞이 특별 이벤트 팝업', type: 'image', status: true, startDate: '2024-07-20 00:00:00', endDate: '2024-08-31 23:59:59', frequency: 'daily', targetAudience: 'all', priority: 1, position: 'center' },
+    { key: 'pop2', id: 'P002', name: '신규 기능 안내 (템플릿)', type: 'template', status: true, startDate: '2024-07-25 10:00:00', endDate: '2024-08-10 23:59:59', frequency: 'once', targetAudience: 'loggedIn', priority: 5, position: 'top' },
+    { key: 'pop3', id: 'P003', name: '마케팅 수신 동의 팝업', type: 'template', status: false, startDate: '2024-06-01 00:00:00', endDate: '2024-12-31 23:59:59', frequency: 'session', targetAudience: 'loggedIn_non_marketing_agreed', priority: 10, position: 'bottom-right' },
+    { key: 'pop4', id: 'P004', name: '서버 점검 안내', type: 'image', status: false, startDate: '2024-07-30 22:00:00', endDate: '2024-07-31 06:00:00', frequency: 'always', targetAudience: 'all', priority: 100, position: 'center' },
 ];
 
 // --- Helper Functions ---
@@ -248,6 +248,17 @@ const PopupExposureSettings = () => {
             ),
              sorter: (a, b) => moment(a.startDate || 0).unix() - moment(b.startDate || 0).unix(),
         },
+        {
+            title: '노출 위치', dataIndex: 'position', key: 'position', width: 120,
+            render: (position) => {
+                switch(position) {
+                    case 'center': return '중앙';
+                    case 'top': return '상단';
+                    case 'bottom-right': return '우측 하단';
+                    default: return position || '-';
+                }
+            }
+        },
         { title: '노출 대상', dataIndex: 'targetAudience', key: 'targetAudience', width: 150, render: formatTargetAudience }, // Simplify display
         { title: '우선순위', dataIndex: 'priority', key: 'priority', width: 100, align: 'right', sorter: (a,b)=> (a.priority || 0) - (b.priority || 0) },
         {
@@ -353,6 +364,18 @@ const PopupExposureSettings = () => {
                                  <Option value="once"><StopOutlined /> 다시 보지 않음</Option>
                                  <Option value="session"><ClockCircleOutlined /> 세션 당 한 번</Option>
                                  <Option value="always"><WarningOutlined /> 매번 (주의)</Option>
+                             </Select>
+                         </Form.Item>
+
+                        <Form.Item
+                             name="position"
+                             label="노출 위치"
+                             rules={[{ required: true, message: '팝업이 표시될 위치를 선택해주세요!' }]}
+                         >
+                             <Select placeholder="노출 위치 선택">
+                                 <Option value="center">중앙</Option>
+                                 <Option value="top">상단</Option>
+                                 <Option value="bottom-right">우측 하단</Option>
                              </Select>
                          </Form.Item>
 

@@ -69,6 +69,7 @@ const PopupCreation = () => {
 
         const formData = { ...values };
         formData.contentType = contentType;
+        formData.status = true; // Always set status to active
 
         // Handle date range
         if (values.exposurePeriod) {
@@ -329,16 +330,15 @@ const PopupCreation = () => {
                         </Col>
                     </Row>
 
-                    <Row gutter={16}>
-                         {/* Removed Col containing '대상 설정' */}
-                         {/* <Col xs={24} sm={12}> ... </Col> */}
-                         {/* Remove the Col containing '상태' */}
-                         {/* <Col xs={24} sm={12}>
-                             <Form.Item name="status" label="상태" valuePropName="checked">
-                                 <Switch checkedChildren="활성" unCheckedChildren="비활성" defaultChecked />
-                             </Form.Item>
-                         </Col> */}
-                     </Row>
+                    {/* Add field for initial priority */}
+                    <Form.Item
+                        name="priority"
+                        label="페이지 내 초기 우선순위"
+                        tooltip="팝업이 속한 페이지 내에서의 초기 순서입니다. 숫자가 낮을수록 먼저 노출되며, 추후 노출 설정 화면에서 조정 가능합니다."
+                        rules={[{ required: true, type: 'number', min: 1, message: '1 이상의 숫자를 입력해주세요.' }]}
+                    >
+                        <InputNumber min={1} style={{ width: 120 }} placeholder="예: 1"/>
+                    </Form.Item>
 
                     {/* Add fields for priority, device type targeting, page targeting if needed */}
 
