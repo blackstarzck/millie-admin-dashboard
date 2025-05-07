@@ -108,8 +108,7 @@ const menuItems = [
     icon: <CalendarOutlined />,
     subMenu: [
       { key: '/events/register', path: '/events/register', name: '이벤트 등록', icon: <FormOutlined /> },
-      { key: '/events/status', path: '/events/status', name: '이벤트 상태', icon: <CheckSquareOutlined /> },
-      { key: '/events/analysis', path: '/events/analysis', name: '이벤트 분석', icon: <FundViewOutlined /> },
+      { key: '/events/status', path: '/events/status', name: '이벤트 상태', icon: <CheckSquareOutlined /> }
     ],
   },
   {

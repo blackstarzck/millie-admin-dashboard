@@ -23,7 +23,6 @@ import TargetGroupManagement from './pages/NotificationManagement/TargetGroupMan
 import PopupCreation from './pages/PopupManagement/PopupCreation';
 import PopupTemplateManagement from './pages/PopupManagement/TemplateManagement';
 import PopupExposureSettings from './pages/PopupManagement/ExposureSettings';
-import EventAnalysis from './pages/EventManagement/EventAnalysis';
 import InquiryLookup from './pages/InquiryManagement/InquiryLookup';
 import InquiryFiltering from './pages/InquiryManagement/InquiryFiltering';
 import FaqManagement from './pages/InquiryManagement/FaqManagement';
@@ -94,7 +93,6 @@ function App() {
               {/* 이벤트 관리 */}
               <Route path="events/register" element={<EventRegistration />} />
               <Route path="events/status" element={<EventStatus />} />
-              <Route path="events/analysis" element={<EventAnalysis />} />
 
               {/* 문의사항 관리 */}
               <Route path="inquiries/list" element={<InquiryLookup />} />
