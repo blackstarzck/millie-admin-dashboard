@@ -22,7 +22,7 @@ import {
   Collapse,
   ColorPicker,
   Image,
-  Radio
+  Radio,
 } from "antd";
 import {
   CalendarOutlined,
@@ -37,7 +37,7 @@ import {
   DeleteOutlined,
   AppstoreAddOutlined,
   ProfileOutlined,
-  InfoCircleOutlined
+  InfoCircleOutlined,
 } from "@ant-design/icons";
 import { DndProvider, useDrag, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
@@ -176,7 +176,13 @@ const TemplateSelector = ({ onSelect, onPreview }) => {
   );
 };
 
-const TemplateInputArea = ({ template, index, moveTemplate, onRemove, formInstance }) => {
+const TemplateInputArea = ({
+  template,
+  index,
+  moveTemplate,
+  onRemove,
+  formInstance,
+}) => {
   const [{ isDragging }, drag] = useDrag({
     type: "TEMPLATE",
     item: { index },
@@ -195,7 +201,10 @@ const TemplateInputArea = ({ template, index, moveTemplate, onRemove, formInstan
     },
   });
 
-  const isClickable = Form.useWatch(["templates", index, "isClickable"], formInstance);
+  const isClickable = Form.useWatch(
+    ["templates", index, "isClickable"],
+    formInstance
+  );
 
   // template 객체는 selectedTemplates 배열의 요소이므로 displayId를 가지고 있어야 함
   const headerTitle = `[${template.displayId || template.id}] ${template.name}`;
@@ -269,14 +278,14 @@ const TemplateInputArea = ({ template, index, moveTemplate, onRemove, formInstan
                 name={["templates", index, "clickThroughUrl"]}
                 label="연결 URL"
                 rules={[
-                  { 
-                    required: true, 
-                    message: "연결 URL을 입력해주세요." 
+                  {
+                    required: true,
+                    message: "연결 URL을 입력해주세요.",
                   },
-                  { 
-                    type: 'url', 
-                    message: '유효한 URL 형식이 아닙니다.'
-                  }
+                  {
+                    type: "url",
+                    message: "유효한 URL 형식이 아닙니다.",
+                  },
                 ]}
               >
                 <Input placeholder="https://example.com/target-page" />
@@ -326,8 +335,8 @@ const getBase64 = (file) =>
     reader.onerror = (error) => reject(error);
   });
 
-const EVENT_TYPE_INTERNAL = 'internal';
-const EVENT_TYPE_EXTERNAL = 'external';
+const EVENT_TYPE_INTERNAL = "internal";
+const EVENT_TYPE_EXTERNAL = "external";
 
 const EventRegistration = () => {
   const [form] = Form.useForm();
@@ -338,7 +347,7 @@ const EventRegistration = () => {
   const [eventPreviewVisible, setEventPreviewVisible] = useState(false);
   const [thumbnailFileList, setThumbnailFileList] = useState([]);
   const [thumbnailPreviewOpen, setThumbnailPreviewOpen] = useState(false);
-  const [thumbnailPreviewImage, setThumbnailPreviewImage] = useState('');
+  const [thumbnailPreviewImage, setThumbnailPreviewImage] = useState("");
   const [eventType, setEventType] = useState(EVENT_TYPE_INTERNAL);
 
   // Sample data for target audience (replace with actual data/API)
@@ -354,60 +363,67 @@ const EventRegistration = () => {
     message.loading({ content: "이벤트 등록 중...", key: "eventCreate" });
 
     const commonData = {
-        title: eventType === EVENT_TYPE_INTERNAL ? values.title1 : values.eventTitleExternal, 
-        description: values.eventDescription,
-        eventPeriod: values.eventPeriod,
-        ogType: eventType === EVENT_TYPE_INTERNAL ? values.ogType : 'website',
-        metaKeywords: eventType === EVENT_TYPE_INTERNAL ? values.metaKeywords : undefined,
-        eventId: `event_${Date.now()}`,
+      title:
+        eventType === EVENT_TYPE_INTERNAL
+          ? values.title1
+          : values.eventTitleExternal,
+      description: values.eventDescription,
+      eventPeriod: values.eventPeriod,
+      ogType: eventType === EVENT_TYPE_INTERNAL ? values.ogType : "website",
+      metaKeywords:
+        eventType === EVENT_TYPE_INTERNAL ? values.metaKeywords : undefined,
+      eventId: `event_${Date.now()}`,
     };
-    
+
     if (values.eventPeriod) {
-        commonData.startDate = values.eventPeriod[0].toISOString();
-        commonData.endDate = values.eventPeriod[1].toISOString();
+      commonData.startDate = values.eventPeriod[0].toISOString();
+      commonData.endDate = values.eventPeriod[1].toISOString();
     }
     delete commonData.eventPeriod;
 
     let eventSpecificData = {};
     if (eventType === EVENT_TYPE_INTERNAL) {
-        const processedTemplates = values.templates?.map((tplData, index) => {
-            const originalTemplate = selectedTemplates[index];
-            return {
-                id: originalTemplate.id,
-                displayId: originalTemplate.displayId,
-                name: originalTemplate.name,
-                backgroundColor: tplData.backgroundColor,
-                isClickable: tplData.isClickable || false,
-                clickThroughUrl: tplData.isClickable ? tplData.clickThroughUrl : undefined,
-                data: tplData.data, 
-            };
+      const processedTemplates =
+        values.templates?.map((tplData, index) => {
+          const originalTemplate = selectedTemplates[index];
+          return {
+            id: originalTemplate.id,
+            displayId: originalTemplate.displayId,
+            name: originalTemplate.name,
+            backgroundColor: tplData.backgroundColor,
+            isClickable: tplData.isClickable || false,
+            clickThroughUrl: tplData.isClickable
+              ? tplData.clickThroughUrl
+              : undefined,
+            data: tplData.data,
+          };
         }) || [];
 
-        eventSpecificData = {
-            type: EVENT_TYPE_INTERNAL,
-            title1: values.title1,
-            title2: values.title2,
-            title3: values.title3,
-            slug: values.slug,
-            templates: processedTemplates,
-            seoTitle: values.seoTitle,
-            ogTitle: values.ogTitle,
-            ogDescription: values.ogDescription,
-            ogImageUrl: values.ogImageUrl,
-            ogUrl: values.ogUrl,
-        };
+      eventSpecificData = {
+        type: EVENT_TYPE_INTERNAL,
+        title1: values.title1,
+        title2: values.title2,
+        title3: values.title3,
+        slug: values.slug,
+        templates: processedTemplates,
+        seoTitle: values.seoTitle,
+        ogTitle: values.ogTitle,
+        ogDescription: values.ogDescription,
+        ogImageUrl: values.ogImageUrl,
+        ogUrl: values.ogUrl,
+      };
     } else if (eventType === EVENT_TYPE_EXTERNAL) {
-        eventSpecificData = {
-            type: EVENT_TYPE_EXTERNAL,
-            externalUrl: values.externalUrl,
-            ogTitle: values.ogTitle,
-            ogDescription: values.ogDescription,
-            ogImageUrl: values.ogImageUrl,
-        };
+      eventSpecificData = {
+        type: EVENT_TYPE_EXTERNAL,
+        externalUrl: values.externalUrl,
+        ogTitle: values.ogTitle,
+        ogDescription: values.ogDescription,
+        ogImageUrl: values.ogImageUrl,
+      };
     }
 
     const formData = { ...commonData, ...eventSpecificData };
-    
+
     console.log("Final Event Form Data:", formData);
 
     try {
@@ -442,8 +458,8 @@ const EventRegistration = () => {
         name: template.name,
         fields: template.fields,
         isClickable: false,
-        clickThroughUrl: '',
-        backgroundColor: '#ffffff',
+        clickThroughUrl: "",
+        backgroundColor: "#ffffff",
         data: template.fields.reduce(
           (acc, field) => ({ ...acc, [field.name]: "" }),
           {}
@@ -515,7 +531,7 @@ const EventRegistration = () => {
         previewTemplate.fields.reduce(
           (acc, field) => ({
             ...acc,
-            [field.name]: field.name, 
+            [field.name]: field.name,
           }),
           {}
         )
@@ -528,57 +544,84 @@ const EventRegistration = () => {
 
   const renderEventPreview = () => {
     const formValues = form.getFieldsValue();
-    const previewTitle = eventType === EVENT_TYPE_INTERNAL 
-                         ? (formValues.title1 || '이벤트 제목') 
-                         : (formValues.eventTitleExternal || '외부 이벤트');
-    const previewDescription = formValues.eventDescription || '이벤트 설명이 여기에 표시됩니다.';
+    const previewTitle =
+      eventType === EVENT_TYPE_INTERNAL
+        ? formValues.title1 || "이벤트 제목"
+        : formValues.eventTitleExternal || "외부 이벤트";
+    const previewDescription =
+      formValues.eventDescription || "이벤트 설명이 여기에 표시됩니다.";
 
     return (
       <div style={{ padding: "20px" }}>
         <h1>{previewTitle}</h1>
-        <p style={{ color: '#555', marginBottom: '20px' }}>{previewDescription}</p>
-        {eventType === EVENT_TYPE_INTERNAL && selectedTemplates.map((template, index) => {
-          const templateType = Object.values(TEMPLATE_TYPES).find(
-            (t) => t.id === template.id
-          );
-          if (!templateType) return null;
-          const templateData = formValues.templates?.[index]?.data || {};
-          const isClickable = formValues.templates?.[index]?.isClickable || false;
-          const clickThroughUrl = formValues.templates?.[index]?.clickThroughUrl;
-          let previewContent = templateType.preview(templateData);
-          if (isClickable && clickThroughUrl) {
-            previewContent = (
-              <a
-                href={clickThroughUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={(e) => e.preventDefault()}
+        <p style={{ color: "#555", marginBottom: "20px" }}>
+          {previewDescription}
+        </p>
+        {eventType === EVENT_TYPE_INTERNAL &&
+          selectedTemplates.map((template, index) => {
+            const templateType = Object.values(TEMPLATE_TYPES).find(
+              (t) => t.id === template.id
+            );
+            if (!templateType) return null;
+            const templateData = formValues.templates?.[index]?.data || {};
+            const isClickable =
+              formValues.templates?.[index]?.isClickable || false;
+            const clickThroughUrl =
+              formValues.templates?.[index]?.clickThroughUrl;
+            let previewContent = templateType.preview(templateData);
+            if (isClickable && clickThroughUrl) {
+              previewContent = (
+                <a
+                  href={clickThroughUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(e) => e.preventDefault()}
+                  style={{
+                    display: "block",
+                    border: "2px dashed blue",
+                    padding: "5px",
+                    textDecoration: "none",
+                  }}
+                  title={`클릭 시 ${clickThroughUrl}로 이동 (미리보기에서는 이동 안 함)`}
+                >
+                  {previewContent}
+                  <div
+                    style={{
+                      textAlign: "center",
+                      color: "blue",
+                      fontSize: "0.9em",
+                      marginTop: "5px",
+                    }}
+                  >
+                    (클릭 가능 영역: {clickThroughUrl})
+                  </div>
+                </a>
+              );
+            }
+            return (
+              <div
+                key={index}
                 style={{
-                  display: 'block',
-                  border: '2px dashed blue',
-                  padding: '5px',
-                  textDecoration: 'none'
+                  marginBottom: "40px",
+                  backgroundColor:
+                    formValues.templates?.[index]?.backgroundColor || "#ffffff",
                 }}
-                title={`클릭 시 ${clickThroughUrl}로 이동 (미리보기에서는 이동 안 함)`}
               >
                 {previewContent}
-                <div style={{ textAlign: 'center', color: 'blue', fontSize: '0.9em', marginTop: '5px' }}>
-                  (클릭 가능 영역: {clickThroughUrl})
-                </div>
-              </a>
+              </div>
             );
-          }
-          return (
-            <div key={index} style={{ marginBottom: "40px", backgroundColor: formValues.templates?.[index]?.backgroundColor || '#ffffff' }}>
-              {previewContent}
-            </div>
-          );
-        })}
+          })}
         {eventType === EVENT_TYPE_EXTERNAL && formValues.externalUrl && (
-            <iframe src={formValues.externalUrl} width="100%" height="600px" title="External Page Preview" style={{border: '1px solid #eee'}}/>
+          <iframe
+            src={formValues.externalUrl}
+            width="100%"
+            height="600px"
+            title="External Page Preview"
+            style={{ border: "1px solid #eee" }}
+          />
         )}
         {eventType === EVENT_TYPE_EXTERNAL && !formValues.externalUrl && (
-            <p>미리보기를 위해 외부 페이지 URL을 입력해주세요.</p>
+          <p>미리보기를 위해 외부 페이지 URL을 입력해주세요.</p>
         )}
       </div>
     );
@@ -604,7 +647,7 @@ const EventRegistration = () => {
   const handleThumbnailCancel = () => setThumbnailPreviewOpen(false);
 
   const uploadButton = (
-    <button style={{ border: 0, background: 'none' }} type="button">
+    <button style={{ border: 0, background: "none" }} type="button">
       <UploadOutlined />
       <div style={{ marginTop: 8 }}>썸네일 업로드</div>
     </button>
@@ -614,10 +657,21 @@ const EventRegistration = () => {
     const newType = e.target.value;
     setEventType(newType);
     const fieldsToReset = [
-        'slug', 'externalUrl', 
-        'title1', 'title2', 'title3', 'eventTitleExternal',
-        'eventDescription',
-        'seoTitle', 'ogTitle', 'ogDescription', 'ogImageUrl', 'ogUrl', 'metaKeywords', 'ogType', 'templates'
+      "slug",
+      "externalUrl",
+      "title1",
+      "title2",
+      "title3",
+      "eventTitleExternal",
+      "eventDescription",
+      "seoTitle",
+      "ogTitle",
+      "ogDescription",
+      "ogImageUrl",
+      "ogUrl",
+      "metaKeywords",
+      "ogType",
+      "templates",
     ];
     form.resetFields(fieldsToReset);
     setSelectedTemplates([]);
@@ -641,10 +695,14 @@ const EventRegistration = () => {
             templates: [],
             ogType: "website",
             eventType: EVENT_TYPE_INTERNAL,
-            eventDescription: ''
+            eventDescription: "",
           }}
         >
-          <Form.Item name="eventType" label="이벤트 유형" rules={[{ required: true }]}>
+          <Form.Item
+            name="eventType"
+            label="이벤트 유형"
+            rules={[{ required: true }]}
+          >
             <Radio.Group onChange={handleEventTypeChange} value={eventType}>
               <Radio.Button value={EVENT_TYPE_INTERNAL}>
                 <ProfileOutlined /> 일반 이벤트 (콘텐츠 직접 구성)
@@ -661,55 +719,159 @@ const EventRegistration = () => {
               <Col xs={24} md={12}>
                 {eventType === EVENT_TYPE_INTERNAL ? (
                   <>
-                    <Form.Item name="title1" label="이벤트명" rules={[{ required: true, message: "대표 이벤트명을 입력해주세요." }]}><Input placeholder="예: 여름맞이 특별 할인 (대표 이벤트명)" /></Form.Item>
-                    <Form.Item name="eventDescription"  rules={[{ required: true, message: "이벤트에 대한 설명을 입력해주세요." }]} label="이벤트 설명" >
-                        <TextArea rows={3} placeholder="이벤트에 대한 간단한 설명을 입력하세요." />
+                    <Form.Item
+                      name="title1"
+                      label="이벤트명"
+                      rules={[
+                        {
+                          required: true,
+                          message: "대표 이벤트명을 입력해주세요.",
+                        },
+                      ]}
+                    >
+                      <Input placeholder="예: 여름맞이 특별 할인 (대표 이벤트명)" />
                     </Form.Item>
-                    <Form.Item name="eventPeriod" label={<><CalendarOutlined /> 이벤트 기간</>} rules={[{ required: true, message: "이벤트 기간을 선택해주세요." }]}>
-                      <RangePicker showTime format="YYYY-MM-DD HH:mm" style={{ width: "100%" }} />
+                    <Form.Item
+                      name="eventDescription"
+                      rules={[
+                        {
+                          required: true,
+                          message: "이벤트에 대한 설명을 입력해주세요.",
+                        },
+                      ]}
+                      label="이벤트 설명"
+                    >
+                      <TextArea
+                        rows={3}
+                        placeholder="이벤트에 대한 간단한 설명을 입력하세요."
+                      />
                     </Form.Item>
-                    <Form.Item name="title2" label="제목1 (내부용)" rules={[{ required: true, message: "제목2를 입력해주세요." }]}><Input placeholder="예: 특별 할인" /></Form.Item>
-                    <Form.Item name="title3" label="제목2 (내부용)" rules={[{ required: true, message: "제목3을 입력해주세요." }]}><Input placeholder="예: 이벤트" /></Form.Item>
+                    <Form.Item
+                      name="eventPeriod"
+                      label={
+                        <>
+                          <CalendarOutlined /> 이벤트 기간
+                        </>
+                      }
+                      rules={[
+                        {
+                          required: true,
+                          message: "이벤트 기간을 선택해주세요.",
+                        },
+                      ]}
+                    >
+                      <RangePicker
+                        showTime
+                        format="YYYY-MM-DD HH:mm"
+                        style={{ width: "100%" }}
+                      />
+                    </Form.Item>
+                    <Form.Item
+                      name="title2"
+                      label="제목1 (내부용)"
+                      rules={[
+                        { required: true, message: "제목2를 입력해주세요." },
+                      ]}
+                    >
+                      <Input placeholder="예: 특별 할인" />
+                    </Form.Item>
+                    <Form.Item
+                      name="title3"
+                      label="제목2 (내부용)"
+                      rules={[
+                        { required: true, message: "제목3을 입력해주세요." },
+                      ]}
+                    >
+                      <Input placeholder="예: 이벤트" />
+                    </Form.Item>
                   </>
                 ) : (
-                    <>
-                      <Form.Item name="eventTitleExternal" label="이벤트명" rules={[{ required: true, message: "이벤트명을 입력해주세요." }]}>
-                        <Input placeholder="예: 밀리의 서재 X 현대카드 특별 제휴" />
-                      </Form.Item>
-                      <Form.Item name="eventDescription"  rules={[{ required: true, message: "이벤트에 대한 설명을 입력해주세요." }]} label="이벤트 설명" >
-                        <TextArea rows={3} placeholder="이벤트에 대한 간단한 설명을 입력하세요." />
-                      </Form.Item>
-                      <Form.Item name="eventPeriod" label={<><CalendarOutlined /> 이벤트 기간</>} rules={[{ required: true, message: "이벤트 기간을 선택해주세요." }]}>
-                        <RangePicker showTime format="YYYY-MM-DD HH:mm" style={{ width: "100%" }} />
-                      </Form.Item>
-                      <Form.Item 
-                        name="externalUrl" 
-                        label="연결할 외부 페이지 URL" 
-                        rules={[
-                          { required: true, message: "연결할 외부 페이지 URL을 입력해주세요." },
-                          { type: 'url', message: "유효한 URL 형식이어야 합니다."}
-                        ]}
-                      >
-                        <Input placeholder="https://www.example.com/your-target-page" />
-                      </Form.Item>
-                    </>
+                  <>
+                    <Form.Item
+                      name="eventTitleExternal"
+                      label="이벤트명"
+                      rules={[
+                        { required: true, message: "이벤트명을 입력해주세요." },
+                      ]}
+                    >
+                      <Input placeholder="예: 밀리의 서재 X 현대카드 특별 제휴" />
+                    </Form.Item>
+                    <Form.Item
+                      name="eventDescription"
+                      rules={[
+                        {
+                          required: true,
+                          message: "이벤트에 대한 설명을 입력해주세요.",
+                        },
+                      ]}
+                      label="이벤트 설명"
+                    >
+                      <TextArea
+                        rows={3}
+                        placeholder="이벤트에 대한 간단한 설명을 입력하세요."
+                      />
+                    </Form.Item>
+                    <Form.Item
+                      name="eventPeriod"
+                      label={
+                        <>
+                          <CalendarOutlined /> 이벤트 기간
+                        </>
+                      }
+                      rules={[
+                        {
+                          required: true,
+                          message: "이벤트 기간을 선택해주세요.",
+                        },
+                      ]}
+                    >
+                      <RangePicker
+                        showTime
+                        format="YYYY-MM-DD HH:mm"
+                        style={{ width: "100%" }}
+                      />
+                    </Form.Item>
+                    <Form.Item
+                      name="externalUrl"
+                      label="연결할 외부 페이지 URL"
+                      rules={[
+                        {
+                          required: true,
+                          message: "연결할 외부 페이지 URL을 입력해주세요.",
+                        },
+                        {
+                          type: "url",
+                          message: "유효한 URL 형식이어야 합니다.",
+                        },
+                      ]}
+                    >
+                      <Input placeholder="https://www.example.com/your-target-page" />
+                    </Form.Item>
+                  </>
                 )}
               </Col>
               <Col xs={24} md={12}>
                 <Form.Item
                   name="thumbnail"
                   label="썸네일 이미지"
-                  rules={[{ required: true, message: "썸네일 이미지를 등록해주세요." }]}
+                  rules={[
+                    {
+                      required: true,
+                      message: "썸네일 이미지를 등록해주세요.",
+                    },
+                  ]}
                 >
-                   <div style={{
-                    width: '100%',
-                    minHeight: '300px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    border: '1px dashed #d9d9d9',
-                    borderRadius: '8px'
-                  }}>
+                  <div
+                    style={{
+                      width: "100%",
+                      minHeight: "300px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      border: "1px dashed #d9d9d9",
+                      borderRadius: "8px",
+                    }}
+                  >
                     <Upload
                       action="https://660d2bd96ddfa2943b33731c.mockapi.io/api/upload"
                       listType="picture-card"
@@ -724,11 +886,13 @@ const EventRegistration = () => {
                 </Form.Item>
                 {thumbnailPreviewImage && (
                   <Image
-                    wrapperStyle={{ display: 'none' }}
+                    wrapperStyle={{ display: "none" }}
                     preview={{
                       visible: thumbnailPreviewOpen,
-                      onVisibleChange: (visible) => setThumbnailPreviewOpen(visible),
-                      afterOpenChange: (visible) => !visible && setThumbnailPreviewImage(''),
+                      onVisibleChange: (visible) =>
+                        setThumbnailPreviewOpen(visible),
+                      afterOpenChange: (visible) =>
+                        !visible && setThumbnailPreviewImage(""),
                     }}
                     src={thumbnailPreviewImage}
                   />
@@ -740,50 +904,77 @@ const EventRegistration = () => {
           {/* --- SEO 및 공유 설정 Card (내부 이벤트 유형일 때만 표시) --- */}
           {eventType === EVENT_TYPE_INTERNAL && (
             <Card title="SEO 및 공유 설정" style={{ marginBottom: 24 }}>
-                <Row gutter={16}>
-                    <Col xs={24} sm={12}>
-                        <Form.Item name="seoTitle" label="페이지 제목 (탭/검색결과용)" tooltip="브라우저 탭이나 검색 결과에 표시될 제목입니다.">
-                        <Input placeholder="예: 썸머 특가 이벤트 | YourBrand" />
-                        </Form.Item>
-                    </Col>
-                    <Col xs={24} sm={12}>
-                        <Form.Item name="ogTitle" label="공유 제목 (OG:Title)" tooltip="SNS, 메신저에 공유될 때 표시될 제목입니다.">
-                        <Input placeholder="예: 놓치지 마세요! 썸머 특가 이벤트 진행 중" />
-                        </Form.Item>
-                    </Col>
-                </Row>
-                <Form.Item name="ogDescription" label="공유/검색 설명 (OG/Meta Description)" tooltip="SNS 공유 및 검색 결과에 표시될 상세 설명입니다.">
-                    <TextArea rows={3} placeholder="최대 2줄 분량의 이벤트 요약 설명을 입력하세요." />
-                </Form.Item>
-                <Row gutter={16}>
-                    <Col xs={24} sm={12}>
-                        <Form.Item name="ogImageUrl" label="공유 이미지 URL (OG:Image)" tooltip="SNS 공유 시 표시될 대표 이미지 URL입니다. 입력하지 않으면 썸네일이 사용될 수 있습니다.">
-                        <Input placeholder="https://yourdomain.com/path/to/og-image.jpg" />
-                        </Form.Item>
-                    </Col>
-                    <Col xs={24} sm={12}>
-                        <Form.Item name="ogUrl" label="대표 URL (OG:Url)" tooltip="이벤트 페이지의 대표(canonical) URL입니다.">
-                        <Input placeholder="https://yourdomain.com/event/your-event-slug" />
-                        </Form.Item>
-                    </Col>
-                </Row>
-                <Row gutter={16}>
-                    <Col xs={24} sm={12}>
-                        <Form.Item name="ogType" label="콘텐츠 타입 (OG:Type)">
-                        <Select defaultValue="website">
-                            <Option value="website">website</Option>
-                            <Option value="article">article</Option>
-                            <Option value="event">event</Option>
-                            <Option value="product">product</Option>
-                        </Select>
-                        </Form.Item>
-                    </Col>
-                    <Col xs={24} sm={12}>
-                        <Form.Item name="metaKeywords" label="메타 키워드 (쉼표로 구분)" tooltip="검색엔진 참조용 키워드입니다. (선택 사항)">
-                        <Input placeholder="예: 이벤트, 할인, 여름, 프로모션" />
-                        </Form.Item>
-                    </Col>
-                </Row>
+              <Row gutter={16}>
+                <Col xs={24} sm={12}>
+                  <Form.Item
+                    name="seoTitle"
+                    label="페이지 제목 (탭/검색결과용)"
+                    tooltip="브라우저 탭이나 검색 결과에 표시될 제목입니다. HTML <title> 태그에 들어갑니다."
+                  >
+                    <Input placeholder="예: 썸머 특가 이벤트 | YourBrand" />
+                  </Form.Item>
+                </Col>
+                <Col xs={24} sm={12}>
+                  <Form.Item
+                    name="ogTitle"
+                    label="공유 제목 (OG:Title)"
+                    tooltip="SNS, 메신저에 공유될 때 표시될 제목입니다."
+                  >
+                    <Input placeholder="예: 놓치지 마세요! 썸머 특가 이벤트 진행 중" />
+                  </Form.Item>
+                </Col>
+              </Row>
+              <Form.Item
+                name="ogDescription"
+                label="공유/검색 설명 (OG/Meta Description)"
+                tooltip="SNS 공유 및 검색 결과에 표시될 상세 설명입니다."
+              >
+                <TextArea
+                  rows={3}
+                  placeholder="최대 2줄 분량의 이벤트 요약 설명을 입력하세요."
+                />
+              </Form.Item>
+              <Row gutter={16}>
+                <Col xs={24} sm={12}>
+                  <Form.Item
+                    name="ogImageUrl"
+                    label="공유 이미지 URL (OG:Image)"
+                    tooltip="SNS 공유 시 표시될 대표 이미지 URL입니다. 입력하지 않으면 썸네일이 사용될 수 있습니다."
+                  >
+                    <Input placeholder="https://yourdomain.com/path/to/og-image.jpg" />
+                  </Form.Item>
+                </Col>
+                <Col xs={24} sm={12}>
+                  <Form.Item
+                    name="ogUrl"
+                    label="대표 URL (OG:Url)"
+                    tooltip="이벤트 페이지의 대표(canonical) URL입니다."
+                  >
+                    <Input placeholder="https://yourdomain.com/event/your-event-slug" />
+                  </Form.Item>
+                </Col>
+              </Row>
+              <Row gutter={16}>
+                <Col xs={24} sm={12}>
+                  <Form.Item name="ogType" label="콘텐츠 타입 (OG:Type)">
+                    <Select defaultValue="website">
+                      <Option value="website">website</Option>
+                      <Option value="article">article</Option>
+                      <Option value="event">event</Option>
+                      <Option value="product">product</Option>
+                    </Select>
+                  </Form.Item>
+                </Col>
+                <Col xs={24} sm={12}>
+                  <Form.Item
+                    name="metaKeywords"
+                    label="메타 키워드 (쉼표로 구분)"
+                    tooltip="검색엔진 참조용 키워드입니다. HTML <meta name='keywords'> 태그에 들어갑니다. (선택 사항)"
+                  >
+                    <Input placeholder="예: 이벤트, 할인, 여름, 프로모션" />
+                  </Form.Item>
+                </Col>
+              </Row>
             </Card>
           )}
 
@@ -792,31 +983,44 @@ const EventRegistration = () => {
             <Card title="이벤트 콘텐츠 구성" style={{ marginBottom: 24 }}>
               <Row gutter={16}>
                 <Col span={12}>
-                  <Card 
-                    title="템플릿 목록" 
-                    size="small" 
-                    bodyStyle={{ 
-                      height: '400px',
-                      overflowY: 'auto',
-                      padding: '8px'
+                  <Card
+                    title="템플릿 목록"
+                    size="small"
+                    bodyStyle={{
+                      height: "400px",
+                      overflowY: "auto",
+                      padding: "8px",
                     }}
                   >
-                    <TemplateSelector onSelect={handleTemplateAdd} onPreview={showPreview} />
+                    <TemplateSelector
+                      onSelect={handleTemplateAdd}
+                      onPreview={showPreview}
+                    />
                   </Card>
                 </Col>
                 <Col span={12}>
-                  <Card 
-                    title="페이지 콘텐츠 구성" 
-                    size="small" 
-                    bodyStyle={{ 
-                      height: '450px',
-                      overflowY: 'auto',
-                      padding: '8px'
+                  <Card
+                    title="페이지 콘텐츠 구성"
+                    size="small"
+                    bodyStyle={{
+                      height: "450px",
+                      overflowY: "auto",
+                      padding: "8px",
                     }}
                   >
                     {selectedTemplates.length === 0 ? (
-                      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-                        <Empty description="템플릿을 선택해주세요" image={Empty.PRESENTED_IMAGE_SIMPLE} />
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          height: "100%",
+                        }}
+                      >
+                        <Empty
+                          description="템플릿을 선택해주세요"
+                          image={Empty.PRESENTED_IMAGE_SIMPLE}
+                        />
                       </div>
                     ) : (
                       selectedTemplates.map((template, index) => (
@@ -839,20 +1043,45 @@ const EventRegistration = () => {
           {/* --- 폼 제출 버튼 --- */}
           <Form.Item>
             <Space>
-              <Button type="default" icon={<EyeOutlined />} onClick={showEventPreview} disabled={eventType === EVENT_TYPE_INTERNAL && selectedTemplates.length === 0}>
+              <Button
+                type="default"
+                icon={<EyeOutlined />}
+                onClick={showEventPreview}
+                disabled={
+                  eventType === EVENT_TYPE_INTERNAL &&
+                  selectedTemplates.length === 0
+                }
+              >
                 이벤트 미리보기
               </Button>
-              <Button type="primary" htmlType="submit" icon={<SendOutlined />} loading={loading}>
+              <Button
+                type="primary"
+                htmlType="submit"
+                icon={<SendOutlined />}
+                loading={loading}
+              >
                 이벤트 등록
               </Button>
             </Space>
           </Form.Item>
         </Form>
 
-        <Modal title="템플릿 미리보기" open={previewVisible} onCancel={() => setPreviewVisible(false)} footer={null} width={800}>
+        <Modal
+          title="템플릿 미리보기"
+          open={previewVisible}
+          onCancel={() => setPreviewVisible(false)}
+          footer={null}
+          width={800}
+        >
           {renderTemplatePreview()}
         </Modal>
-        <Modal title="이벤트 미리보기" open={eventPreviewVisible} onCancel={() => setEventPreviewVisible(false)} footer={null} width={1000}>
+        <Modal
+          title="이벤트 미리보기"
+          open={eventPreviewVisible}
+          onCancel={() => setEventPreviewVisible(false)}
+          footer={null}
+          width={1000}
+        >
           {renderEventPreview()}
         </Modal>
       </Space>
