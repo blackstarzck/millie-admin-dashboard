@@ -99,7 +99,6 @@ const menuItems = [
     icon: <MessageOutlined />, // 아이콘 변경 가능
     subMenu: [
       { key: '/notices/manage', path: '/notices/manage', name: '게시 관리', icon: <OrderedListOutlined /> },
-      { key: '/notices/categories', path: '/notices/categories', name: '카테고리 설정', icon: <AppstoreOutlined /> },
       { key: '/notices/history', path: '/notices/history', name: '노출 내역', icon: <HistoryOutlined /> },
     ],
   },
@@ -109,7 +108,6 @@ const menuItems = [
     icon: <CalendarOutlined />,
     subMenu: [
       { key: '/events/register', path: '/events/register', name: '이벤트 등록', icon: <FormOutlined /> },
-      { key: '/events/url', path: '/events/url', name: 'URL 생성', icon: <LinkOutlined /> },
       { key: '/events/status', path: '/events/status', name: '이벤트 상태', icon: <CheckSquareOutlined /> },
       { key: '/events/analysis', path: '/events/analysis', name: '이벤트 분석', icon: <FundViewOutlined /> },
     ],

@@ -40,11 +40,9 @@ import ServicePolicy from './pages/SystemSettings/ServicePolicy';
 import PartnerAccount from './pages/PartnerManagement/PartnerAccount';
 import SettlementManagement from './pages/PartnerManagement/SettlementManagement';
 import InquiryManagementPartner from './pages/PartnerManagement/InquiryManagementPartner';
-import CategorySettings from './pages/NoticeManagement/CategorySettings';
 import NoticeHistory from './pages/NoticeManagement/NoticeHistory';
 import ExposureHistory from './pages/PopupManagement/ExposureHistory';
 import EventRegistration from './pages/EventManagement/EventRegistration';
-import UrlGeneration from './pages/EventManagement/UrlGeneration';
 import EventStatus from './pages/EventManagement/EventStatus';
 import AuthorInfoManagement from './pages/SelfPublishing/AuthorInfoManagement';
 import BadgeManagement from './pages/UserManagement/BadgeManagement';
@@ -91,12 +89,10 @@ function App() {
 
               {/* 공지사항 관리 */}
               <Route path="notices/manage" element={<NoticeList />} />
-              <Route path="notices/categories" element={<CategorySettings />} />
               <Route path="notices/history" element={<NoticeHistory />} />
 
               {/* 이벤트 관리 */}
               <Route path="events/register" element={<EventRegistration />} />
-              <Route path="events/url" element={<UrlGeneration />} />
               <Route path="events/status" element={<EventStatus />} />
               <Route path="events/analysis" element={<EventAnalysis />} />
 
