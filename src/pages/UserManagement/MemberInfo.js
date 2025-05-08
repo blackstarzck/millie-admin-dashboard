@@ -38,6 +38,7 @@ import {
     MessageOutlined,
 } from '@ant-design/icons';
 import Highlighter from 'react-highlight-words';
+import moment from 'moment';
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -306,6 +307,22 @@ const MemberInfo = () => {
         }
     };
 
+    // 행 클릭 시 수정 모달을 바로 여는 함수
+    const openEditModalForRow = (record) => {
+        const userWithHistory = { // 샘플 구독 내역, 실제로는 API 등에서 가져와야 함
+            ...record,
+            subscriptionHistory: [
+                { key: 'sub1', startDate: '2024-01-15', plan: '연간', amount: 99000, status: 'active' },
+                { key: 'sub2', startDate: '2024-07-01', plan: '월간', amount: 9900, status: 'active' },
+                { key: 'sub3', startDate: '2023-12-01', plan: '월간', amount: 9900, status: 'expired' },
+            ]
+        };
+        setSelectedUser(userWithHistory);
+        setEditedUser({ ...userWithHistory }); // 수정 모드니까 editedUser도 바로 설정
+        setIsModalVisible(true);
+        setIsEditMode(true); // 수정 모드로 설정
+    };
+
     const columns = [
         {
             title: 'ID',
@@ -403,6 +420,36 @@ const MemberInfo = () => {
             sorter: (a, b) => new Date(a.signupDate) - new Date(b.signupDate),
         },
         {
+            title: '마지막 접속일',
+            dataIndex: 'lastLogin',
+            key: 'lastLogin',
+            width: 180,
+            sorter: (a, b) => {
+                if (!a.lastLogin && !b.lastLogin) return 0;
+                if (!a.lastLogin) return 1;
+                if (!b.lastLogin) return -1;
+                return new Date(a.lastLogin) - new Date(b.lastLogin);
+            },
+            render: (text) => {
+                if (!text) return '-';
+                const lastLoginDate = moment(text);
+                const today = moment();
+                const daysDiff = today.diff(lastLoginDate, 'days');
+                let diffText = '';
+                if (daysDiff === 0) {
+                    diffText = '(오늘)';
+                } else if (daysDiff > 0) {
+                    diffText = `(${daysDiff}일 전)`;
+                }
+                return (
+                    <>
+                        {lastLoginDate.format('YYYY-MM-DD HH:mm')}
+                        {diffText && <Text type="secondary" style={{ display: 'block', fontSize: '0.85em' }}>{diffText}</Text>}
+                    </>
+                );
+            },
+        },
+        {
             title: '상태',
             dataIndex: 'status',
             key: 'status',
@@ -410,29 +457,14 @@ const MemberInfo = () => {
             filters: Object.entries(statusMap)
                          .map(([key, { text }]) => ({ text, value: key })),
             onFilter: (value, record) => record.status === value,
-            render: (status) => {
+            render: (status, record) => {
                 const statusInfo = statusMap[status] || { color: 'default', text: status, icon: null };
-                return <Tag color={statusInfo.color} icon={statusInfo.icon}>{statusInfo.text}</Tag>;
-            },
-        },
-        {
-            title: '관리',
-            key: 'action',
-            width: 80,
-            align: 'center',
-            render: (_, record) => {
-                const menu = (
-                    <Menu onClick={(e) => handleMenuClick(e, record)}>
-                        <Menu.Item key="detail" icon={<EyeOutlined />}>상세 보기</Menu.Item>
-                        <Menu.Item key="edit" icon={<EditOutlined />}>정보 수정</Menu.Item>
-                    </Menu>
-                );
                 return (
-                    <Dropdown overlay={menu} trigger={['click']}>
-                        <Button icon={<MoreOutlined />} type="text" />
-                    </Dropdown>
+                    <Tag color={statusInfo.color} icon={statusInfo.icon}>
+                        {statusInfo.text}
+                    </Tag>
                 );
-            }
+            },
         },
     ];
 
@@ -476,10 +508,18 @@ const MemberInfo = () => {
                     dataSource={users}
                     loading={loading}
                     pagination={{ pageSize: 10, showSizeChanger: true }}
-                    scroll={{ x: 1200 }}
+                    scroll={{ x: 1300 }}
                     bordered
                     size="small"
                     rowKey="key"
+                    onRow={(record) => {
+                        return {
+                            onClick: (event) => {
+                                openEditModalForRow(record); // 수정 모달 바로 열기
+                            },
+                            style: { cursor: 'pointer' } 
+                        };
+                    }}
                 />
             </Card>
 

@@ -24,7 +24,6 @@ import PopupCreation from './pages/PopupManagement/PopupCreation';
 import PopupTemplateManagement from './pages/PopupManagement/TemplateManagement';
 import PopupExposureSettings from './pages/PopupManagement/ExposureSettings';
 import InquiryLookup from './pages/InquiryManagement/InquiryLookup';
-import InquiryFiltering from './pages/InquiryManagement/InquiryFiltering';
 import FaqManagement from './pages/InquiryManagement/FaqManagement';
 import UserStatistics from './pages/DataAnalysis/UserStatistics';
 import ContentStatistics from './pages/DataAnalysis/ContentStatistics';
@@ -45,6 +44,11 @@ import EventRegistration from './pages/EventManagement/EventRegistration';
 import EventStatus from './pages/EventManagement/EventStatus';
 import AuthorInfoManagement from './pages/SelfPublishing/AuthorInfoManagement';
 import BadgeManagement from './pages/UserManagement/BadgeManagement';
+import CurationManagement from './pages/ContentManagement/CurationManagement';
+
+// 새로 추가된 신고 관리 페이지 컴포넌트 임포트
+import ReportList from './pages/ReportManagement/ReportList';
+import ReportSettings from './pages/ReportManagement/ReportSettings';
 
 function App() {
   return (
@@ -63,6 +67,8 @@ function App() {
               <Route path="content/books" element={<BookManagement />} />
               <Route path="content/categories" element={<CategoryManagement />} />
               <Route path="content/metadata" element={<MetadataManagement />} />
+              <Route path="content/approval" element={<ContentApproval />} />
+              <Route path="content/curation" element={<CurationManagement />} />
 
               {/* 자가출판 */}
               <Route path="self-publishing/approval" element={<ContentApproval />} />
@@ -73,6 +79,10 @@ function App() {
               <Route path="users/sanctions" element={<AccountSanctions />} />
               <Route path="users/subscriptions" element={<SubscriptionHistory />} />
               <Route path="users/badges" element={<BadgeManagement />} />
+
+              {/* 신고 관리 라우트 추가 */}
+              <Route path="reports/list" element={<ReportList />} />
+              <Route path="reports/settings" element={<ReportSettings />} />
 
               {/* 알림 관리 */}
               <Route path="notifications/dispatch" element={<NotificationDispatch />} />
@@ -96,7 +106,6 @@ function App() {
 
               {/* 문의사항 관리 */}
               <Route path="inquiries/list" element={<InquiryLookup />} />
-              <Route path="inquiries/filter" element={<InquiryFiltering />} />
               <Route path="inquiries/faq" element={<FaqManagement />} />
 
               {/* 데이터 분석 */}

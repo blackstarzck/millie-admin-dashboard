@@ -36,7 +36,13 @@ import {
   QuestionCircleOutlined,
   EditOutlined,
   TrophyOutlined,
-  UsergroupAddOutlined
+  UsergroupAddOutlined,
+  DesktopOutlined,
+  FileOutlined,
+  UploadOutlined,
+  CheckCircleOutlined,
+  TagsOutlined,
+  TagOutlined
 } from '@ant-design/icons';
 
 // 메뉴 데이터 구조화 (key 추가, 아이콘 추가)
@@ -48,8 +54,10 @@ const menuItems = [
     icon: <BookOutlined />,
     subMenu: [
       { key: '/content/books', path: '/content/books', name: '도서 관리', icon: <BookOutlined /> },
-      { key: '/content/categories', path: '/content/categories', name: '카테고리 관리', icon: <AppstoreOutlined /> },
+      { key: '/content/categories', path: '/content/categories', name: '카테고리 관리', icon: <TagOutlined /> },
       { key: '/content/metadata', path: '/content/metadata', name: '메타데이터 관리', icon: <DatabaseOutlined /> },
+      { key: '/content/approval', path: '/content/approval', name: '콘텐츠 승인', icon: <CheckCircleOutlined /> },
+      { key: '/content/curation', path: '/content/curation', name: '큐레이션 관리', icon: <TagsOutlined /> },
     ],
   },
   {
@@ -70,6 +78,15 @@ const menuItems = [
       { key: '/users/subscriptions', path: '/users/subscriptions', name: '구독 내역', icon: <HistoryOutlined /> },
       { key: '/users/sanctions', path: '/users/sanctions', name: '계정 제재', icon: <WarningOutlined /> },
       { key: '/users/badges', path: '/users/badges', name: '회원 배지 관리', icon: <TrophyOutlined /> }
+    ],
+  },
+  {
+    key: '/reports',
+    name: '신고 관리',
+    icon: <WarningOutlined />,
+    subMenu: [
+      { key: '/reports/list', path: '/reports/list', name: '신고 접수 및 심사', icon: <OrderedListOutlined /> },
+      { key: '/reports/settings', path: '/reports/settings', name: '신고 정책 관리', icon: <SettingOutlined /> },
     ],
   },
   {
@@ -117,7 +134,6 @@ const menuItems = [
     icon: <MessageOutlined />,
     subMenu: [
       { key: '/inquiries/list', path: '/inquiries/list', name: '문의 조회', icon: <OrderedListOutlined /> },
-      { key: '/inquiries/filter', path: '/inquiries/filter', name: '문의 필터링', icon: <FilterOutlined /> },
       { key: '/inquiries/faq', path: '/inquiries/faq', name: 'FAQ 관리', icon: <QuestionCircleOutlined /> },
     ],
   },

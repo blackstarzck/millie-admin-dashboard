@@ -36,17 +36,43 @@ import {
     FileTextOutlined,
 } from '@ant-design/icons';
 import moment from 'moment';
+// CurationManagement에서 큐레이션 데이터를 가져옵니다 (데모용)
+import { initialCurations as allCurationsData } from './CurationManagement';
 
 const { Title, Text, Link } = Typography;
 const { Option } = Select;
 const { TextArea } = Input;
 
+// Firebase Storage 이미지 URL 목록 (표지 이미지용)
+const sampleCoverImageUrls = [
+    'https://firebasestorage.googleapis.com/v0/b/card-maker-89016.appspot.com/o/AG1%2FF-AG1-1.png?alt=media&token=3bd34326-431b-4654-aef3-7db0f2738972',
+    'https://firebasestorage.googleapis.com/v0/b/card-maker-89016.appspot.com/o/AG1%2FF-AG1-10.png?alt=media&token=d3452afd-608a-4529-87a9-c8871872ff7f',
+    'https://firebasestorage.googleapis.com/v0/b/card-maker-89016.appspot.com/o/AG1%2FF-AG1-3.png?alt=media&token=cd0f35a8-a09c-4cd5-a527-2c229066d279',
+    'https://firebasestorage.googleapis.com/v0/b/card-maker-89016.appspot.com/o/AG1%2FM-AG1-1.png?alt=media&token=21827222-9c14-4828-8918-3569b2c08ce5',
+    'https://firebasestorage.googleapis.com/v0/b/card-maker-89016.appspot.com/o/HP1%2FF-HP1-10.png?alt=media&token=1d7d51d6-78d6-4bba-b5db-a96453e605ab',
+    'https://firebasestorage.googleapis.com/v0/b/card-maker-89016.appspot.com/o/HP1%2FF-HP1-12.png?alt=media&token=3292f705-5a04-4201-8fe3-4cabbbf1998a',
+];
+
+// 랜덤 표지 이미지 URL 반환 함수
+const getRandomCoverImage = () => sampleCoverImageUrls[Math.floor(Math.random() * sampleCoverImageUrls.length)];
+
 // Updated Initial Data reflecting new structure + audio/ebook info
 const initialBooks = [
-    { key: '1', BOOK_ID: 'db2d7f6d848c4742', BOOK_NAME: '숙론', BOOK_AUTHOR: '최재천', BOOK_PUBLISHER: '김영사', BOOK_COVER_IMAGE: 'https://img.millie.co.kr/200x/service/cover/180080659/f9238e2933934e2e8249c74a6e9c7ce7.jpg', CATEGORY_SEQ: '1240', CATEGORY_NAME: '사회과학', GENRE: '교양과학', BOOK_SERVICE_YN: 'Y', BOOK_EBOOK_RENT_YN: 'Y', EBOOK_PUBLISH_DATE: '2024-05-17', REGISTRATION_DATE: '2024-05-10', TAKE_COUNT: '73', BOOK_ADULT_YN: 'N', IS_EXCLUSIVE: 'N', CONTENT_TYPE: '10', PLAY_TIME: '00:00:00', LEADER_NAME: '', LEADER_JOB: '', ISBN: '9791138434195', LANGUAGE: 'ko', TAGS: ['과학', '사회', '토론'], AGE_GROUP: 'all', DESCRIPTION: '숙고하고 토론해야 할 우리 시대의 다양한 질문들', TOC: '1부...', SUMMARY: '우리는 끊임없이...', SERIES_NAME: '', SERIES_NUM: null, SERIES_COUNT: null, FILE_FORMAT: 'EPUB', DRM_YN: 'Y', FILE_SIZE_MB: 5.2, PAGE_COUNT: 320, PRICE: 16200, COPYRIGHT_INFO: '김영사 © 2024', SERVICE_REGION: 'KR' },
-    { key: '2', BOOK_ID: 'anotherBook123', BOOK_NAME: 'React 마스터하기', BOOK_AUTHOR: '김개발', BOOK_PUBLISHER: 'IT출판', BOOK_COVER_IMAGE: 'https://via.placeholder.com/40x60.png?text=React', CATEGORY_SEQ: '500', CATEGORY_NAME: 'IT/컴퓨터', GENRE: '프로그래밍', BOOK_SERVICE_YN: 'Y', BOOK_EBOOK_RENT_YN: 'N', EBOOK_PUBLISH_DATE: '2023-01-15', REGISTRATION_DATE: '2023-01-10', TAKE_COUNT: '150', BOOK_ADULT_YN: 'N', IS_EXCLUSIVE: 'Y', CONTENT_TYPE: '10', PLAY_TIME: '00:00:00', LEADER_NAME: '', LEADER_JOB: '', ISBN: '9791162240101', LANGUAGE: 'ko', TAGS: ['React', '웹개발'], AGE_GROUP: 'all', DESCRIPTION: 'React의 기초부터 심화까지 다루는 개발 서적', TOC: null, SUMMARY: null, SERIES_NAME: '웹 개발 시리즈', SERIES_NUM: 1, SERIES_COUNT: 5, FILE_FORMAT: 'EPUB', DRM_YN: 'Y', FILE_SIZE_MB: 15.8, PAGE_COUNT: 600, PRICE: 32000, COPYRIGHT_INFO: 'IT출판 © 2023', SERVICE_REGION: 'GLOBAL' },
-    { key: '3', BOOK_ID: 'someOtherId456', BOOK_NAME: 'Node.js 실전 가이드', BOOK_AUTHOR: '박코딩', BOOK_PUBLISHER: '코딩북스', BOOK_COVER_IMAGE: 'https://via.placeholder.com/40x60.png?text=Node', CATEGORY_SEQ: '501', BOOK_SERVICE_YN: 'N', BOOK_EBOOK_RENT_YN: 'N', EBOOK_PUBLISH_DATE: '2023-05-20', REGISTRATION_DATE: '2023-05-15', TAKE_COUNT: '88', BOOK_ADULT_YN: 'Y', IS_EXCLUSIVE: 'N', CONTENT_TYPE: '10', PLAY_TIME: '00:00:00', LEADER_NAME: '', LEADER_JOB: '', ISBN: '', LANGUAGE: '', TAGS: [], AGE_GROUP: '', DESCRIPTION: '', TOC: '', SUMMARY: '', SERIES_NAME: '', SERIES_NUM: null, SERIES_COUNT: null, FILE_FORMAT: '', DRM_YN: '', FILE_SIZE_MB: '', PAGE_COUNT: '', PRICE: '', COPYRIGHT_INFO: '', SERVICE_REGION: '' },
-    { key: '4', BOOK_ID: 'audiobook789', BOOK_NAME: '불편한 편의점 (오디오북)', BOOK_AUTHOR: '김호연', BOOK_PUBLISHER: '나무옆의자', BOOK_COVER_IMAGE: 'https://via.placeholder.com/40x60.png?text=Audio', CATEGORY_SEQ: '1240', CATEGORY_NAME: '소설', GENRE: '한국소설', BOOK_SERVICE_YN: 'Y', BOOK_EBOOK_RENT_YN: 'Y', EBOOK_PUBLISH_DATE: '2022-08-10', REGISTRATION_DATE: '2022-08-01', TAKE_COUNT: '250', BOOK_ADULT_YN: 'N', IS_EXCLUSIVE: 'N', CONTENT_TYPE: '20', PLAY_TIME: '08:35:20', LEADER_NAME: '김유정', LEADER_JOB: '성우', ISBN: '9791161571188', LANGUAGE: 'ko', TAGS: ['힐링', '편의점', '드라마'], AGE_GROUP: 'all', DESCRIPTION: '서울역 뒤편 골목길의 작은 편의점에서 벌어지는 이야기 (오디오북)', TOC: null, SUMMARY: null, SERIES_NAME: '', SERIES_NUM: null, SERIES_COUNT: null, FILE_FORMAT: 'MP3', DRM_YN: 'Y', FILE_SIZE_MB: 450.5, PAGE_COUNT: null, PRICE: 12600, COPYRIGHT_INFO: '나무옆의자 © 2022', SERVICE_REGION: 'KR' },
+    { key: '1', BOOK_ID: 'db2d7f6d848c4742', BOOK_NAME: '숙론', BOOK_AUTHOR: '최재천', BOOK_PUBLISHER: '김영사', BOOK_COVER_IMAGE: getRandomCoverImage(), CATEGORY_SEQ: '1240', CATEGORY_NAME: '사회과학', GENRE: '교양과학', BOOK_SERVICE_YN: 'Y', BOOK_EBOOK_RENT_YN: 'Y', EBOOK_PUBLISH_DATE: '2024-05-17', REGISTRATION_DATE: '2024-05-10', TAKE_COUNT: '73', BOOK_ADULT_YN: 'N', IS_EXCLUSIVE: 'N', CONTENT_TYPE: '10', PLAY_TIME: '00:00:00', LEADER_NAME: '', LEADER_JOB: '', ISBN: '9791138434195', LANGUAGE: 'ko', TAGS: ['과학', '사회', '토론'], AGE_GROUP: 'all', DESCRIPTION: '숙고하고 토론해야 할 우리 시대의 다양한 질문들', TOC: '1부...', SUMMARY: '우리는 끊임없이...', SERIES_NAME: '', SERIES_NUM: null, SERIES_COUNT: null, FILE_FORMAT: 'EPUB', DRM_YN: 'Y', FILE_SIZE_MB: 5.2, PAGE_COUNT: 320, PRICE: 16200, COPYRIGHT_INFO: '김영사 © 2024', SERVICE_REGION: 'KR' },
+    { key: '2', BOOK_ID: 'anotherBook123', BOOK_NAME: 'React 마스터하기', BOOK_AUTHOR: '김개발', BOOK_PUBLISHER: 'IT출판', BOOK_COVER_IMAGE: getRandomCoverImage(), CATEGORY_SEQ: '500', CATEGORY_NAME: 'IT/컴퓨터', GENRE: '프로그래밍', BOOK_SERVICE_YN: 'Y', BOOK_EBOOK_RENT_YN: 'N', EBOOK_PUBLISH_DATE: '2023-01-15', REGISTRATION_DATE: '2023-01-10', TAKE_COUNT: '150', BOOK_ADULT_YN: 'N', IS_EXCLUSIVE: 'Y', CONTENT_TYPE: '10', PLAY_TIME: '00:00:00', LEADER_NAME: '', LEADER_JOB: '', ISBN: '9791162240101', LANGUAGE: 'ko', TAGS: ['React', '웹개발'], AGE_GROUP: 'all', DESCRIPTION: 'React의 기초부터 심화까지 다루는 개발 서적', TOC: null, SUMMARY: null, SERIES_NAME: '웹 개발 시리즈', SERIES_NUM: 1, SERIES_COUNT: 5, FILE_FORMAT: 'EPUB', DRM_YN: 'Y', FILE_SIZE_MB: 15.8, PAGE_COUNT: 600, PRICE: 32000, COPYRIGHT_INFO: 'IT출판 © 2023', SERVICE_REGION: 'GLOBAL' },
+    { key: '3', BOOK_ID: 'someOtherId456', BOOK_NAME: 'Node.js 실전 가이드', BOOK_AUTHOR: '박코딩', BOOK_PUBLISHER: '코딩북스', BOOK_COVER_IMAGE: getRandomCoverImage(), CATEGORY_SEQ: '501', CATEGORY_NAME: 'IT/컴퓨터', BOOK_SERVICE_YN: 'N', BOOK_EBOOK_RENT_YN: 'N', EBOOK_PUBLISH_DATE: '2023-05-20', REGISTRATION_DATE: '2023-05-15', TAKE_COUNT: '88', BOOK_ADULT_YN: 'Y', IS_EXCLUSIVE: 'N', CONTENT_TYPE: '10', PLAY_TIME: '00:00:00', LEADER_NAME: '', LEADER_JOB: '', ISBN: '9791162240231', LANGUAGE: 'ko', TAGS: ['Nodejs', '백엔드'], AGE_GROUP: 'adult', DESCRIPTION: 'Node.js를 활용한 실전 백엔드 개발 가이드', TOC: '1. Node.js 소개...', SUMMARY: 'Node.js는...', SERIES_NAME: '', SERIES_NUM: null, SERIES_COUNT: null, FILE_FORMAT: 'PDF', DRM_YN: 'Y', FILE_SIZE_MB: 12.1, PAGE_COUNT: 450, PRICE: 28000, COPYRIGHT_INFO: '코딩북스 © 2023', SERVICE_REGION: 'KR' },
+    { key: '4', BOOK_ID: 'audiobook789', BOOK_NAME: '불편한 편의점 (오디오북)', BOOK_AUTHOR: '김호연', BOOK_PUBLISHER: '나무옆의자', BOOK_COVER_IMAGE: getRandomCoverImage(), CATEGORY_SEQ: '1240', CATEGORY_NAME: '소설', GENRE: '한국소설', BOOK_SERVICE_YN: 'Y', BOOK_EBOOK_RENT_YN: 'Y', EBOOK_PUBLISH_DATE: '2022-08-10', REGISTRATION_DATE: '2022-08-01', TAKE_COUNT: '250', BOOK_ADULT_YN: 'N', IS_EXCLUSIVE: 'N', CONTENT_TYPE: '20', PLAY_TIME: '08:35:20', LEADER_NAME: '김유정', LEADER_JOB: '성우', ISBN: '9791161571188', LANGUAGE: 'ko', TAGS: ['힐링', '편의점', '드라마'], AGE_GROUP: 'all', DESCRIPTION: '서울역 뒤편 골목길의 작은 편의점에서 벌어지는 이야기 (오디오북)', TOC: null, SUMMARY: null, SERIES_NAME: '', SERIES_NUM: null, SERIES_COUNT: null, FILE_FORMAT: 'MP3', DRM_YN: 'Y', FILE_SIZE_MB: 450.5, PAGE_COUNT: null, PRICE: 12600, COPYRIGHT_INFO: '나무옆의자 © 2022', SERVICE_REGION: 'KR' },
+    // --- 추가된 10개 더미 데이터 --- 
+    { key: '5', BOOK_ID: 'ebook5', BOOK_NAME: '데이터 분석 입문', BOOK_AUTHOR: '이나영', BOOK_PUBLISHER: '데이터사이언스', BOOK_COVER_IMAGE: getRandomCoverImage(), CATEGORY_NAME: 'IT/컴퓨터', GENRE: '데이터 분석', BOOK_SERVICE_YN: 'Y', BOOK_EBOOK_RENT_YN: 'Y', EBOOK_PUBLISH_DATE: '2024-01-20', REGISTRATION_DATE: '2024-01-15', TAKE_COUNT: '120', BOOK_ADULT_YN: 'N', IS_EXCLUSIVE: 'N', CONTENT_TYPE: '10', ISBN: '9791199000005', PRICE: 25000, PAGE_COUNT: 400, TAGS: ['데이터', 'Python', 'R'], FILE_FORMAT: 'EPUB', DRM_YN: 'Y', SERVICE_REGION: 'KR' }, 
+    { key: '6', BOOK_ID: 'audio6', BOOK_NAME: '달러구트 꿈 백화점 (오디오북)', BOOK_AUTHOR: '이미예', BOOK_PUBLISHER: '팩토리나인', BOOK_COVER_IMAGE: getRandomCoverImage(), CATEGORY_NAME: '소설', GENRE: '판타지', BOOK_SERVICE_YN: 'Y', BOOK_EBOOK_RENT_YN: 'N', EBOOK_PUBLISH_DATE: '2023-11-01', REGISTRATION_DATE: '2023-10-25', TAKE_COUNT: '300', BOOK_ADULT_YN: 'N', IS_EXCLUSIVE: 'Y', CONTENT_TYPE: '20', ISBN: '9791165341909', PRICE: 13800, PLAY_TIME: '07:15:00', LEADER_NAME: '박지윤', LEADER_JOB: '성우', TAGS: ['판타지', '꿈'], FILE_FORMAT: 'MP3', DRM_YN: 'Y', SERVICE_REGION: 'KR' },
+    { key: '7', BOOK_ID: 'ebook7', BOOK_NAME: '여행의 이유', BOOK_AUTHOR: '김영하', BOOK_PUBLISHER: '문학동네', BOOK_COVER_IMAGE: getRandomCoverImage(), CATEGORY_NAME: '시/에세이', GENRE: '에세이', BOOK_SERVICE_YN: 'Y', BOOK_EBOOK_RENT_YN: 'Y', EBOOK_PUBLISH_DATE: '2019-04-17', REGISTRATION_DATE: '2019-04-10', TAKE_COUNT: '500', BOOK_ADULT_YN: 'N', IS_EXCLUSIVE: 'N', CONTENT_TYPE: '10', ISBN: '9788954655972', PRICE: 13500, PAGE_COUNT: 216, TAGS: ['여행', '에세이', '김영하'], FILE_FORMAT: 'EPUB', DRM_YN: 'Y', SERVICE_REGION: 'GLOBAL' },
+    { key: '8', BOOK_ID: 'ebook8', BOOK_NAME: '사피엔스', BOOK_AUTHOR: '유발 하라리', BOOK_PUBLISHER: '김영사', BOOK_COVER_IMAGE: getRandomCoverImage(), CATEGORY_NAME: '인문', GENRE: '역사', BOOK_SERVICE_YN: 'Y', BOOK_EBOOK_RENT_YN: 'Y', EBOOK_PUBLISH_DATE: '2015-11-24', REGISTRATION_DATE: '2015-11-20', TAKE_COUNT: '800', BOOK_ADULT_YN: 'N', IS_EXCLUSIVE: 'N', CONTENT_TYPE: '10', ISBN: '9788934972464', PRICE: 22000, PAGE_COUNT: 696, TAGS: ['역사', '인류', '빅 히스토리'], FILE_FORMAT: 'EPUB', DRM_YN: 'Y', SERVICE_REGION: 'GLOBAL' },
+    { key: '9', BOOK_ID: 'audio9', BOOK_NAME: '미드나잇 라이브러리 (오디오북)', BOOK_AUTHOR: '매트 헤이그', BOOK_PUBLISHER: '인플루엔셜', BOOK_COVER_IMAGE: getRandomCoverImage(), CATEGORY_NAME: '소설', GENRE: '영미소설', BOOK_SERVICE_YN: 'Y', BOOK_EBOOK_RENT_YN: 'Y', EBOOK_PUBLISH_DATE: '2021-04-28', REGISTRATION_DATE: '2021-04-20', TAKE_COUNT: '450', BOOK_ADULT_YN: 'N', IS_EXCLUSIVE: 'N', CONTENT_TYPE: '20', ISBN: '9791191056540', PRICE: 15800, PLAY_TIME: '09:50:30', LEADER_NAME: '강수진', LEADER_JOB: '성우', TAGS: ['판타지', '인생', '선택'], FILE_FORMAT: 'MP3', DRM_YN: 'Y', SERVICE_REGION: 'KR' },
+    { key: '10', BOOK_ID: 'ebook10', BOOK_NAME: '파이썬 알고리즘 인터뷰', BOOK_AUTHOR: '박상길', BOOK_PUBLISHER: '책만', BOOK_COVER_IMAGE: getRandomCoverImage(), CATEGORY_NAME: 'IT/컴퓨터', GENRE: '알고리즘', BOOK_SERVICE_YN: 'Y', BOOK_EBOOK_RENT_YN: 'N', EBOOK_PUBLISH_DATE: '2020-07-15', REGISTRATION_DATE: '2020-07-10', TAKE_COUNT: '210', BOOK_ADULT_YN: 'N', IS_EXCLUSIVE: 'N', CONTENT_TYPE: '10', ISBN: '9791189909178', PRICE: 38000, PAGE_COUNT: 960, TAGS: ['Python', '알고리즘', '코딩테스트'], FILE_FORMAT: 'EPUB', DRM_YN: 'Y', SERVICE_REGION: 'KR' },
+    { key: '11', BOOK_ID: 'ebook11', BOOK_NAME: '부자 아빠 가난한 아빠', BOOK_AUTHOR: '로버트 기요사키', BOOK_PUBLISHER: '민음인', BOOK_COVER_IMAGE: getRandomCoverImage(), CATEGORY_NAME: '경영/경제', GENRE: '재테크', BOOK_SERVICE_YN: 'Y', BOOK_EBOOK_RENT_YN: 'Y', EBOOK_PUBLISH_DATE: '2018-02-07', REGISTRATION_DATE: '2018-02-01', TAKE_COUNT: '650', BOOK_ADULT_YN: 'N', IS_EXCLUSIVE: 'N', CONTENT_TYPE: '10', ISBN: '9788980715990', PRICE: 15000, PAGE_COUNT: 460, TAGS: ['재테크', '부자', '투자'], FILE_FORMAT: 'EPUB', DRM_YN: 'Y', SERVICE_REGION: 'GLOBAL' },
+    { key: '12', BOOK_ID: 'audio12', BOOK_NAME: '클루지 (오디오북)', BOOK_AUTHOR: '개리 마커스', BOOK_PUBLISHER: '갤리온', BOOK_COVER_IMAGE: getRandomCoverImage(), CATEGORY_NAME: '인문', GENRE: '심리학', BOOK_SERVICE_YN: 'Y', BOOK_EBOOK_RENT_YN: 'Y', EBOOK_PUBLISH_DATE: '2023-09-15', REGISTRATION_DATE: '2023-09-10', TAKE_COUNT: '180', BOOK_ADULT_YN: 'N', IS_EXCLUSIVE: 'N', CONTENT_TYPE: '20', ISBN: '9788901261837', PRICE: 16000, PLAY_TIME: '06:20:10', LEADER_NAME: '김상현', LEADER_JOB: '전문낭독가', TAGS: ['심리학', '뇌과학', '인지오류'], FILE_FORMAT: 'MP3', DRM_YN: 'Y', SERVICE_REGION: 'KR' },
+    { key: '13', BOOK_ID: 'ebook13', BOOK_NAME: '코스모스', BOOK_AUTHOR: '칼 세이건', BOOK_PUBLISHER: '사이언스북스', BOOK_COVER_IMAGE: getRandomCoverImage(), CATEGORY_NAME: '사회과학', GENRE: '교양과학', BOOK_SERVICE_YN: 'Y', BOOK_EBOOK_RENT_YN: 'Y', EBOOK_PUBLISH_DATE: '2006-12-20', REGISTRATION_DATE: '2006-12-15', TAKE_COUNT: '720', BOOK_ADULT_YN: 'N', IS_EXCLUSIVE: 'N', CONTENT_TYPE: '10', ISBN: '9788983711892', PRICE: 20000, PAGE_COUNT: 752, TAGS: ['우주', '과학', '칼 세이건'], FILE_FORMAT: 'EPUB', DRM_YN: 'Y', SERVICE_REGION: 'GLOBAL' },
+    { key: '14', BOOK_ID: 'ebook14', BOOK_NAME: '팩트풀니스', BOOK_AUTHOR: '한스 로슬링', BOOK_PUBLISHER: '김영사', BOOK_COVER_IMAGE: getRandomCoverImage(), CATEGORY_NAME: '사회과학', GENRE: '사회비평', BOOK_SERVICE_YN: 'Y', BOOK_EBOOK_RENT_YN: 'Y', EBOOK_PUBLISH_DATE: '2019-03-08', REGISTRATION_DATE: '2019-03-01', TAKE_COUNT: '550', BOOK_ADULT_YN: 'N', IS_EXCLUSIVE: 'N', CONTENT_TYPE: '10', ISBN: '9788934986799', PRICE: 19800, PAGE_COUNT: 464, TAGS: ['데이터', '통계', '세상읽기'], FILE_FORMAT: 'EPUB', DRM_YN: 'Y', SERVICE_REGION: 'GLOBAL' },
 ];
 
 // Helper to get content type tag
@@ -70,6 +96,19 @@ const getRegionTag = (regionCode) => {
         default: return <Tag>{regionCode || '-'}</Tag>;
     }
 };
+
+// 헬퍼 함수: 특정 도서 key가 포함된 큐레이션 목록 반환
+const getCurationsContainingBook = (bookKey, curations) => {
+    return curations.filter(curation => 
+        curation.contents?.some(content => content.key === bookKey)
+    );
+};
+
+// 큐레이션 필터 옵션 생성
+const curationFilterOptions = allCurationsData.map(curation => ({
+    text: curation.title,
+    value: curation.key,
+}));
 
 const BookManagement = () => {
     const [books, setBooks] = useState(initialBooks);
@@ -117,6 +156,7 @@ const BookManagement = () => {
                 const contentType = values.CONTENT_TYPE;
                 const formattedValues = {
                     ...values,
+                    BOOK_COVER_IMAGE: values.BOOK_COVER_IMAGE || getRandomCoverImage(),
                     EBOOK_PUBLISH_DATE: values.EBOOK_PUBLISH_DATE ? values.EBOOK_PUBLISH_DATE.format('YYYY-MM-DD') : null,
                     REGISTRATION_DATE: values.REGISTRATION_DATE ? values.REGISTRATION_DATE.format('YYYY-MM-DD') : null,
                     // Clear irrelevant fields based on type
@@ -403,6 +443,38 @@ const BookManagement = () => {
          { title: 'ISBN', dataIndex: 'ISBN', key: 'isbn', width: 130, ellipsis: true },
          //{ title: '장르', dataIndex: 'GENRE', key: 'genre', width: 100, ellipsis: true }, // Hiding less critical columns for space
         {
+            title: '소속 큐레이션 수', 
+            key: 'curationCount', 
+            width: 100, 
+            align: 'center',
+            render: (_, record) => {
+                const containingCurations = getCurationsContainingBook(record.key, allCurationsData);
+                if (containingCurations.length === 0) {
+                    return '-';
+                }
+                const curationTitles = containingCurations.map(c => c.title);
+                const tooltipTitle = (
+                    <div>
+                        <span style={{ fontWeight: 'bold' }}>포함된 큐레이션:</span>
+                        <ul style={{ paddingLeft: '15px', marginBottom: 0, marginTop: '5px' }}>
+                            {curationTitles.map((title, index) => <li key={index}>{title}</li>)}
+                        </ul>
+                    </div>
+                );
+                return (
+                    <Tooltip title={tooltipTitle}>
+                        <Tag color="cyan">{`${containingCurations.length}개`}</Tag>
+                    </Tooltip>
+                );
+            },
+            filters: curationFilterOptions,
+            onFilter: (value, record) => {
+                // value는 선택된 큐레이션의 key
+                const targetCuration = allCurationsData.find(c => c.key === value);
+                return targetCuration?.contents?.some(content => content.key === record.key) || false;
+            },
+        },
+        {
             title: '서비스', dataIndex: 'BOOK_SERVICE_YN', key: 'service', align: 'center', width: 80,
             render: (yn) => <Tag color={yn === 'Y' ? 'success' : 'default'} icon={yn === 'Y' ? <CheckCircleOutlined /> : <CloseCircleOutlined />}>{yn === 'Y' ? 'Y' : 'N'}</Tag>,
             filters: [{ text: 'Y', value: 'Y' }, { text: 'N', value: 'N' }],
@@ -556,6 +628,9 @@ const BookManagement = () => {
                             </Form.Item>
                          </Col>
                      </Row>
+                     <Form.Item name="BOOK_COVER_IMAGE" label="표지 이미지 URL">
+                        <Input placeholder="https://example.com/image.png" />
+                     </Form.Item>
 
                     <Typography.Title level={5} style={{ marginBottom: 16, marginTop: 16 }}>상세 정보</Typography.Title>
                     <Row gutter={16}>

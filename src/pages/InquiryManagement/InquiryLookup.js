@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import moment from "moment";
 import {
   Table,
   Input,
@@ -12,6 +13,7 @@ import {
   Input as AntInput,
   Descriptions,
   Divider,
+  Image,
 } from "antd";
 import { PaperClipOutlined } from "@ant-design/icons";
 
@@ -29,7 +31,7 @@ const InquiryLookup = () => {
       category: "결제",
       title: "결제가 제대로 안됩니다.",
       user: "user001",
-      date: "2024-07-26",
+      date: "2024-07-26T10:00:00Z",
       status: "답변대기",
       content:
         "사이트에서 결제를 시도하는데 계속 오류가 발생합니다. 확인 부탁드립니다.",
@@ -48,7 +50,7 @@ const InquiryLookup = () => {
       category: "계정",
       title: "비밀번호를 잊어버렸어요.",
       user: "user008",
-      date: "2024-07-25",
+      date: "2024-07-25T14:30:00Z",
       status: "답변완료",
       content:
         "로그인 페이지에서 비밀번호 찾기 기능을 이용해도 이메일이 오지 않습니다.",
@@ -57,7 +59,7 @@ const InquiryLookup = () => {
       inquiryEmail: "support@example.com",
       phoneNumber: "010-9876-5432",
       attachments: [],
-      responseDate: "2024-07-26",
+      responseDate: "2024-07-26T09:00:00Z",
       respondedBy: "김지원",
     },
     {
@@ -66,7 +68,7 @@ const InquiryLookup = () => {
       category: "콘텐츠",
       title: "오류가 있는 것 같습니다.",
       user: "user015",
-      date: "2024-07-25",
+      date: "2024-07-25T11:20:00Z",
       status: "답변대기",
       content: "특정 강의 영상 재생 시 화면이 검게 나옵니다.",
       inquiryEmail: "contact@example.com",
@@ -84,16 +86,38 @@ const InquiryLookup = () => {
   const [responseText, setResponseText] = useState("");
   const [form] = Form.useForm();
 
+  // New state for managing single image preview
+  const [previewImageState, setPreviewImageState] = useState({
+    visible: false,
+    src: null,
+    scaleStep: 0.5, // Default scale step from example
+  });
+
   const filteredInquiries = inquiries.filter((inq) => {
     const matchesSearch =
-      inq.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      inq.user.toLowerCase().includes(searchTerm.toLowerCase());
+      (inq.title && inq.title.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (inq.user && inq.user.toLowerCase().includes(searchTerm.toLowerCase()));
     const matchesStatus =
       filterStatus === "all" ||
       (filterStatus === "pending" && inq.status === "답변대기") ||
       (filterStatus === "completed" && inq.status === "답변완료");
     return matchesSearch && matchesStatus;
   });
+
+  // 답변 대기 건수 계산
+  const pendingCount = filteredInquiries.filter(inq => inq.status === "답변대기").length;
+
+  // 날짜만 YYYY. MM. DD. 형식으로 포맷하는 함수
+  const formatDateOnly = (dateString) => {
+    if (!dateString) return "-";
+    return moment(dateString).format("YYYY. MM. DD.");
+  };
+
+  // 시간만 HH:mm:ss 형식으로 포맷하는 함수
+  const formatTimeOnly = (dateString) => {
+    if (!dateString) return "";
+    return moment(dateString).format("HH:mm:ss");
+  };
 
   const columns = [
     {
@@ -144,15 +168,53 @@ const InquiryLookup = () => {
       title: "문의일",
       dataIndex: "date",
       key: "date",
-      width: 100,
+      width: 180,
       ellipsis: true,
+      render: (dateString, record) => {
+        if (!dateString) return "-";
+        const datePart = formatDateOnly(dateString);
+        const timePart = formatTimeOnly(dateString);
+
+        return (
+          <>
+            {datePart}
+            {timePart && (
+              <>
+                <br />
+                <Text type="secondary" style={{ fontSize: "0.85em" }}>
+                  {timePart}
+                </Text>
+              </>
+            )}
+          </>
+        );
+      },
     },
     {
       title: "답변완료일",
       dataIndex: "responseDate",
       key: "responseDate",
-      width: 120,
-      render: (date) => date || "-",
+      width: 180,
+      render: (responseDateString, record) => {
+        if (!responseDateString) return "-";
+
+        const datePart = formatDateOnly(responseDateString);
+        const timePart = formatTimeOnly(responseDateString);
+
+        return (
+          <>
+            {datePart}
+            {timePart && (
+              <>
+                <br />
+                <Text type="secondary" style={{ fontSize: "0.85em" }}>
+                  {timePart}
+                </Text>
+              </>
+            )}
+          </>
+        );
+      },
       ellipsis: true,
     },
     {
@@ -194,17 +256,6 @@ const InquiryLookup = () => {
       render: (admin) => admin || "-",
       ellipsis: true,
     },
-    {
-      title: "관리",
-      key: "action",
-      width: 100,
-      fixed: "right",
-      render: (_, record) => (
-        <Button type="link" onClick={() => showModal(record)}>
-          {record.status === "답변완료" ? "상세보기" : "상세/답변"}
-        </Button>
-      ),
-    },
   ];
 
   const showModal = (inquiry) => {
@@ -224,7 +275,7 @@ const InquiryLookup = () => {
               ...inq,
               status: "답변완료",
               response: responseText,
-              responseDate: new Date().toISOString().split("T")[0], // YYYY-MM-DD 형식
+              responseDate: new Date().toISOString(), // YYYY-MM-DD HH:mm:ss 형식
               respondedBy: "김지원", // 실제로는 로그인한 관리자 정보를 사용해야 함
             }
           : inq
@@ -247,9 +298,33 @@ const InquiryLookup = () => {
     form.resetFields();
   };
 
+  // Function to open image preview
+  const handleShowImagePreview = (fileUrl) => {
+    setPreviewImageState({
+      visible: true,
+      src: fileUrl,
+      scaleStep: 0.5, // Reset or maintain as needed
+    });
+  };
+
+  // Function to close image preview (called by Image component's onVisibleChange)
+  const handlePreviewVisibleChange = (value) => {
+    if (!value) { // Only act when closing
+      setPreviewImageState({
+        visible: false,
+        src: null, // Clear src when closing
+        scaleStep: 0.5,
+      });
+    }
+  };
+
   return (
     <Space direction="vertical" style={{ width: "100%" }} size="large">
       <Title level={4}>문의사항 조회</Title>
+
+      <Text strong style={{ display: 'block' }}>
+        답변 대기 중인 문의: {pendingCount} 건
+      </Text>
 
       <Space wrap>
         <Search
@@ -275,7 +350,15 @@ const InquiryLookup = () => {
         dataSource={filteredInquiries}
         rowKey="key"
         pagination={{ pageSize: 10 }}
-        scroll={{ x: 1600 }}
+        scroll={{ x: 1500 }}
+        onRow={(record) => {
+          return {
+            onClick: (event) => {
+              showModal(record);
+            },
+            style: { cursor: 'pointer' }
+          };
+        }}
       />
 
       {selectedInquiry && (
@@ -303,7 +386,12 @@ const InquiryLookup = () => {
                 {selectedInquiry.phoneNumber || "-"}
               </Descriptions.Item>
               <Descriptions.Item label="문의일">
-                {selectedInquiry.date}
+                {selectedInquiry.date ? formatDateOnly(selectedInquiry.date) : '-'}
+                {selectedInquiry.date && formatTimeOnly(selectedInquiry.date) && (
+                  <Text type="secondary" style={{ fontSize: "0.85em", display: 'block' }}>
+                    {formatTimeOnly(selectedInquiry.date)}
+                  </Text>
+                )}
               </Descriptions.Item>
               <Descriptions.Item label="제목">
                 {selectedInquiry.title}
@@ -324,15 +412,16 @@ const InquiryLookup = () => {
               {selectedInquiry.attachments &&
                 selectedInquiry.attachments.length > 0 && (
                   <Descriptions.Item label="첨부파일">
-                    <Space direction="vertical">
+                    <Space direction="vertical" style={{ width: '100%' }}>
                       {selectedInquiry.attachments.map((file, index) => (
-                        <Button
-                          key={index}
-                          type="link"
-                          icon={<PaperClipOutlined />}
-                          onClick={() => window.open(file.url, "_blank")}
+                        <Button 
+                            key={index}
+                            type="text" 
+                            icon={<PaperClipOutlined />}
+                            onClick={() => handleShowImagePreview(file.url)} // Call new handler
+                            style={{ paddingLeft: 0, textAlign: 'left', display: 'block' }}
                         >
-                          {file.name}
+                            {file.name}
                         </Button>
                       ))}
                     </Space>
@@ -359,7 +448,13 @@ const InquiryLookup = () => {
                 </p>
                 <p style={{ marginTop: "10px" }}>
                   <Text type="secondary">
-                    답변일: {selectedInquiry.responseDate} | 답변자:{" "}
+                    답변일: {selectedInquiry.responseDate ? formatDateOnly(selectedInquiry.responseDate) : '-'}
+                    {selectedInquiry.responseDate && formatTimeOnly(selectedInquiry.responseDate) && (
+                      <Text type="secondary" style={{ fontSize: "0.85em", display: 'block' }}>
+                        {formatTimeOnly(selectedInquiry.responseDate)}
+                      </Text>
+                    )}
+                    {' | '}답변자:{" "}
                     {selectedInquiry.respondedBy}
                   </Text>
                 </p>
@@ -385,6 +480,20 @@ const InquiryLookup = () => {
           </Form>
         </Modal>
       )}
+
+      {/* Hidden Image component for previewing */}
+      <Image
+        width={0} // Effectively hidden via style or zero dimensions
+        height={0}
+        style={{ display: 'none' }}
+        src={previewImageState.src || ""} // Use placeholder if src is null
+        preview={{
+          visible: previewImageState.visible,
+          scaleStep: previewImageState.scaleStep,
+          src: previewImageState.src, // Explicitly set preview src
+          onVisibleChange: handlePreviewVisibleChange,
+        }}
+      />
     </Space>
   );
 };
