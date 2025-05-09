@@ -108,13 +108,15 @@ function App() {
               <Route path="inquiries/list" element={<InquiryLookup />} />
               <Route path="inquiries/faq" element={<FaqManagement />} />
 
+              {/* 사용자 분석 */}
+              <Route path="user-analysis/statistics" element={<UserStatistics />} />
+              <Route path="user-analysis/visits" element={<VisitStatistics />} />
+              <Route path="user-analysis/referrers" element={<ReferrerPath />} />
+
               {/* 데이터 분석 */}
-              <Route path="analysis/users" element={<UserStatistics />} />
               <Route path="analysis/content" element={<ContentStatistics />} />
               <Route path="analysis/campaign" element={<CampaignEffect />} />
               <Route path="analysis/reports" element={<ReportGeneration />} />
-              <Route path="analysis/visits" element={<VisitStatistics />} />
-              <Route path="analysis/referrers" element={<ReferrerPath />} />
 
               {/* 시스템 설정 */}
               <Route path="settings/permissions" element={<PermissionManagement />} />
