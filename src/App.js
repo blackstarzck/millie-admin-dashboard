@@ -111,7 +111,6 @@ function App() {
               {/* 사용자 분석 */}
               <Route path="user-analysis/statistics" element={<UserStatistics />} />
               <Route path="user-analysis/visits" element={<VisitStatistics />} />
-              <Route path="user-analysis/referrers" element={<ReferrerPath />} />
 
               {/* 데이터 분석 */}
               <Route path="analysis/content" element={<ContentStatistics />} />

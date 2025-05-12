@@ -144,7 +144,6 @@ const menuItems = [
     subMenu: [
       { key: '/user-analysis/statistics', path: '/user-analysis/statistics', name: '사용자 통계', icon: <UserOutlined /> },
       { key: '/user-analysis/visits', path: '/user-analysis/visits', name: '방문 통계', icon: <PieChartOutlined /> },
-      { key: '/user-analysis/referrers', path: '/user-analysis/referrers', name: '유입 경로', icon: <LinkOutlined /> },
     ],
   },
   {

@@ -12,6 +12,7 @@ import {
     Dropdown,
     Button,
     Menu,
+    DatePicker,
 } from 'antd';
 // import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'; // Example using recharts
 import {
@@ -27,6 +28,7 @@ import {
 } from 'chart.js';
 import { Line, Doughnut } from 'react-chartjs-2';
 import { DownOutlined, ArrowUpOutlined, ArrowDownOutlined } from '@ant-design/icons';
+import moment from 'moment';
 
 ChartJS.register(
   CategoryScale,
@@ -71,12 +73,13 @@ const centerTextPlugin = {
 ChartJS.register(centerTextPlugin); // 플러그인 등록
 
 const { Title, Text } = Typography;
+const { RangePicker } = DatePicker;
 
 const UserStatistics = () => {
   const [dauTimeRange, setDauTimeRange] = useState('daily'); // 'daily', 'weekly', 'monthly'
-  const [userStatusPeriod, setUserStatusPeriod] = useState('30d');
-  const [genderPeriod, setGenderPeriod] = useState('30d');
-  const [ageGroupPeriod, setAgeGroupPeriod] = useState('30d');
+  const [userStatusDateRange, setUserStatusDateRange] = useState([moment().subtract(30, 'days'), moment()]);
+  const [genderDateRange, setGenderDateRange] = useState([moment().subtract(30, 'days'), moment()]);
+  const [ageGroupDateRange, setAgeGroupDateRange] = useState([moment().subtract(30, 'days'), moment()]);
 
   const dailyLabels = ['07-20', '07-21', '07-22', '07-23', '07-24', '07-25', '07-26'];
   const dailyDauValues = [1000, 1050, 1020, 1100, 1150, 1120, 1180];
@@ -273,60 +276,47 @@ const UserStatistics = () => {
   };
 
   // 기간 변경 핸들러
-  const handlePeriodChange = (chartType, periodKey) => {
-    if (chartType === 'userStatus') setUserStatusPeriod(periodKey);
-    else if (chartType === 'gender') setGenderPeriod(periodKey);
-    else if (chartType === 'ageGroup') setAgeGroupPeriod(periodKey);
+  const handleDateRangeChange = (chartType, dates) => {
+    if (dates && dates.length === 2) {
+      if (chartType === 'userStatus') setUserStatusDateRange(dates);
+      else if (chartType === 'gender') setGenderDateRange(dates);
+      else if (chartType === 'ageGroup') setAgeGroupDateRange(dates);
+    }
   };
 
-  // 드롭다운 메뉴 렌더링 함수
-  const renderPeriodDropdown = (chartType, currentPeriod) => {
-    const periodText = {
-      '30d': '30일',
-      '3m': '3개월',
-      '6m': '6개월',
-    };
+  // 드롭다운 메뉴 렌더링 함수를 DatePicker로 변경
+  const renderDateRangePicker = (chartType, currentDateRange) => {
     return (
-      <Dropdown
-        overlay={(
-          <Menu onClick={({ key }) => handlePeriodChange(chartType, key)}>
-            <Menu.Item key="30d">30일</Menu.Item>
-            <Menu.Item key="3m">3개월</Menu.Item>
-            <Menu.Item key="6m">6개월</Menu.Item>
-          </Menu>
-        )}
-      >
-        <Button size="small">
-          {periodText[currentPeriod]} <DownOutlined />
-        </Button>
-      </Dropdown>
+      <RangePicker
+        value={currentDateRange}
+        onChange={(dates) => handleDateRangeChange(chartType, dates)}
+        allowClear={false}
+        style={{ width: 240 }}
+      />
     );
   };
 
   // 동적 데이터 선택 로직 (useMemo 사용)
   const currentUserStatusArray = useMemo(() => {
-    switch (userStatusPeriod) {
-      case '3m': return userStatusData3m;
-      case '6m': return userStatusData6m;
-      default: return userStatusData30d;
-    }
-  }, [userStatusPeriod]);
+    const daysDiff = moment(userStatusDateRange[1]).diff(userStatusDateRange[0], 'days');
+    if (daysDiff <= 30) return userStatusData30d;
+    else if (daysDiff <= 90) return userStatusData3m;
+    else return userStatusData6m;
+  }, [userStatusDateRange]);
 
   const currentGenderArray = useMemo(() => {
-    switch (genderPeriod) {
-      case '3m': return genderData3m;
-      case '6m': return genderData6m;
-      default: return genderData30d;
-    }
-  }, [genderPeriod]);
+    const daysDiff = moment(genderDateRange[1]).diff(genderDateRange[0], 'days');
+    if (daysDiff <= 30) return genderData30d;
+    else if (daysDiff <= 90) return genderData3m;
+    else return genderData6m;
+  }, [genderDateRange]);
 
   const currentAgeGroupArray = useMemo(() => {
-    switch (ageGroupPeriod) {
-      case '3m': return ageGroupData3m;
-      case '6m': return ageGroupData6m;
-      default: return ageGroupData30d;
-    }
-  }, [ageGroupPeriod]);
+    const daysDiff = moment(ageGroupDateRange[1]).diff(ageGroupDateRange[0], 'days');
+    if (daysDiff <= 30) return ageGroupData30d;
+    else if (daysDiff <= 90) return ageGroupData3m;
+    else return ageGroupData6m;
+  }, [ageGroupDateRange]);
 
   // 도넛 차트 데이터 객체 (useMemo 사용)
   const userStatusDoughnutData = useMemo(() => ({ 
@@ -428,7 +418,7 @@ const UserStatistics = () => {
       {/* 도넛 차트 섹션 */}
       <Row gutter={[16, 16]}>
         <Col xs={24} md={12} lg={8}>
-          <Card title="사용자 상태 분포" extra={renderPeriodDropdown('userStatus', userStatusPeriod)}>
+          <Card title="사용자 상태 분포" extra={renderDateRangePicker('userStatus', userStatusDateRange)}>
             <div style={{ height: 300 }}><Doughnut options={userStatusDoughnutOptions} data={userStatusDoughnutData} /></div>
             <List
               itemLayout="horizontal"
@@ -451,7 +441,7 @@ const UserStatistics = () => {
           </Card>
         </Col>
         <Col xs={24} md={12} lg={8}>
-          <Card title="성별 분포" extra={renderPeriodDropdown('gender', genderPeriod)}>
+          <Card title="성별 분포" extra={renderDateRangePicker('gender', genderDateRange)}>
             <div style={{ height: 300 }}><Doughnut options={genderDoughnutOptions} data={genderDoughnutData} /></div>
             <List
               itemLayout="horizontal"
@@ -474,7 +464,7 @@ const UserStatistics = () => {
           </Card>
         </Col>
         <Col xs={24} md={12} lg={8}>
-          <Card title="연령대별 분포" extra={renderPeriodDropdown('ageGroup', ageGroupPeriod)}>
+          <Card title="연령대별 분포" extra={renderDateRangePicker('ageGroup', ageGroupDateRange)}>
             <div style={{ height: 300 }}><Doughnut options={ageGroupDoughnutOptions} data={ageGroupDoughnutData} /></div>
             <List
               itemLayout="horizontal"

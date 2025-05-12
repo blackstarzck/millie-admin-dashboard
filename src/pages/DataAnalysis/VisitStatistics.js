@@ -262,6 +262,7 @@ const VisitStatistics = () => {
     const [selectedAgeGroup, setSelectedAgeGroup] = useState(AGE_GROUPS_KEYS);
     const chartRefs = [useRef(null), useRef(null), useRef(null)]; // 각 도넛 차트 인스턴스 참조
     const [hiddenDoughnutSegments, setHiddenDoughnutSegments] = useState({}); // { peakIndex: { segmentLabel: boolean } }
+    const [compareDate, setCompareDate] = useState(moment().subtract(1, 'days'));
 
     const allTimeHourlyData = useMemo(() => generateDetailedHourlyData(), []);
 
@@ -512,7 +513,7 @@ const VisitStatistics = () => {
             ),
         },
         {
-            title: '방문자 수',
+            title: '조회 수',
             dataIndex: 'visits',
             key: 'visits',
             align: 'right',
@@ -522,243 +523,352 @@ const VisitStatistics = () => {
     ];
     const displayedPopularBooks = popularBookDataAll.slice(0, visibleBookCount);
 
-    // ReferrerPath 컴포넌트의 내용 추가
-    const [period, setPeriod] = useState('daily');
-    const [selectedDate, setSelectedDate] = useState(null);
-    const [data, setData] = useState(generateSampleData());
-    // 차트 참조 생성
-    const chartRef = useRef(null);
+    // 유입 경로 분석 관련 상태와 함수를 별도의 컴포넌트로 분리
+    const ReferrerPathAnalysis = () => {
+        const [refPeriod, setRefPeriod] = useState('daily');
+        const [refSelectedDate, setRefSelectedDate] = useState(null);
+        const [refData, setRefData] = useState(generateSampleData());
+        const refChartRef = useRef(null);
 
-    // periodData를 useState 이전에 선언된 함수를 사용하도록 수정
-    const periodData = generatePeriodData(period);
+        const refPeriodData = generatePeriodData(refPeriod);
 
-    // 차트 클릭 이벤트 핸들러
-    const handleChartClick = (event) => {
-        if (!chartRef.current) return;
-        
-        const chart = chartRef.current;
-        const points = chart.getElementsAtEventForMode(event, 'nearest', { intersect: true }, false);
-        
-        if (points.length) {
-            const firstPoint = points[0];
-            const index = firstPoint.index;
-            const selectedDate = periodData.labels[index];
-            setSelectedDate(selectedDate);
-            setData(generateSelectedDateData(selectedDate));
-        }
-    };
-
-    const generateSelectedDateData = (date) => {
-        // Simple hash function to make data vary with date
-        let seed = 0;
-        if (date) { // Ensure date is not null/undefined
-            for (let i = 0; i < date.length; i++) {
-                seed = (seed << 5) - seed + date.charCodeAt(i);
-                seed |= 0; // Convert to 32bit integer
+        // 차트 클릭 이벤트 핸들러
+        const handleRefChartClick = (event) => {
+            if (!refChartRef.current) return;
+            
+            const chart = refChartRef.current;
+            const points = chart.getElementsAtEventForMode(event, 'nearest', { intersect: true }, false);
+            
+            if (points.length) {
+                const firstPoint = points[0];
+                const index = firstPoint.index;
+                const selectedDate = refPeriodData.labels[index];
+                setRefSelectedDate(selectedDate);
+                setRefData(generateSelectedDateData(selectedDate));
             }
-        }
-
-        const randomFactor = (val) => Math.max(10, Math.floor(val * (0.8 + (Math.abs(seed % 100) / 250)))); // Vary by +/- 20%
-
-        const searchData = {
-            google: { visits: randomFactor(700), device: { pc: 65, mobile: 35 } },
-            naver: { visits: randomFactor(600), device: { pc: 45, mobile: 55 } },
-            daum: { visits: randomFactor(400), device: { pc: 55, mobile: 45 } },
-            zoom: { visits: randomFactor(250), device: { pc: 70, mobile: 30 } },
-            bing: { visits: randomFactor(150), device: { pc: 60, mobile: 40 } },
-            other: { visits: randomFactor(100), device: { pc: 50, mobile: 50 } },
-        };
-        const socialData = {
-            kakao: { visits: randomFactor(500), device: { pc: 30, mobile: 70 } },
-            facebook: { visits: randomFactor(450), device: { pc: 40, mobile: 60 } },
-            instagram: { visits: randomFactor(550), device: { pc: 25, mobile: 75 } },
-            twitter: { visits: randomFactor(200), device: { pc: 45, mobile: 55 } },
-            youtube: { visits: randomFactor(300), device: { pc: 35, mobile: 65 } },
-            other: { visits: randomFactor(100), device: { pc: 40, mobile: 60 } },
-        };
-        const otherData = {
-            direct: { visits: randomFactor(800), device: { pc: 55, mobile: 45 } },
-            ai: { visits: randomFactor(200), device: { pc: 75, mobile: 25 } },
         };
 
-        return {
-            search: searchData,
-            social: socialData,
-            other: otherData
-        };
-    };
-
-    const chartData = {
-        labels: periodData.labels,
-        datasets: [
-            {
-                label: '현재',
-                data: periodData.labels.map((_, index) => 
-                    periodData.searchData[index] + 
-                    periodData.socialData[index] + 
-                    periodData.otherData[index]
-                ),
-                backgroundColor: '#1890ff',
-            },
-            {
-                label: '이전',
-                data: periodData.labels.map((_, index) => 
-                    periodData.prevSearchData[index] + 
-                    periodData.prevSocialData[index] + 
-                    periodData.prevOtherData[index]
-                ),
-                backgroundColor: 'rgba(24, 144, 255, 0.3)',
-            }
-        ],
-    };
-
-    const chartOptions = {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-            legend: {
-                display: true,
-                position: 'top',
-                labels: {
-                    boxWidth: 12,
-                    padding: 15
+        // 선택된 날짜의 데이터 생성 함수
+        const generateSelectedDateData = (date) => {
+            // Simple hash function to make data vary with date
+            let seed = 0;
+            if (date) { // Ensure date is not null/undefined
+                for (let i = 0; i < date.length; i++) {
+                    seed = (seed << 5) - seed + date.charCodeAt(i);
+                    seed |= 0; // Convert to 32bit integer
                 }
-            },
-            title: {
-                display: false,
-                text: '유입 경로별 방문자 수 추이',
-            },
-            tooltip: {
-                callbacks: {
-                    title: function(context) {
-                        const isPrev = context[0].datasetIndex === 1;
-                        const periodText = period === 'daily' ? '어제' : 
-                                         period === 'weekly' ? '저번주' : '저번달';
-                        return isPrev ? periodText : '현재';
-                    },
-                    label: function(context) {
-                        const dataset = context.dataset;
-                        const isPrev = context.datasetIndex === 1;
-                        const value = context.raw;
-                        
-                        if (isPrev) {
-                            return `${value.toLocaleString()}명`;
-                        } else {
-                            const prevValue = context.chart.data.datasets[1].data[context.dataIndex];
-                            const diff = value - prevValue;
-                            const diffPercentage = Math.round((diff / prevValue) * 100);
-                            
-                            const isIncrease = diff >= 0;
-                            const diffIcon = isIncrease ? '▲' : '▼';
-                            
-                            return [
-                                `${value.toLocaleString()}명`,
-                                `${diffIcon} ${Math.abs(diff).toLocaleString()}명 (${diffPercentage}%)`
-                            ];
-                        }
+            }
+
+            const randomFactor = (val) => Math.max(10, Math.floor(val * (0.8 + (Math.abs(seed % 100) / 250)))); // Vary by +/- 20%
+
+            const searchData = {
+                google: { visits: randomFactor(700), device: { pc: 65, mobile: 35 } },
+                naver: { visits: randomFactor(600), device: { pc: 45, mobile: 55 } },
+                daum: { visits: randomFactor(400), device: { pc: 55, mobile: 45 } },
+                zoom: { visits: randomFactor(250), device: { pc: 70, mobile: 30 } },
+                bing: { visits: randomFactor(150), device: { pc: 60, mobile: 40 } },
+                other: { visits: randomFactor(100), device: { pc: 50, mobile: 50 } },
+            };
+            const socialData = {
+                kakao: { visits: randomFactor(500), device: { pc: 30, mobile: 70 } },
+                facebook: { visits: randomFactor(450), device: { pc: 40, mobile: 60 } },
+                instagram: { visits: randomFactor(550), device: { pc: 25, mobile: 75 } },
+                twitter: { visits: randomFactor(200), device: { pc: 45, mobile: 55 } },
+                youtube: { visits: randomFactor(300), device: { pc: 35, mobile: 65 } },
+                other: { visits: randomFactor(100), device: { pc: 40, mobile: 60 } },
+            };
+            const otherData = {
+                direct: { visits: randomFactor(800), device: { pc: 55, mobile: 45 } },
+                ai: { visits: randomFactor(200), device: { pc: 75, mobile: 25 } },
+            };
+
+            return {
+                search: searchData,
+                social: socialData,
+                other: otherData
+            };
+        };
+
+        const refChartData = {
+            labels: refPeriodData.labels,
+            datasets: [
+                {
+                    label: '현재',
+                    data: refPeriodData.labels.map((_, index) => 
+                        refPeriodData.searchData[index] + 
+                        refPeriodData.socialData[index] + 
+                        refPeriodData.otherData[index]
+                    ),
+                    backgroundColor: '#1890ff',
+                },
+                {
+                    label: '이전',
+                    data: refPeriodData.labels.map((_, index) => 
+                        refPeriodData.prevSearchData[index] + 
+                        refPeriodData.prevSocialData[index] + 
+                        refPeriodData.prevOtherData[index]
+                    ),
+                    backgroundColor: 'rgba(24, 144, 255, 0.3)',
+                }
+            ],
+        };
+
+        const refChartOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top',
+                    labels: {
+                        boxWidth: 12,
+                        padding: 15
                     }
                 },
-                backgroundColor: 'rgba(0, 0, 0, 0.7)',
-                titleColor: '#fff',
-                bodyColor: function(context) {
-                    if (!context || !context[0]) return '#fff';
-                    
-                    const tooltipItem = context[0];
-                    if (tooltipItem.datasetIndex === 1) return '#fff';
-                    
-                    const currentValue = tooltipItem.raw;
-                    const prevValue = tooltipItem.chart.data.datasets[1].data[tooltipItem.dataIndex];
-                    const diff = currentValue - prevValue;
-                    
-                    return diff >= 0 ? '#ff4d4f' : '#1890ff';
-                },
-                borderColor: 'rgba(255, 255, 255, 0.2)',
-                borderWidth: 1,
-                padding: 10,
-                displayColors: true,
-                usePointStyle: true
-            }
-        },
-        scales: {
-            x: {
-                grid: {
+                title: {
                     display: false,
+                    text: '유입 경로별 방문자 수 추이',
                 },
-                ticks: {
-                    maxRotation: 45,
-                    minRotation: 45,
+                tooltip: {
+                    callbacks: {
+                        title: function(context) {
+                            const isPrev = context[0].datasetIndex === 1;
+                            const periodText = refPeriod === 'daily' ? '어제' : 
+                                             refPeriod === 'weekly' ? '저번주' : '저번달';
+                            return isPrev ? periodText : '현재';
+                        },
+                        label: function(context) {
+                            const dataset = context.dataset;
+                            const isPrev = context.datasetIndex === 1;
+                            const value = context.raw;
+                            
+                            if (isPrev) {
+                                return `${value.toLocaleString()}명`;
+                            } else {
+                                const prevValue = context.chart.data.datasets[1].data[context.dataIndex];
+                                const diff = value - prevValue;
+                                const diffPercentage = Math.round((diff / prevValue) * 100);
+                                
+                                const isIncrease = diff >= 0;
+                                const diffIcon = isIncrease ? '▲' : '▼';
+                                
+                                return [
+                                    `${value.toLocaleString()}명`,
+                                    `${diffIcon} ${Math.abs(diff).toLocaleString()}명 (${diffPercentage}%)`
+                                ];
+                            }
+                        }
+                    },
+                    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                    titleColor: '#fff',
+                    bodyColor: function(context) {
+                        if (!context || !context[0]) return '#fff';
+                        
+                        const tooltipItem = context[0];
+                        if (tooltipItem.datasetIndex === 1) return '#fff';
+                        
+                        const currentValue = tooltipItem.raw;
+                        const prevValue = tooltipItem.chart.data.datasets[1].data[tooltipItem.dataIndex];
+                        const diff = currentValue - prevValue;
+                        
+                        return diff >= 0 ? '#ff4d4f' : '#1890ff';
+                    },
+                    borderColor: 'rgba(255, 255, 255, 0.2)',
+                    borderWidth: 1,
+                    padding: 10,
+                    displayColors: true,
+                    usePointStyle: true
                 }
             },
-            y: {
-                beginAtZero: true,
-                title: {
-                    display: true,
-                    text: '방문자 수',
+            scales: {
+                x: {
+                    grid: {
+                        display: false,
+                    },
+                    ticks: {
+                        maxRotation: 45,
+                        minRotation: 45,
+                    }
+                },
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: '방문자 수',
+                    },
                 },
             },
-        },
-        barPercentage: 0.6,
-        categoryPercentage: 0.8,
-        interaction: {
-            mode: 'index',
-            intersect: false,
-            axis: 'x'
-        }
-    };
-
-    // 데이터 변환 함수
-    const transformData = (data, type) => {
-        const totalVisits = Object.values(data[type]).reduce((sum, item) => sum + item.visits, 0);
-        return Object.entries(data[type]).map(([key, value]) => ({
-            key,
-            name: key === 'direct' ? '직접유입' : 
-                  key === 'ai' ? '기타유입' : 
-                  key.charAt(0).toUpperCase() + key.slice(1),
-            visits: value.visits,
-            percentage: Math.round((value.visits / totalVisits) * 100),
-            device: value.device,
-        }));
-    };
-
-    // 디바이스 데이터 변환 함수
-    const transformDeviceData = (data) => {
-        const allData = {
-            ...data.search,
-            ...data.social,
-            ...data.other
+            barPercentage: 0.6,
+            categoryPercentage: 0.8,
+            interaction: {
+                mode: 'index',
+                intersect: false,
+                axis: 'x'
+            }
         };
 
-        const totalVisits = Object.values(allData).reduce((sum, item) => sum + item.visits, 0);
-        const pcVisits = Object.values(allData).reduce((sum, item) => sum + (item.visits * item.device.pc / 100), 0);
-        const mobileVisits = Object.values(allData).reduce((sum, item) => sum + (item.visits * item.device.mobile / 100), 0);
+        // 데이터 변환 함수
+        const transformData = (data, type) => {
+            const totalVisits = Object.values(data[type]).reduce((sum, item) => sum + item.visits, 0);
+            return Object.entries(data[type]).map(([key, value]) => ({
+                key,
+                name: key === 'direct' ? '직접유입' : 
+                      key === 'ai' ? '기타유입' : 
+                      key.charAt(0).toUpperCase() + key.slice(1),
+                visits: value.visits,
+                percentage: Math.round((value.visits / totalVisits) * 100),
+                device: value.device,
+            }));
+        };
 
-        return [
-            {
-                key: 'pc',
-                name: 'PC',
-                visits: Math.round(pcVisits),
-                percentage: Math.round((pcVisits / totalVisits) * 100)
-            },
-            {
-                key: 'mobile',
-                name: '모바일',
-                visits: Math.round(mobileVisits),
-                percentage: Math.round((mobileVisits / totalVisits) * 100)
-            }
-        ];
+        // 디바이스 데이터 변환 함수
+        const transformDeviceData = (data) => {
+            const allData = {
+                ...data.search,
+                ...data.social,
+                ...data.other
+            };
+
+            const totalVisits = Object.values(allData).reduce((sum, item) => sum + item.visits, 0);
+            const pcVisits = Object.values(allData).reduce((sum, item) => sum + (item.visits * item.device.pc / 100), 0);
+            const mobileVisits = Object.values(allData).reduce((sum, item) => sum + (item.visits * item.device.mobile / 100), 0);
+
+            return [
+                {
+                    key: 'pc',
+                    name: 'PC',
+                    visits: Math.round(pcVisits),
+                    percentage: Math.round((pcVisits / totalVisits) * 100)
+                },
+                {
+                    key: 'mobile',
+                    name: '모바일',
+                    visits: Math.round(mobileVisits),
+                    percentage: Math.round((mobileVisits / totalVisits) * 100)
+                }
+            ];
+        };
+
+        const renderListItem = (item) => (
+            <List.Item>
+                <Space style={{ width: '100%', justifyContent: 'space-between' }}>
+                    <Text>{item.name}</Text>
+                    <Space>
+                        <Text>{item.visits.toLocaleString()}명</Text>
+                        <Text type="secondary">({item.percentage}%)</Text>
+                    </Space>
+                </Space>
+            </List.Item>
+        );
+
+        return (
+            <>
+                <Title level={2}><SearchOutlined /> 유입 경로 분석</Title>
+
+                <Card size="small">
+                    <Space>
+                        <Radio.Group value={refPeriod} onChange={(e) => setRefPeriod(e.target.value)}>
+                            <Radio.Button value="daily">일간</Radio.Button>
+                            <Radio.Button value="weekly">주간</Radio.Button>
+                            <Radio.Button value="monthly">월간</Radio.Button>
+                        </Radio.Group>
+                        {refSelectedDate && (
+                            <Text type="secondary" style={{ marginLeft: 16 }}>
+                                선택된 기간: {refSelectedDate}
+                            </Text>
+                        )}
+                    </Space>
+                </Card>
+
+                <Card size="small">
+                    <div style={{ height: '300px' }}>
+                        <Bar 
+                            ref={refChartRef}
+                            data={refChartData} 
+                            options={refChartOptions} 
+                            onClick={handleRefChartClick}
+                        />
+                    </div>
+                </Card>
+
+                <Row gutter={[16, 16]}>
+                    <Col span={6}>
+                        <Card 
+                            title="검색 엔진 유입" 
+                            size="small"
+                            style={{ height: '100%' }}
+                        >
+                            <List
+                                size="small"
+                                dataSource={transformData(refData, 'search')}
+                                renderItem={renderListItem}
+                            />
+                        </Card>
+                    </Col>
+                    <Col span={6}>
+                        <Card 
+                            title="SNS 유입" 
+                            size="small"
+                            style={{ height: '100%' }}
+                        >
+                            <List
+                                size="small"
+                                dataSource={transformData(refData, 'social')}
+                                renderItem={renderListItem}
+                            />
+                         </Card>
+                     </Col>
+                    <Col span={6}>
+                        <Card 
+                            title="기타 유입" 
+                            size="small"
+                            style={{ height: '100%' }}
+                        >
+                            <List
+                                size="small"
+                                dataSource={transformData(refData, 'other')}
+                                renderItem={renderListItem}
+                            />
+                         </Card>
+                     </Col>
+                    <Col span={6}>
+                        <Card 
+                            title="디바이스별 유입" 
+                            size="small"
+                            style={{ height: '100%' }}
+                        >
+                            <List
+                                size="small"
+                                dataSource={transformDeviceData(refData)}
+                                renderItem={renderListItem}
+                            />
+                        </Card>
+                    </Col>
+                </Row>
+            </>
+        );
     };
 
-    const renderListItem = (item) => (
-        <List.Item>
-            <Space style={{ width: '100%', justifyContent: 'space-between' }}>
-                <Text>{item.name}</Text>
-                <Space>
-                    <Text>{item.visits.toLocaleString()}명</Text>
-                    <Text type="secondary">({item.percentage}%)</Text>
-                </Space>
-            </Space>
-        </List.Item>
-    );
+    // 더미 비교 데이터 생성 함수
+    const generateCompareData = (baseData, date) => {
+        return baseData.map(peakDetail => {
+            // 각 세그먼트별로 다른 변동폭 적용
+            return {
+                ...peakDetail,
+                segmentDetails: peakDetail.segmentDetails.map(segment => {
+                    // 각 세그먼트별로 -30% ~ +30% 사이의 랜덤 변동
+                    const randomFactor = 0.7 + Math.random() * 0.6;
+                    const newVisits = Math.floor(segment.visits * randomFactor);
+                    return {
+                        ...segment,
+                        visits: newVisits,
+                        percentageString: ((newVisits / (peakDetail.totalVisitsUnfiltered * randomFactor)) * 100).toFixed(1) + '%'
+                    };
+                }),
+                totalVisitsUnfiltered: Math.floor(peakDetail.totalVisitsUnfiltered * (0.7 + Math.random() * 0.6))
+            };
+        });
+    };
 
     return (
         <Space direction="vertical" size="large" style={{ display: 'flex' }}>
@@ -818,49 +928,150 @@ const VisitStatistics = () => {
             {topPeakHoursDetails.length > 0 && <Title level={4} style={{marginTop: 24}}>주요 피크 시간 상세 분포</Title>}
             <Row gutter={[16, 24]}>
                 {topPeakHoursDetails.map((peakDetail, peakIndex) => {
-                    const dynamicDoughnutOptions = {
-                        ...basePeakDoughnutChartOptions, 
-                        plugins: {
-                            ...(basePeakDoughnutChartOptions?.plugins || {}),
-                            centerTextPlugin: {
-                                ...(basePeakDoughnutChartOptions?.plugins?.centerTextPlugin || {}),
-                                display: true,
-                                textLines: [
-                                    `${peakDetail.hour}:00-${peakDetail.hour + 1}:00`,
-                                    `${(peakDetail.filteredTotalVisitsInPeak ?? 0).toLocaleString()}명` 
-                                ],
-                                fontStyle: (peakDetail.filteredTotalVisitsInPeak ?? 0) >= 1000 ? '14px Arial' : '16px Arial',
-                                fontWeight: 'bold',
-                                textColor: '#333'
+                    const compareData = generateCompareData([peakDetail], compareDate)[0];
+                    
+                    // 대비되는 색상 생성 함수
+                    const getContrastColor = (color) => {
+                        // HSL 색상에서 색상각을 180도 회전하여 보색 생성
+                        const hsl = color.match(/hsla?\((\d+),\s*(\d+)%,\s*(\d+)%[^)]*\)/);
+                        if (hsl) {
+                            const [_, h, s, l] = hsl;
+                            // 색상각을 180도 회전 (0-360 범위 내에서)
+                            const newH = (parseInt(h) + 180) % 360;
+                            // 채도와 명도는 유지
+                            return `hsla(${newH}, ${s}%, ${l}%, 0.7)`;
+                        }
+                        return color + '80'; // 기본 투명도 적용
+                    };
+
+                    const barChartData = {
+                        labels: peakDetail.segmentDetails.map(seg => seg.label),
+                        datasets: [
+                            {
+                                label: `${selectedWeekdays} (${moment().format('MM/DD')})`,
+                                data: peakDetail.segmentDetails.map(seg => seg.visits),
+                                backgroundColor: peakDetail.segmentDetails.map(seg => seg.originalColor),
+                                borderColor: peakDetail.segmentDetails.map(seg => seg.originalColor),
+                                borderWidth: 1
                             },
-                             legend: { display: false }, // 내부 범례는 항상 숨김
-                             tooltip: { /* ... 툴크 콜백 ... */ }
+                            {
+                                label: `${WEEKDAYS_OPTIONS.find(d => d.value === moment(compareDate).format('ddd'))?.label} (${moment(compareDate).format('MM/DD')})`,
+                                data: compareData.segmentDetails.map(seg => seg.visits),
+                                backgroundColor: peakDetail.segmentDetails.map(seg => getContrastColor(seg.originalColor)),
+                                borderColor: peakDetail.segmentDetails.map(seg => getContrastColor(seg.originalColor)),
+                                borderWidth: 1
+                            }
+                        ]
+                    };
+
+                    const barChartOptions = {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        indexAxis: 'y',
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'top',
+                                labels: {
+                                    usePointStyle: true,
+                                    padding: 20,
+                                    font: {
+                                        size: 12
+                                    }
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        const value = context.raw;
+                                        const dataset = context.dataset;
+                                        const total = dataset.data.reduce((a, b) => a + b, 0);
+                                        const percentage = ((value / total) * 100).toFixed(1);
+                                        const diff = context.datasetIndex === 0 ? 
+                                            value - context.chart.data.datasets[1].data[context.dataIndex] :
+                                            value - context.chart.data.datasets[0].data[context.dataIndex];
+                                        const diffPercentage = ((diff / (value - diff)) * 100).toFixed(1);
+                                        
+                                        return [
+                                            `${dataset.label}: ${value.toLocaleString()}명 (${percentage}%)`,
+                                            diff !== 0 ? `${diff > 0 ? '▲' : '▼'} ${Math.abs(diff).toLocaleString()}명 (${diffPercentage}%)` : '변동 없음'
+                                        ];
+                                    }
+                                }
+                            },
+                            title: {
+                                display: false // 기존 타이틀 제거
+                            }
+                        },
+                        scales: {
+                            x: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: '방문자 수'
+                                },
+                                ticks: {
+                                    callback: function(value) {
+                                        return value.toLocaleString();
+                                    }
+                                }
+                            },
+                            y: {
+                                ticks: {
+                                    font: {
+                                        size: 12
+                                    }
+                                }
+                            }
                         }
                     };
-                    const cardTitle = `피크 ${peakIndex + 1} 상세 분포 (전체: ${(peakDetail.totalVisitsUnfiltered ?? 0).toLocaleString()}명)`;
 
                     return (
                         <Col key={`peak-${peakDetail.hour}-${peakIndex}`} xs={24} md={12} lg={8}>
                             <Card 
-                                title={cardTitle} 
                                 bordered={false}
                                 headStyle={{borderBottom: '1px solid #f0f0f0', textAlign: 'center'}}
                                 style={{ height: '100%' }}
+                                title={
+                                    <Space direction="vertical" size={0} style={{ width: '100%' }}>
+                                        <Text strong>{WEEKDAYS_OPTIONS.find(d => d.value === selectedWeekdays)?.label}요일 ({moment().format('MM/DD')})</Text>
+                                        <Text type="secondary" style={{ fontSize: '12px' }}>{peakDetail.hour}:00-{peakDetail.hour + 1}:00</Text>
+                                    </Space>
+                                }
+                                extra={
+                                    <DatePicker
+                                        value={compareDate}
+                                        onChange={(date) => setCompareDate(date)}
+                                        allowClear={false}
+                                        style={{ width: 120 }}
+                                    />
+                                }
                             >
                                 {peakDetail.segmentDetails.length > 0 ? (
                                     <>
-                                        <div style={{ height: '220px', position: 'relative', marginBottom: 16 }}>
-                                            <Doughnut 
-                                                key={`doughnut-${peakIndex}-${JSON.stringify(hiddenDoughnutSegments[peakIndex])}`} // 키 변경으로 리렌더링
-                                                options={dynamicDoughnutOptions} 
-                                                data={peakDetail.doughnutChartData} 
+                                        <div style={{ height: '300px', position: 'relative', marginBottom: 16 }}>
+                                            <Bar 
+                                                data={barChartData}
+                                                options={{
+                                                    ...barChartOptions,
+                                                    plugins: {
+                                                        ...barChartOptions.plugins,
+                                                        title: {
+                                                            display: false // 기존 타이틀 제거
+                                                        }
+                                                    }
+                                                }}
                                             />
                                         </div>
                                         <List
                                             size="small"
-                                            dataSource={peakDetail.segmentDetails} // 정렬된 전체 세그먼트 리스트 사용
+                                            dataSource={peakDetail.segmentDetails}
                                             renderItem={(segment) => {
                                                 const isHidden = hiddenDoughnutSegments[peakIndex]?.[segment.label] || false;
+                                                const compareSegment = compareData.segmentDetails.find(s => s.label === segment.label);
+                                                const diff = segment.visits - compareSegment.visits;
+                                                const diffPercentage = ((diff / compareSegment.visits) * 100).toFixed(1);
+                                                
                                                 return (
                                                     <List.Item 
                                                         style={{padding: '8px 0', cursor:'pointer', opacity: isHidden ? 0.5 : 1}}
@@ -868,8 +1079,22 @@ const VisitStatistics = () => {
                                                     >
                                                         <Tag color={segment.originalColor} style={{ marginRight: 8, minWidth: '15px', height:'15px', borderRadius:'50%', opacity: isHidden ? 0.5 : 1 }} />
                                                         <Text style={{ flex: 1, textDecoration: isHidden ? 'line-through' : 'none' }}>{segment.label}</Text>
-                                                        <Text strong style={{ marginRight: 8 }}>{(segment.visits ?? 0).toLocaleString()}명</Text>
-                                                        <Text type="secondary">({segment.percentageString || '0%'})</Text>
+                                                        <Space direction="vertical" align="end" size={0}>
+                                                            <Space>
+                                                                <Text strong>{segment.visits.toLocaleString()}명</Text>
+                                                                <Text type="secondary">({segment.percentageString})</Text>
+                                                            </Space>
+                                                            <Space>
+                                                                <Text type="secondary" style={{ fontSize: '12px' }}>
+                                                                    {moment(compareDate).format('MM/DD')}: {compareSegment.visits.toLocaleString()}명
+                                                                </Text>
+                                                                {diff !== 0 && (
+                                                                    <Text type={diff > 0 ? 'success' : 'danger'} style={{ fontSize: '12px' }}>
+                                                                        {diff > 0 ? '▲' : '▼'} {Math.abs(diff).toLocaleString()}명 ({diffPercentage}%)
+                                                                    </Text>
+                                                                )}
+                                                            </Space>
+                                                        </Space>
                                                     </List.Item>
                                                 );
                                             }}
@@ -891,88 +1116,8 @@ const VisitStatistics = () => {
             
             <Modal title="도서 상세 정보" open={isBookDetailModalVisible} onCancel={handleBookDetailModalClose} footer={[ <Button key="close" onClick={handleBookDetailModalClose}>닫기</Button>, <Button key="edit" type="primary" href={selectedBook?.link ? `/content/books/edit/${selectedBook.id}` : '#'} >도서 관리로 이동</Button>, ]} width={600} > {selectedBook && ( <Row gutter={16}> <Col span={8}> <Image width="100%" src={selectedBook.coverUrl || 'https://via.placeholder.com/150?text=No+Image'} alt={selectedBook.title} fallback="https://via.placeholder.com/150?text=Error" /> </Col> <Col span={16}> <Descriptions bordered column={1} size="small"> <Descriptions.Item label="제목">{selectedBook.title}</Descriptions.Item> <Descriptions.Item label="저자">{selectedBook.author}</Descriptions.Item> <Descriptions.Item label="출판사">{selectedBook.publisher}</Descriptions.Item> <Descriptions.Item label="카테고리">{selectedBook.category}</Descriptions.Item> <Descriptions.Item label="설명">{selectedBook.description}</Descriptions.Item> <Descriptions.Item label="방문자 수 (선택 기간)">{selectedBook.visits?.toLocaleString()}</Descriptions.Item> </Descriptions> </Col> </Row> )} </Modal>
 
-            <Title level={2}><SearchOutlined /> 유입 경로 분석</Title>
-
-            <Card size="small">
-                <Space>
-                    <Radio.Group value={period} onChange={(e) => setPeriod(e.target.value)}>
-                        <Radio.Button value="daily">일간</Radio.Button>
-                        <Radio.Button value="weekly">주간</Radio.Button>
-                        <Radio.Button value="monthly">월간</Radio.Button>
-                    </Radio.Group>
-                    {selectedDate && (
-                        <Text type="secondary" style={{ marginLeft: 16 }}>
-                            선택된 기간: {selectedDate}
-                        </Text>
-                    )}
-                </Space>
-            </Card>
-
-            <Card size="small">
-                <div style={{ height: '300px' }}>
-                    <Bar 
-                        ref={chartRef}
-                        data={chartData} 
-                        options={chartOptions} 
-                        onClick={handleChartClick}
-                    />
-                </div>
-            </Card>
-
-            <Row gutter={[16, 16]}>
-                <Col span={6}>
-                    <Card 
-                        title="검색 엔진 유입" 
-                        size="small"
-                        style={{ height: '100%' }}
-                    >
-                        <List
-                            size="small"
-                            dataSource={transformData(data, 'search')}
-                            renderItem={renderListItem}
-                        />
-                    </Card>
-                </Col>
-                <Col span={6}>
-                    <Card 
-                        title="SNS 유입" 
-                        size="small"
-                        style={{ height: '100%' }}
-                    >
-                        <List
-                            size="small"
-                            dataSource={transformData(data, 'social')}
-                            renderItem={renderListItem}
-                        />
-                     </Card>
-                 </Col>
-                <Col span={6}>
-                    <Card 
-                        title="기타 유입" 
-                        size="small"
-                        style={{ height: '100%' }}
-                    >
-                        <List
-                            size="small"
-                            dataSource={transformData(data, 'other')}
-                            renderItem={renderListItem}
-                        />
-                     </Card>
-                 </Col>
-                <Col span={6}>
-                    <Card 
-                        title="디바이스별 유입" 
-                        size="small"
-                        style={{ height: '100%' }}
-                    >
-                        <List
-                            size="small"
-                            dataSource={transformDeviceData(data)}
-                            renderItem={renderListItem}
-                        />
-                    </Card>
-                </Col>
-            </Row>
+            {/* 유입 경로 분석 */}
+            <ReferrerPathAnalysis />
         </Space>
     );
 };
