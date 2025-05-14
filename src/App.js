@@ -45,6 +45,7 @@ import EventStatus from './pages/EventManagement/EventStatus';
 import AuthorInfoManagement from './pages/SelfPublishing/AuthorInfoManagement';
 import BadgeManagement from './pages/UserManagement/BadgeManagement';
 import CurationManagement from './pages/ContentManagement/CurationManagement';
+import SeriesManagement from './pages/ContentManagement/SeriesManagement';
 
 // 새로 추가된 신고 관리 페이지 컴포넌트 임포트
 import ReportList from './pages/ReportManagement/ReportList';
@@ -66,8 +67,10 @@ function App() {
               {/* 콘텐츠 관리 */}
               <Route path="content/books" element={<BookManagement />} />
               <Route path="content/categories" element={<CategoryManagement />} />
+              <Route path="content/series-management" element={<SeriesManagement />} />
               <Route path="content/metadata" element={<MetadataManagement />} />
               <Route path="content/approval" element={<ContentApproval />} />
+              <Route path="content/analysis" element={<ContentStatistics />} />
               <Route path="content/curation" element={<CurationManagement />} />
 
               {/* 자가출판 */}
@@ -113,7 +116,6 @@ function App() {
               <Route path="user-analysis/visits" element={<VisitStatistics />} />
 
               {/* 데이터 분석 */}
-              <Route path="analysis/content" element={<ContentStatistics />} />
               <Route path="analysis/campaign" element={<CampaignEffect />} />
               <Route path="analysis/reports" element={<ReportGeneration />} />
 

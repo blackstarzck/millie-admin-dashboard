@@ -42,7 +42,11 @@ import {
   UploadOutlined,
   CheckCircleOutlined,
   TagsOutlined,
-  TagOutlined
+  TagOutlined,
+  ApartmentOutlined,
+  AppstoreAddOutlined,
+  DashboardOutlined,
+  PartitionOutlined
 } from '@ant-design/icons';
 
 // 메뉴 데이터 구조화 (key 추가, 아이콘 추가)
@@ -55,8 +59,10 @@ const menuItems = [
     subMenu: [
       { key: '/content/books', path: '/content/books', name: '도서 관리', icon: <BookOutlined /> },
       { key: '/content/categories', path: '/content/categories', name: '카테고리 관리', icon: <TagOutlined /> },
+      { key: '/content/series-management', path: '/content/series-management', name: '시리즈 관리', icon: <ApartmentOutlined /> },
       { key: '/content/metadata', path: '/content/metadata', name: '메타데이터 관리', icon: <DatabaseOutlined /> },
       { key: '/content/approval', path: '/content/approval', name: '콘텐츠 승인', icon: <CheckCircleOutlined /> },
+      { key: '/content/analysis', path: '/content/analysis', name: '콘텐츠 통계', icon: <BookOutlined /> },
       { key: '/content/curation', path: '/content/curation', name: '큐레이션 관리', icon: <TagsOutlined /> },
     ],
   },
@@ -151,7 +157,6 @@ const menuItems = [
     name: '데이터 분석',
     icon: <AreaChartOutlined />,
     subMenu: [
-      { key: '/analysis/content', path: '/analysis/content', name: '콘텐츠 통계', icon: <BookOutlined /> },
       { key: '/analysis/campaign', path: '/analysis/campaign', name: '알림/팝업/이벤트 효과', icon: <FundViewOutlined /> },
       { key: '/analysis/reports', path: '/analysis/reports', name: '리포트 생성', icon: <FileTextOutlined /> },
     ],

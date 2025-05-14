@@ -1,0 +1,350 @@
+import React, { useState, useMemo, useCallback } from 'react';
+import {
+    Table,
+    Button,
+    Modal,
+    Form,
+    Input,
+    Typography,
+    Space,
+    Popconfirm,
+    message,
+    Tag,
+    List,
+    Tooltip,
+    InputNumber
+} from 'antd';
+import { PlusOutlined, EditOutlined, DeleteOutlined, BookOutlined, InfoCircleOutlined } from '@ant-design/icons';
+import { initialBooks as allBookData } from './BookManagement'; // BookManagement에서 initialBooks 가져오기
+
+const { Title, Text, Link } = Typography;
+
+// 초기 시리즈 데이터 가공 함수 (useMemo 내부로 이동하여 allBookData 변경에 반응하도록 수정)
+const processSeriesData = (books) => {
+    const seriesMap = new Map(); // 시리즈명 -> { key, name, bookCount, books: [{bookKey, bookName, seriesNum}], firstRegistrationDate, totalBooksInSeries (initialBooks 기준) }
+    let nextId = 1; 
+
+    books.forEach(book => {
+        if (book.SERIES_NAME && book.SERIES_NAME.trim() !== '') {
+            let seriesDetail;
+            if (!seriesMap.has(book.SERIES_NAME)) {
+                const currentId = nextId++;
+                seriesDetail = {
+                    id: currentId, 
+                    key: currentId,  
+                    name: book.SERIES_NAME,
+                    bookCount: 0,
+                    booksInCurrentList: [],
+                    firstRegistrationDate: book.REGISTRATION_DATE,
+                };
+                seriesMap.set(book.SERIES_NAME, seriesDetail);
+            } else {
+                seriesDetail = seriesMap.get(book.SERIES_NAME);
+            }
+
+            seriesDetail.bookCount += 1;
+            seriesDetail.booksInCurrentList.push({
+                bookKey: book.key, 
+                bookName: book.BOOK_NAME,
+                seriesNum: book.SERIES_NUM
+            });
+
+            if (book.REGISTRATION_DATE && (!seriesDetail.firstRegistrationDate || new Date(book.REGISTRATION_DATE) < new Date(seriesDetail.firstRegistrationDate))) {
+                seriesDetail.firstRegistrationDate = book.REGISTRATION_DATE;
+            }
+        }
+    });
+
+    // booksInCurrentList를 seriesNum 기준으로 정렬
+    seriesMap.forEach(series => {
+        series.booksInCurrentList.sort((a, b) => {
+            if (a.seriesNum == null) return 1; // null이나 undefined는 뒤로
+            if (b.seriesNum == null) return -1;
+            return a.seriesNum - b.seriesNum;
+        });
+    });
+    
+    return Array.from(seriesMap.values()).sort((a,b) => a.name.localeCompare(b.name));
+};
+
+const SeriesManagement = () => {
+    // allBookData는 외부에서 오므로, 이를 기반으로 초기 상태를 설정합니다.
+    // 이 페이지에서 시리즈를 추가/삭제/수정하는 것은 allBookData를 직접 변경하지 않고,
+    // 이 컴포넌트의 내부 상태인 'seriesDisplayList'를 관리합니다.
+    const [seriesDisplayList, setSeriesDisplayList] = useState(() => processSeriesData(allBookData));
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [editingSeries, setEditingSeries] = useState(null); // 현재 수정 중인 시리즈 객체
+    const [form] = Form.useForm();
+    const [searchTerm, setSearchTerm] = useState(''); // 검색어 상태 추가
+
+    // BookManagement에서 가져온 원본 도서 목록을 기반으로 시리즈 정보를 계산 (화면 표시는 seriesDisplayList 사용)
+    const seriesAnalytics = useMemo(() => {
+        const analytics = {};
+        allBookData.forEach(book => {
+            if (book.SERIES_NAME && book.SERIES_NAME.trim() !== '') {
+                if (!analytics[book.SERIES_NAME]) {
+                    analytics[book.SERIES_NAME] = { totalBookCount: 0, bookIds: new Set() };
+                }
+                analytics[book.SERIES_NAME].bookIds.add(book.BOOK_ID || book.key);
+            }
+        });
+        Object.keys(analytics).forEach(seriesName => {
+            analytics[seriesName].totalBookCount = analytics[seriesName].bookIds.size;
+        });
+        return analytics;
+    }, [allBookData]); // allBookData는 변경되지 않는다고 가정, 실제 앱에서는 props나 context로 관리
+
+
+    const handleAddSeries = () => {
+        setEditingSeries(null);
+        form.resetFields();
+        setIsModalOpen(true);
+    };
+
+    const handleEditSeries = (series) => {
+        setEditingSeries(series);
+        form.setFieldsValue({ name: series.name });
+        setIsModalOpen(true);
+    };
+
+    const handleCancelModal = () => {
+        setIsModalOpen(false);
+        setEditingSeries(null);
+        form.resetFields();
+    };
+
+    const handleFormSubmit = useCallback(() => {
+        form.validateFields()
+            .then(values => {
+                if (editingSeries) {
+                    if (seriesDisplayList.some(s => s.name === values.name && s.key !== editingSeries.key)) {
+                        message.error('이미 존재하는 시리즈명입니다.');
+                        return;
+                    }
+                    setSeriesDisplayList(prevList =>
+                        prevList.map(s =>
+                            s.key === editingSeries.key ? { ...s, name: values.name } : s
+                        )
+                    );
+                    message.success('시리즈가 수정되었습니다.');
+                } else {
+                    if (seriesDisplayList.some(s => s.name === values.name)) {
+                        message.error('이미 존재하는 시리즈명입니다.');
+                        return;
+                    }
+                    const newId = seriesDisplayList.length > 0 
+                                ? Math.max(...seriesDisplayList.map(s => s.id)) + 1 
+                                : 1;
+                    const newSeries = {
+                        id: newId,        
+                        key: newId,       
+                        name: values.name,
+                        bookCount: 0, 
+                        booksInCurrentList: [],
+                        firstRegistrationDate: new Date().toISOString().split('T')[0]
+                    };
+                    setSeriesDisplayList(prevList => [...prevList, newSeries].sort((a,b) => a.name.localeCompare(b.name)));
+                    message.success('새 시리즈가 추가되었습니다.');
+                }
+                handleCancelModal();
+            })
+            .catch(info => {
+                console.log('Validate Failed:', info);
+            });
+    }, [form, editingSeries, seriesDisplayList]);
+
+    const handleDeleteSeries = useCallback((seriesKey) => {
+        setSeriesDisplayList(prevList => prevList.filter(s => s.key !== seriesKey));
+        message.success(`'${seriesKey}' 시리즈가 삭제되었습니다.`);
+    }, []);
+
+    // 확장된 행에 표시될 도서 목록 테이블의 컬럼
+    const expandedBookColumns = [
+        {
+            title: '번호',
+            dataIndex: 'seriesNum',
+            key: 'seriesNum',
+            width: 80,
+            align: 'center',
+            render: (num) => num != null ? `Vol.${num}` : '-',
+        },
+        {
+            title: '도서명',
+            dataIndex: 'bookName',
+            key: 'bookName',
+            ellipsis: true,
+        },
+        // 필요하다면 여기에 더 많은 도서 정보 컬럼 추가 (예: 저자, 출판일 등)
+        // 이 경우 processSeriesData에서 booksInCurrentList에 해당 정보를 포함시켜야 함
+    ];
+
+    // 검색어에 따라 필터링된 시리즈 목록
+    const filteredSeriesList = useMemo(() => {
+        if (!searchTerm) {
+            return seriesDisplayList;
+        }
+        return seriesDisplayList.filter(series =>
+            series.name.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+    }, [seriesDisplayList, searchTerm]);
+
+    const columns = [
+        {
+            title: '시리즈 ID',
+            dataIndex: 'id',
+            key: 'seriesId',
+            width: 120,
+            align: 'center',
+            sorter: (a, b) => a.id - b.id,
+            render: (id) => <Text copyable>{id}</Text>
+        },
+        {
+            title: '시리즈명',
+            dataIndex: 'name',
+            key: 'name',
+            width: 250,
+            ellipsis: true,
+            sorter: (a, b) => a.name.localeCompare(b.name),
+            render: (name) => <Text strong>{name}</Text>,
+        },
+        {
+            title: (
+                <Tooltip title="실제 원본 데이터(initialBooks) 기준 해당 시리즈의 총 고유 도서 수">
+                    총 도서 수 <InfoCircleOutlined />
+                </Tooltip>
+            ),
+            dataIndex: 'name',
+            key: 'totalBookCount',
+            align: 'right',
+            sorter: (a, b) => (seriesAnalytics[a.name]?.totalBookCount || 0) - (seriesAnalytics[b.name]?.totalBookCount || 0),
+            render: (seriesName) => {
+                const count = seriesAnalytics[seriesName]?.totalBookCount || 0;
+                return <Tag color={count > 0 ? "blue" : "default"}>{count} 권</Tag>;
+            }
+        },
+        {
+            title: '최초 등록일 (추정)',
+            dataIndex: 'firstRegistrationDate',
+            key: 'firstRegistrationDate',
+            align: 'center',
+            sorter: (a, b) => new Date(a.firstRegistrationDate) - new Date(b.firstRegistrationDate),
+            render: (date) => date ? date : '-',
+        },
+        {
+            title: '관리',
+            key: 'action',
+            align: 'center',
+            fixed: 'right',
+            width: 120,
+            render: (_, record) => (
+                <Space size="small">
+                    <Tooltip title="수정">
+                        <Button icon={<EditOutlined />} onClick={() => handleEditSeries(record)} size="small" />
+                    </Tooltip>
+                    <Popconfirm
+                        title={`'${record.name}' (ID: ${record.id}) 시리즈를 삭제하시겠습니까?`}
+                        description="이 작업은 되돌릴 수 없으며, 현재 화면 목록에서만 제거됩니다."
+                        onConfirm={() => handleDeleteSeries(record.key)}
+                        okText="삭제"
+                        cancelText="취소"
+                    >
+                        <Tooltip title="삭제">
+                            <Button icon={<DeleteOutlined />} danger size="small" />
+                        </Tooltip>
+                    </Popconfirm>
+                </Space>
+            ),
+        },
+    ];
+
+    return (
+        <Space direction="vertical" size="large" style={{ display: 'flex' }}>
+            <Title level={2}><BookOutlined /> 시리즈 관리</Title>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, flexWrap: 'wrap', gap: '10px' }}>
+                <Input.Search
+                    placeholder="시리즈명 검색..."
+                    allowClear
+                    enterButton
+                    style={{ width: 300 }}
+                    onSearch={setSearchTerm} // Enter 또는 검색 버튼 클릭 시
+                    onChange={(e) => {
+                        if (!e.target.value) { // 입력값이 비었을 때 즉시 전체 목록 표시
+                            setSearchTerm('');
+                        }
+                    }}
+                />
+                <Space>
+                    <Text>총 {filteredSeriesList.length}개의 시리즈가 있습니다.</Text>
+                    <Button
+                        type="primary"
+                        icon={<PlusOutlined />}
+                        onClick={handleAddSeries}
+                    >
+                        새 시리즈 추가
+                    </Button>
+                </Space>
+            </div>
+
+            <Table
+                columns={columns}
+                dataSource={filteredSeriesList} // 필터링된 목록 사용
+                pagination={{ pageSize: 10, showSizeChanger: true, pageSizeOptions: ['10', '20', '50'] }}
+                scroll={{ x: 900 }}
+                bordered
+                size="small"
+                rowKey="key"
+                expandable={{
+                    expandedRowRender: record => (
+                        <Table
+                            columns={expandedBookColumns}
+                            dataSource={record.booksInCurrentList}
+                            rowKey="bookKey"
+                            pagination={false}
+                            size="small"
+                            bordered
+                            style={{ margin: '0 20px' }}
+                            title={() => <Text strong>{`'${record.name}' 시리즈 도서 목록 (${record.booksInCurrentList?.length || 0}권)`}</Text>}
+                        />
+                    ),
+                    rowExpandable: record => record.booksInCurrentList && record.booksInCurrentList.length > 0,
+                }}
+            />
+
+            <Modal
+                title={editingSeries ? "시리즈 수정" : "새 시리즈 추가"}
+                open={isModalOpen}
+                onOk={handleFormSubmit}
+                onCancel={handleCancelModal}
+                okText={editingSeries ? "수정" : "추가"}
+                cancelText="취소"
+                destroyOnClose
+            >
+                <Form form={form} layout="vertical" name="series_form">
+                    <Form.Item
+                        name="name"
+                        label="시리즈명"
+                        rules={[
+                            { required: true, message: '시리즈명을 입력해주세요.' },
+                            { whitespace: true, message: '시리즈명은 공백만으로 이루어질 수 없습니다.' },
+                            {
+                                validator: (_, value) => {
+                                    const isDuplicate = seriesDisplayList.some(
+                                        s => s.name === value && s.id !== editingSeries?.id
+                                    );
+                                    if (isDuplicate) {
+                                        return Promise.reject(new Error('이미 사용 중인 시리즈명입니다.'));
+                                    }
+                                    return Promise.resolve();
+                                },
+                            },
+                        ]}
+                    >
+                        <Input placeholder="예: 해리포터 시리즈" />
+                    </Form.Item>
+                </Form>
+            </Modal>
+        </Space>
+    );
+};
+
+export default SeriesManagement; 
