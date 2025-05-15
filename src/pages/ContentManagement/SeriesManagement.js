@@ -36,6 +36,7 @@ const processSeriesData = (books) => {
                     bookCount: 0,
                     booksInCurrentList: [],
                     firstRegistrationDate: book.REGISTRATION_DATE,
+                    // categoryName 및 subCategoryName 은 아래에서 집계 후 설정
                 };
                 seriesMap.set(book.SERIES_NAME, seriesDetail);
             } else {
@@ -46,7 +47,9 @@ const processSeriesData = (books) => {
             seriesDetail.booksInCurrentList.push({
                 bookKey: book.key, 
                 bookName: book.BOOK_NAME,
-                seriesNum: book.SERIES_NUM
+                seriesNum: book.SERIES_NUM,
+                categoryName: book.CATEGORY_NAME, // 도서별 카테고리 정보
+                subCategoryName: book.SUB_CATEGORY_NAME // 도서별 하위 카테고리 정보
             });
 
             if (book.REGISTRATION_DATE && (!seriesDetail.firstRegistrationDate || new Date(book.REGISTRATION_DATE) < new Date(seriesDetail.firstRegistrationDate))) {
@@ -55,8 +58,45 @@ const processSeriesData = (books) => {
         }
     });
 
-    // booksInCurrentList를 seriesNum 기준으로 정렬
+    // 시리즈별 대표 카테고리 및 하위 카테고리 계산
     seriesMap.forEach(series => {
+        // 시리즈 내 도서들의 카테고리 빈도 계산
+        const categoryCounts = series.booksInCurrentList.reduce((acc, book) => {
+            if (book.categoryName) {
+                acc[book.categoryName] = (acc[book.categoryName] || 0) + 1;
+            }
+            return acc;
+        }, {});
+
+        // 가장 빈번한 카테고리 찾기
+        let representativeCategory = '-';
+        if (Object.keys(categoryCounts).length > 0) {
+            representativeCategory = Object.keys(categoryCounts).reduce((a, b) => 
+                categoryCounts[a] > categoryCounts[b] ? a : b
+            );
+        }
+        series.categoryName = representativeCategory !== '-' ? representativeCategory : '';
+
+        // 대표 카테고리에 속하는 도서들의 하위 카테고리 빈도 계산
+        const subCategoryCounts = series.booksInCurrentList
+            .filter(book => book.categoryName === series.categoryName) // 대표 카테고리에 해당하는 책들만 필터링
+            .reduce((acc, book) => {
+                if (book.subCategoryName) {
+                    acc[book.subCategoryName] = (acc[book.subCategoryName] || 0) + 1;
+                }
+                return acc;
+            }, {});
+        
+        // 가장 빈번한 하위 카테고리 찾기
+        let representativeSubCategory = '-';
+        if (Object.keys(subCategoryCounts).length > 0) {
+            representativeSubCategory = Object.keys(subCategoryCounts).reduce((a, b) => 
+                subCategoryCounts[a] > subCategoryCounts[b] ? a : b
+            );
+        }
+        series.subCategoryName = representativeSubCategory !== '-' ? representativeSubCategory : '';
+
+        // booksInCurrentList를 seriesNum 기준으로 정렬
         series.booksInCurrentList.sort((a, b) => {
             if (a.seriesNum == null) return 1; // null이나 undefined는 뒤로
             if (b.seriesNum == null) return -1;
@@ -76,6 +116,7 @@ const SeriesManagement = () => {
     const [editingSeries, setEditingSeries] = useState(null); // 현재 수정 중인 시리즈 객체
     const [form] = Form.useForm();
     const [searchTerm, setSearchTerm] = useState(''); // 검색어 상태 추가
+    const [expandedRowKeys, setExpandedRowKeys] = useState([]); // 확장된 행의 키를 관리하는 상태
 
     // BookManagement에서 가져온 원본 도서 목록을 기반으로 시리즈 정보를 계산 (화면 표시는 seriesDisplayList 사용)
     const seriesAnalytics = useMemo(() => {
@@ -103,7 +144,10 @@ const SeriesManagement = () => {
 
     const handleEditSeries = (series) => {
         setEditingSeries(series);
-        form.setFieldsValue({ name: series.name });
+        form.setFieldsValue({ 
+            name: series.name,
+            // 카테고리/하위 카테고리 필드도 수정 모달에 추가하려면 여기에 setFieldsValue 필요
+        });
         setIsModalOpen(true);
     };
 
@@ -117,13 +161,19 @@ const SeriesManagement = () => {
         form.validateFields()
             .then(values => {
                 if (editingSeries) {
-                    if (seriesDisplayList.some(s => s.name === values.name && s.key !== editingSeries.key)) {
+                    if (seriesDisplayList.some(s => s.name === values.name && s.id !== editingSeries.id)) {
                         message.error('이미 존재하는 시리즈명입니다.');
                         return;
                     }
                     setSeriesDisplayList(prevList =>
                         prevList.map(s =>
-                            s.key === editingSeries.key ? { ...s, name: values.name } : s
+                            s.key === editingSeries.key ? { 
+                                ...s, 
+                                name: values.name, 
+                                // 카테고리/하위 카테고리도 수정 시 반영하려면 여기에 추가
+                                // categoryName: values.categoryName, 
+                                // subCategoryName: values.subCategoryName,
+                            } : s
                         )
                     );
                     message.success('시리즈가 수정되었습니다.');
@@ -141,7 +191,9 @@ const SeriesManagement = () => {
                         name: values.name,
                         bookCount: 0, 
                         booksInCurrentList: [],
-                        firstRegistrationDate: new Date().toISOString().split('T')[0]
+                        firstRegistrationDate: new Date().toISOString().split('T')[0],
+                        categoryName: values.categoryName || '', // 새 시리즈 추가 시 카테고리
+                        subCategoryName: values.subCategoryName || '', // 새 시리즈 추가 시 하위 카테고리
                     };
                     setSeriesDisplayList(prevList => [...prevList, newSeries].sort((a,b) => a.name.localeCompare(b.name)));
                     message.success('새 시리즈가 추가되었습니다.');
@@ -174,8 +226,20 @@ const SeriesManagement = () => {
             key: 'bookName',
             ellipsis: true,
         },
-        // 필요하다면 여기에 더 많은 도서 정보 컬럼 추가 (예: 저자, 출판일 등)
-        // 이 경우 processSeriesData에서 booksInCurrentList에 해당 정보를 포함시켜야 함
+        {
+            title: '카테고리', // 확장된 도서 목록에도 카테고리 표시
+            dataIndex: 'categoryName',
+            key: 'categoryName',
+            ellipsis: true,
+            width: 120,
+        },
+        {
+            title: '하위 카테고리', // 확장된 도서 목록에도 하위 카테고리 표시
+            dataIndex: 'subCategoryName',
+            key: 'subCategoryName',
+            ellipsis: true,
+            width: 150,
+        },
     ];
 
     // 검색어에 따라 필터링된 시리즈 목록
@@ -196,7 +260,7 @@ const SeriesManagement = () => {
             width: 120,
             align: 'center',
             sorter: (a, b) => a.id - b.id,
-            render: (id) => <Text copyable>{id}</Text>
+            render: (id) => <Text>{id}</Text>
         },
         {
             title: '시리즈명',
@@ -208,11 +272,25 @@ const SeriesManagement = () => {
             render: (name) => <Text strong>{name}</Text>,
         },
         {
-            title: (
-                <Tooltip title="실제 원본 데이터(initialBooks) 기준 해당 시리즈의 총 고유 도서 수">
-                    총 도서 수 <InfoCircleOutlined />
-                </Tooltip>
-            ),
+            title: '카테고리', // 새 컬럼
+            dataIndex: 'categoryName',
+            key: 'categoryName',
+            width: 130,
+            ellipsis: true,
+            sorter: (a, b) => (a.categoryName || '').localeCompare(b.categoryName || ''),
+            render: (category) => category || '-',
+        },
+        {
+            title: '하위 카테고리', // 새 컬럼
+            dataIndex: 'subCategoryName',
+            key: 'subCategoryName',
+            width: 150,
+            ellipsis: true,
+            sorter: (a, b) => (a.subCategoryName || '').localeCompare(b.subCategoryName || ''),
+            render: (subCategory) => subCategory || '-',
+        },
+        {
+            title: '총 도서 수',
             dataIndex: 'name',
             key: 'totalBookCount',
             align: 'right',
@@ -257,6 +335,12 @@ const SeriesManagement = () => {
         },
     ];
 
+    // 행 확장/축소 핸들러
+    const handleTableRowExpand = (expanded, record) => {
+        const keys = expanded ? [record.key] : [];
+        setExpandedRowKeys(keys);
+    };
+
     return (
         <Space direction="vertical" size="large" style={{ display: 'flex' }}>
             <Title level={2}><BookOutlined /> 시리즈 관리</Title>
@@ -287,12 +371,14 @@ const SeriesManagement = () => {
 
             <Table
                 columns={columns}
-                dataSource={filteredSeriesList} // 필터링된 목록 사용
+                dataSource={filteredSeriesList}
                 pagination={{ pageSize: 10, showSizeChanger: true, pageSizeOptions: ['10', '20', '50'] }}
                 scroll={{ x: 900 }}
                 bordered
                 size="small"
                 rowKey="key"
+                expandedRowKeys={expandedRowKeys} // 제어되는 확장된 행 키
+                onExpand={handleTableRowExpand}   // 확장/축소 이벤트 핸들러
                 expandable={{
                     expandedRowRender: record => (
                         <Table
@@ -318,6 +404,7 @@ const SeriesManagement = () => {
                 okText={editingSeries ? "수정" : "추가"}
                 cancelText="취소"
                 destroyOnClose
+                width={600} // 모달 너비 조정 (카테고리 필드 추가 시)
             >
                 <Form form={form} layout="vertical" name="series_form">
                     <Form.Item
@@ -341,6 +428,15 @@ const SeriesManagement = () => {
                     >
                         <Input placeholder="예: 해리포터 시리즈" />
                     </Form.Item>
+                    {/* 
+                        만약 새 시리즈 추가/수정 시 카테고리도 지정하게 하려면 여기에 Form.Item 추가 
+                        <Form.Item name="categoryName" label="대표 카테고리">
+                            <Input placeholder="예: 소설" />
+                        </Form.Item>
+                        <Form.Item name="subCategoryName" label="대표 하위 카테고리">
+                            <Input placeholder="예: 판타지" />
+                        </Form.Item>
+                    */}
                 </Form>
             </Modal>
         </Space>
