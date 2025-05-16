@@ -17,6 +17,7 @@ import {
   Row,
   Col,
   Select,
+  Switch,
 } from "antd";
 import {
   PlusOutlined,
@@ -76,6 +77,7 @@ const processSeriesData = (books) => {
         bookKey: book.key,
         bookName: book.BOOK_NAME,
         seriesNum: book.SERIES_NUM,
+        bookServiceYN: book.BOOK_SERVICE_YN,
       });
 
       if (
@@ -228,6 +230,31 @@ const SeriesManagement = () => {
     message.success(`'${seriesKey}' 시리즈가 삭제되었습니다.`);
   }, []);
 
+  // 시리즈 내 도서 서비스 상태 변경 핸들러
+  const handleBookServiceStatusChange = useCallback(
+    (bookKey, newStatusYN, seriesKey) => {
+      setSeriesDisplayList((prevList) =>
+        prevList.map((series) => {
+          if (series.key === seriesKey) {
+            return {
+              ...series,
+              booksInCurrentList: series.booksInCurrentList.map((book) =>
+                book.bookKey === bookKey
+                  ? { ...book, bookServiceYN: newStatusYN }
+                  : book
+              ),
+            };
+          }
+          return series;
+        })
+      );
+      message.success(
+        `시리즈 '${seriesKey}'의 도서 '${bookKey}' 서비스 상태가 변경되었습니다 (화면 표시용).`
+      );
+    },
+    []
+  );
+
   // 확장된 행에 표시될 도서 목록 테이블의 컬럼
   const expandedBookColumns = [
     {
@@ -243,6 +270,32 @@ const SeriesManagement = () => {
       dataIndex: "bookName",
       key: "bookName",
       ellipsis: true,
+    },
+    {
+      title: "상태",
+      dataIndex: "bookServiceYN",
+      key: "status",
+      width: 120,
+      align: "center",
+      render: (bookServiceYN, bookRecord) => {
+        // 현재 확장된 시리즈의 key를 expandedRowKeys에서 가져옵니다.
+        // (단일 확장 모드를 가정, 여러 행 동시 확장은 고려하지 않음)
+        const currentExpandedSeriesKey = expandedRowKeys[0];
+        return (
+          <Switch
+            checked={bookServiceYN === "Y"}
+            checkedChildren="서비스중"
+            unCheckedChildren="중지"
+            onChange={(checked) =>
+              handleBookServiceStatusChange(
+                bookRecord.bookKey,
+                checked ? "Y" : "N",
+                currentExpandedSeriesKey
+              )
+            }
+          />
+        );
+      },
     },
     // 필요하다면 여기에 더 많은 도서 정보 컬럼 추가 (예: 저자, 출판일 등)
     // 이 경우 processSeriesData에서 booksInCurrentList에 해당 정보를 포함시켜야 함
@@ -524,7 +577,7 @@ const SeriesManagement = () => {
                 ))}
             </Select>
           </Form.Item>
-          <Form.Item name="introduction" label="책 소개">
+          <Form.Item name="introduction" label="시리즈 소개">
             <TextArea
               rows={4}
               placeholder="시리즈에 대한 간략한 소개를 입력해주세요."

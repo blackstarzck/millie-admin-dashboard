@@ -21,6 +21,7 @@ import {
   Alert,
   Divider,
   AutoComplete,
+  Switch,
 } from "antd";
 import {
   PlusOutlined,
@@ -2171,18 +2172,6 @@ const BookManagement = () => {
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item
-                name="BOOK_SERVICE_YN"
-                label="서비스 상태"
-                initialValue="Y"
-              >
-                <Select style={{ width: "100%" }}>
-                  <Option value="Y">서비스중</Option>
-                  <Option value="N">중지</Option>
-                </Select>
-              </Form.Item>
-            </Col>
-            <Col span={12}>
               <Form.Item name="DRM_YN" label="DRM 적용" initialValue="Y">
                 <Select style={{ width: "100%" }}>
                   <Option value="Y">적용</Option>
@@ -2227,6 +2216,17 @@ const BookManagement = () => {
               </Form.Item>
             </Col>
           </Row>
+          <Divider />
+          <Form.Item
+            name="BOOK_SERVICE_YN"
+            label="서비스 상태"
+            valuePropName="checked"
+            initialValue={true} // 'Y'를 true로 가정
+            getValueFromEvent={(e) => (e ? "Y" : "N")} // Switch 값(true/false)을 'Y'/'N'으로 변환
+            normalize={(value) => value === "Y"} // 폼 데이터 로드 시 'Y'를 true로 변환
+          >
+            <Switch checkedChildren="서비스중" unCheckedChildren="중지" />
+          </Form.Item>
         </Form>
       </Modal>
 
