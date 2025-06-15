@@ -1,55 +1,59 @@
+import { ConfigProvider } from 'antd';
+import koKR from 'antd/locale/ko_KR';
 import React from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Navigate, Route, Routes } from 'react-router-dom';
 import AppLayout from './components/Layout';
 import { GroupProvider } from './context/GroupContext';
 import { PopupTemplateProvider } from './context/PopupTemplateContext';
-import { ConfigProvider } from 'antd';
-import koKR from 'antd/locale/ko_KR';
 
 // 페이지 컴포넌트 임포트
-import Dashboard from './pages/Dashboard';
 import BookManagement from './pages/ContentManagement/BookManagement';
 import CategoryManagement from './pages/ContentManagement/CategoryManagement';
 import ContentApproval from './pages/ContentManagement/ContentApproval';
+import CurationManagement from './pages/ContentManagement/CurationManagement';
+import KeywordManagement from './pages/ContentManagement/KeywordManagement';
 import MetadataManagement from './pages/ContentManagement/MetadataManagement';
-import NoticeList from './pages/NoticeManagement/NoticeList';
-import MemberInfo from './pages/UserManagement/MemberInfo';
-import AccountSanctions from './pages/UserManagement/AccountSanctions';
-import SubscriptionHistory from './pages/UserManagement/SubscriptionHistory';
-import NotificationDispatch from './pages/NotificationManagement/NotificationDispatch';
-import NotificationTemplate from './pages/NotificationManagement/NotificationTemplate';
-import DispatchHistory from './pages/NotificationManagement/DispatchHistory';
-import TargetGroupManagement from './pages/NotificationManagement/TargetGroupManagement';
-import PopupCreation from './pages/PopupManagement/PopupCreation';
-import PopupTemplateManagement from './pages/PopupManagement/TemplateManagement';
-import PopupExposureSettings from './pages/PopupManagement/ExposureSettings';
-import InquiryLookup from './pages/InquiryManagement/InquiryLookup';
-import FaqManagement from './pages/InquiryManagement/FaqManagement';
-import UserStatistics from './pages/DataAnalysis/UserStatistics';
-import ContentStatistics from './pages/DataAnalysis/ContentStatistics';
+import SeriesManagement from './pages/ContentManagement/SeriesManagement';
+import Dashboard from './pages/Dashboard';
 import CampaignEffect from './pages/DataAnalysis/CampaignEffect';
+import ContentStatistics from './pages/DataAnalysis/ContentStatistics';
 import ReportGeneration from './pages/DataAnalysis/ReportGeneration';
+import UserStatistics from './pages/DataAnalysis/UserStatistics';
 import VisitStatistics from './pages/DataAnalysis/VisitStatistics';
-import ReferrerPath from './pages/DataAnalysis/ReferrerPath';
-import PermissionManagement from './pages/SystemSettings/PermissionManagement';
-import ApiManagement from './pages/SystemSettings/ApiManagement';
-import SecuritySettings from './pages/SystemSettings/SecuritySettings';
-import ServicePolicy from './pages/SystemSettings/ServicePolicy';
-import PartnerAccount from './pages/PartnerManagement/PartnerAccount';
-import SettlementManagement from './pages/PartnerManagement/SettlementManagement';
-import InquiryManagementPartner from './pages/PartnerManagement/InquiryManagementPartner';
-import NoticeHistory from './pages/NoticeManagement/NoticeHistory';
-import ExposureHistory from './pages/PopupManagement/ExposureHistory';
 import EventRegistration from './pages/EventManagement/EventRegistration';
 import EventStatus from './pages/EventManagement/EventStatus';
+import FaqManagement from './pages/InquiryManagement/FaqManagement';
+import InquiryLookup from './pages/InquiryManagement/InquiryLookup';
+import NoticeHistory from './pages/NoticeManagement/NoticeHistory';
+import NoticeList from './pages/NoticeManagement/NoticeList';
+import DispatchHistory from './pages/NotificationManagement/DispatchHistory';
+import NotificationDispatch from './pages/NotificationManagement/NotificationDispatch';
+import NotificationTemplate from './pages/NotificationManagement/NotificationTemplate';
+import TargetGroupManagement from './pages/NotificationManagement/TargetGroupManagement';
+import InquiryManagementPartner from './pages/PartnerManagement/InquiryManagementPartner';
+import PartnerAccount from './pages/PartnerManagement/PartnerAccount';
+import SettlementManagement from './pages/PartnerManagement/SettlementManagement';
+import ExposureHistory from './pages/PopupManagement/ExposureHistory';
+import PopupExposureSettings from './pages/PopupManagement/ExposureSettings';
+import PopupCreation from './pages/PopupManagement/PopupCreation';
+import PopupTemplateManagement from './pages/PopupManagement/TemplateManagement';
 import AuthorInfoManagement from './pages/SelfPublishing/AuthorInfoManagement';
+import ApiManagement from './pages/SystemSettings/ApiManagement';
+import PermissionManagement from './pages/SystemSettings/PermissionManagement';
+import SecuritySettings from './pages/SystemSettings/SecuritySettings';
+import ServicePolicy from './pages/SystemSettings/ServicePolicy';
+import AccountSanctions from './pages/UserManagement/AccountSanctions';
 import BadgeManagement from './pages/UserManagement/BadgeManagement';
-import CurationManagement from './pages/ContentManagement/CurationManagement';
-import SeriesManagement from './pages/ContentManagement/SeriesManagement';
+import MemberInfo from './pages/UserManagement/MemberInfo';
+import SubscriptionHistory from './pages/UserManagement/SubscriptionHistory';
 
 // 새로 추가된 신고 관리 페이지 컴포넌트 임포트
 import ReportList from './pages/ReportManagement/ReportList';
 import ReportSettings from './pages/ReportManagement/ReportSettings';
+import WorksList from './pages/SelfPublishing/WorksList';
+
+// 쿠폰 관리 페이지
+import Coupon from './pages/CouponManagement/Coupon';
 
 function App() {
   return (
@@ -67,15 +71,16 @@ function App() {
               {/* 콘텐츠 관리 */}
               <Route path="content/books" element={<BookManagement />} />
               <Route path="content/categories" element={<CategoryManagement />} />
+              <Route path="content/keywords" element={<KeywordManagement />} />
               <Route path="content/series-management" element={<SeriesManagement />} />
               <Route path="content/metadata" element={<MetadataManagement />} />
-              <Route path="content/approval" element={<ContentApproval />} />
               <Route path="content/analysis" element={<ContentStatistics />} />
               <Route path="content/curation" element={<CurationManagement />} />
 
               {/* 자가출판 */}
               <Route path="self-publishing/approval" element={<ContentApproval />} />
               <Route path="self-publishing/authors" element={<AuthorInfoManagement />} />
+              <Route path="self-publishing/works" element={<WorksList />} />
 
               {/* 회원 관리 */}
               <Route path="users/info" element={<MemberInfo />} />
@@ -106,6 +111,7 @@ function App() {
               {/* 이벤트 관리 */}
               <Route path="events/register" element={<EventRegistration />} />
               <Route path="events/status" element={<EventStatus />} />
+              <Route path="events/coupons" element={<Coupon />} />
 
               {/* 문의사항 관리 */}
               <Route path="inquiries/list" element={<InquiryLookup />} />
@@ -140,4 +146,4 @@ function App() {
   );
 }
 
-export default App; 
+export default App;

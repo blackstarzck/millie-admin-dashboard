@@ -1,52 +1,41 @@
-import React, { useState } from 'react';
 import { Menu } from 'antd';
+import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 // 아이콘 임포트 (예시 - 필요에 따라 추가/변경)
 import {
-  AppstoreOutlined,
-  BookOutlined,
-  UserOutlined,
-  NotificationOutlined,
-  MessageOutlined,
-  CalendarOutlined,
+  ApartmentOutlined,
+  ApiOutlined,
   AreaChartOutlined,
-  SettingOutlined,
-  TeamOutlined,
-  PieChartOutlined,
-  ProfileOutlined,
+  BellOutlined,
+  BlockOutlined,
+  BookOutlined,
+  CalendarOutlined,
   CheckSquareOutlined,
   DatabaseOutlined,
-  UserSwitchOutlined,
-  BellOutlined,
-  MailOutlined,
-  WarningOutlined,
-  BlockOutlined,
-  FormOutlined,
-  FileTextOutlined,
-  OrderedListOutlined,
-  HistoryOutlined,
-  FundViewOutlined,
-  ApiOutlined,
-  SecurityScanOutlined,
-  FileProtectOutlined,
   DollarCircleOutlined,
-  SolutionOutlined,
-  LinkOutlined,
-  FilterOutlined,
-  QuestionCircleOutlined,
   EditOutlined,
+  FileProtectOutlined,
+  FileTextOutlined,
+  FormOutlined,
+  FundViewOutlined,
+  HistoryOutlined,
+  MessageOutlined,
+  NotificationOutlined,
+  OrderedListOutlined,
+  PieChartOutlined,
+  ProfileOutlined,
+  QuestionCircleOutlined,
+  SecurityScanOutlined,
+  SettingOutlined,
+  SolutionOutlined,
+  TagOutlined,
+  TagsOutlined,
+  TeamOutlined,
   TrophyOutlined,
   UsergroupAddOutlined,
-  DesktopOutlined,
-  FileOutlined,
-  UploadOutlined,
-  CheckCircleOutlined,
-  TagsOutlined,
-  TagOutlined,
-  ApartmentOutlined,
-  AppstoreAddOutlined,
-  DashboardOutlined,
-  PartitionOutlined
+  UserOutlined,
+  UserSwitchOutlined,
+  WarningOutlined
 } from '@ant-design/icons';
 
 // 메뉴 데이터 구조화 (key 추가, 아이콘 추가)
@@ -59,9 +48,9 @@ const menuItems = [
     subMenu: [
       { key: '/content/books', path: '/content/books', name: '도서 관리', icon: <BookOutlined /> },
       { key: '/content/categories', path: '/content/categories', name: '카테고리 관리', icon: <TagOutlined /> },
+      { key: '/content/keywords', path: '/content/keywords', name: '키워드 관리', icon: <TagsOutlined /> },
       { key: '/content/series-management', path: '/content/series-management', name: '시리즈 관리', icon: <ApartmentOutlined /> },
       { key: '/content/metadata', path: '/content/metadata', name: '메타데이터 관리', icon: <DatabaseOutlined /> },
-      { key: '/content/approval', path: '/content/approval', name: '콘텐츠 승인', icon: <CheckCircleOutlined /> },
       { key: '/content/analysis', path: '/content/analysis', name: '콘텐츠 통계', icon: <BookOutlined /> },
       { key: '/content/curation', path: '/content/curation', name: '큐레이션 관리', icon: <TagsOutlined /> },
     ],
@@ -73,6 +62,7 @@ const menuItems = [
     subMenu: [
       { key: '/self-publishing/approval', path: '/self-publishing/approval', name: '심사', icon: <CheckSquareOutlined /> },
       { key: '/self-publishing/authors', path: '/self-publishing/authors', name: '작가 정보 관리', icon: <SolutionOutlined /> },
+      { key: '/self-publishing/works', path: '/self-publishing/works', name: '작품 목록', icon: <OrderedListOutlined /> },
     ],
   },
   {
@@ -131,7 +121,8 @@ const menuItems = [
     icon: <CalendarOutlined />,
     subMenu: [
       { key: '/events/register', path: '/events/register', name: '이벤트 등록', icon: <FormOutlined /> },
-      { key: '/events/status', path: '/events/status', name: '이벤트 상태', icon: <CheckSquareOutlined /> }
+      { key: '/events/status', path: '/events/status', name: '이벤트 상태', icon: <CheckSquareOutlined /> },
+      { key: '/events/coupons', path: '/events/coupons', name: '쿠폰 관리', icon: <TagsOutlined /> }
     ],
   },
   {
@@ -257,4 +248,4 @@ const Sidebar = () => {
   );
 };
 
-export default Sidebar; 
+export default Sidebar;

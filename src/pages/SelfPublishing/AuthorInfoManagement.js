@@ -160,7 +160,7 @@ const AuthorInfoManagement = () => {
             <Descriptions.Item label="소개">{selectedAuthor.introduction}</Descriptions.Item>
           </Descriptions>
 
-          <Title level={4} className="book-list-title" style={{ marginTop: 0, marginBottom: 16 }}>출판 도서 목록 ({selectedAuthor.bookCount}권)</Title>
+          <Title level={4} className="book-list-title" style={{ marginTop: 0, marginBottom: 16 }}>출판 작품 목록 ({selectedAuthor.bookCount}권)</Title>
           <Table
             className="book-list-table"
             columns={bookColumns}
