@@ -1,47 +1,47 @@
-import React, { useState, useMemo } from "react";
 import {
-  Table,
-  Button,
-  Modal,
-  Form,
-  Input,
-  Select,
-  Space,
-  Typography,
-  Tag,
-  message,
-  Image,
-  Tooltip,
-  DatePicker,
-  Popconfirm,
-  InputNumber,
-  Upload,
-  Row,
-  Col,
-  Alert,
-  Divider,
-  AutoComplete,
-  Switch,
-} from "antd";
-import {
-  PlusOutlined,
-  EditOutlined,
-  DeleteOutlined,
+  AudioOutlined,
   BookOutlined,
   CheckCircleOutlined,
   CloseCircleOutlined,
-  AudioOutlined,
-  ReadOutlined,
-  UploadOutlined,
   CloseOutlined,
-  GlobalOutlined,
-  SafetyOutlined,
+  DeleteOutlined,
+  EditOutlined,
   FileExcelOutlined,
   FileTextOutlined,
+  PlusOutlined,
+  ReadOutlined,
+  SafetyOutlined,
+  UploadOutlined
 } from "@ant-design/icons";
+import {
+  Alert,
+  AutoComplete,
+  Button,
+  Col,
+  DatePicker,
+  Divider,
+  Form,
+  Image,
+  Input,
+  InputNumber,
+  Modal,
+  Popconfirm,
+  Row,
+  Select,
+  Space,
+  Switch,
+  Table,
+  Tag,
+  Tooltip,
+  Typography,
+  Upload,
+  message,
+} from "antd";
 import moment from "moment";
+import React, { useMemo, useState } from "react";
 // CurationManagement에서 큐레이션 데이터를 가져옵니다 (데모용)
 import { initialCurations as allCurationsData } from "./CurationManagement";
+import { initialKeywords as allKeywordsData } from "./KeywordManagement";
 
 const { Title, Text, Link } = Typography;
 const { Option } = Select;
@@ -138,7 +138,7 @@ export const initialBooks = [
     LEADER_JOB: "",
     ISBN: "9791138434195",
     LANGUAGE: ["ko"],
-    TAGS: ["과학", "사회", "토론"],
+    TAGS: ["역사", "자기계발"],
     AGE_GROUP: "all",
     DESCRIPTION: "숙고하고 토론해야 할 우리 시대의 다양한 질문들",
     TOC: "1부...",
@@ -154,6 +154,9 @@ export const initialBooks = [
       "출판사 서평: 이 책은 현대 사회의 다양한 문제들을 깊이 있게 다루고 있습니다.",
     BOOK_FILE_NAME: "숙론_최종.epub",
     VIDEO_URL: "",
+    RECOMMENDATION_TITLE: "이 시대의 필독서",
+    RECOMMENDATION_MESSAGE: "최재천 교수와 함께하는 깊이 있는 토론의 장으로 여러분을 초대합니다. 생각을 넓히고 지적 대화를 나눌 수 있는 최고의 기회입니다.",
+    RECOMMENDATION_TEXTS: ["#생각의_전환", "#지적_대화", "#필독서", "#최재천"],
   },
   {
     key: "2",
@@ -179,7 +182,7 @@ export const initialBooks = [
     LEADER_JOB: "",
     ISBN: "9791162240101",
     LANGUAGE: ["ko", "en"],
-    TAGS: ["React", "웹개발"],
+    TAGS: ["자기계발"],
     AGE_GROUP: "all",
     DESCRIPTION: "React의 기초부터 심화까지 다루는 개발 서적",
     TOC: null,
@@ -192,6 +195,9 @@ export const initialBooks = [
     COPYRIGHT_INFO: "IT출판 © 2023",
     SERVICE_REGION: "GLOBAL",
     BOOK_FILE_NAME: "react_guide.pdf",
+    RECOMMENDATION_TITLE: "React 개발자 필독서",
+    RECOMMENDATION_MESSAGE: "React의 모든 것을 담았습니다. 이 책 한 권으로 React 마스터가 되어보세요.",
+    RECOMMENDATION_TEXTS: ["#React정복", "#프론트엔드_필수템", "#개발자_추천"],
   },
   {
     key: "3",
@@ -216,7 +222,7 @@ export const initialBooks = [
     LEADER_JOB: "",
     ISBN: "9791162240231",
     LANGUAGE: ["ko"],
-    TAGS: ["Nodejs", "백엔드"],
+    TAGS: ["자기계발"],
     AGE_GROUP: "adult",
     DESCRIPTION: "Node.js를 활용한 실전 백엔드 개발 가이드",
     TOC: "1. Node.js 소개...",
@@ -230,6 +236,9 @@ export const initialBooks = [
     SERVICE_REGION: "KR",
     SUB_CATEGORY_NAME: "백엔드 프로그래밍",
     BOOK_FILE_NAME: "",
+    RECOMMENDATION_TITLE: "",
+    RECOMMENDATION_MESSAGE: "",
+    RECOMMENDATION_TEXTS: [],
   },
   {
     key: "4",
@@ -255,7 +264,7 @@ export const initialBooks = [
     LEADER_JOB: "성우",
     ISBN: "9791161571188",
     LANGUAGE: ["ko"],
-    TAGS: ["힐링", "편의점", "드라마"],
+    TAGS: ["가족", "성장"],
     AGE_GROUP: "all",
     DESCRIPTION:
       "서울역 뒤편 골목길의 작은 편의점에서 벌어지는 이야기 (오디오북)",
@@ -270,6 +279,9 @@ export const initialBooks = [
     COPYRIGHT_INFO: "나무옆의자 © 2022",
     SERVICE_REGION: "KR",
     BOOK_FILE_NAME: "",
+    RECOMMENDATION_TITLE: "마음이 따뜻해지는 이야기",
+    RECOMMENDATION_MESSAGE: "김유정 성우의 목소리로 듣는 '불편한 편의점', 잠시 쉬어가고 싶은 당신에게 위로를 선사합니다.",
+    RECOMMENDATION_TEXTS: ["#오늘의_위로", "#따뜻한_목소리", "#스테디셀러"],
   },
   // 나머지 initialBooks 데이터에도 BOOK_TRANSLATOR: '' (또는 실제값) 추가 필요
   {
@@ -293,13 +305,14 @@ export const initialBooks = [
     ISBN: "9791199000005",
     PRICE: 25000,
     PAGE_COUNT: 400,
-    TAGS: ["데이터", "Python", "R"],
+    TAGS: ["자기계발"],
     FILE_FORMAT: "EPUB",
     DRM_YN: "Y",
     SERVICE_REGION: "KR",
     BOOK_FILE_NAME: "",
     SERIES_NAME: "",
     SERIES_NUM: null,
+    RECOMMENDATION_TEXTS: ["#데이터", "#Python", "#R"],
   },
   {
     key: "6",
@@ -324,13 +337,14 @@ export const initialBooks = [
     PLAY_TIME: "07:15:00",
     LEADER_NAME: "박지윤",
     LEADER_JOB: "성우",
-    TAGS: ["판타지", "꿈"],
+    TAGS: ["판타지", "성장"],
     FILE_FORMAT: "MP3",
     DRM_YN: "Y",
     SERVICE_REGION: "KR",
     BOOK_FILE_NAME: "",
     SERIES_NAME: "",
     SERIES_NUM: null,
+    RECOMMENDATION_TEXTS: ["#판타지", "#꿈"],
   },
   {
     key: "7",
@@ -353,13 +367,14 @@ export const initialBooks = [
     ISBN: "9788954655972",
     PRICE: 13500,
     PAGE_COUNT: 216,
-    TAGS: ["여행", "에세이", "김영하"],
+    TAGS: ["모험", "여행", "성장"],
     FILE_FORMAT: "EPUB",
     DRM_YN: "Y",
     SERVICE_REGION: "GLOBAL",
     BOOK_FILE_NAME: "",
     SERIES_NAME: "",
     SERIES_NUM: null,
+    RECOMMENDATION_TEXTS: ["#여행", "#에세이", "#김영하"],
   },
   {
     key: "8",
@@ -382,13 +397,14 @@ export const initialBooks = [
     ISBN: "9788934972464",
     PRICE: 22000,
     PAGE_COUNT: 696,
-    TAGS: ["역사", "인류", "빅 히스토리"],
+    TAGS: ["역사", "성장"],
     FILE_FORMAT: "EPUB",
     DRM_YN: "Y",
     SERVICE_REGION: "GLOBAL",
     BOOK_FILE_NAME: "",
     SERIES_NAME: "",
     SERIES_NUM: null,
+    RECOMMENDATION_TEXTS: ["#역사", "#인류", "#빅 히스토리"],
   },
   {
     key: "9",
@@ -413,13 +429,14 @@ export const initialBooks = [
     PLAY_TIME: "09:50:30",
     LEADER_NAME: "강수진",
     LEADER_JOB: "성우",
-    TAGS: ["판타지", "인생", "선택"],
+    TAGS: ["판타지", "성장"],
     FILE_FORMAT: "MP3",
     DRM_YN: "Y",
     SERVICE_REGION: "KR",
     BOOK_FILE_NAME: "",
     SERIES_NAME: "",
     SERIES_NUM: null,
+    RECOMMENDATION_TEXTS: ["#판타지", "#인생", "#선택"],
   },
   {
     key: "10",
@@ -442,13 +459,14 @@ export const initialBooks = [
     ISBN: "9791189909178",
     PRICE: 38000,
     PAGE_COUNT: 960,
-    TAGS: ["Python", "알고리즘", "코딩테스트"],
+    TAGS: ["자기계발"],
     FILE_FORMAT: "EPUB",
     DRM_YN: "Y",
     SERVICE_REGION: "KR",
     BOOK_FILE_NAME: "",
     SERIES_NAME: "",
     SERIES_NUM: null,
+    RECOMMENDATION_TEXTS: ["#Python", "#알고리즘", "#코딩테스트"],
   },
   {
     key: "11",
@@ -471,13 +489,14 @@ export const initialBooks = [
     ISBN: "9788980715990",
     PRICE: 15000,
     PAGE_COUNT: 460,
-    TAGS: ["재테크", "부자", "투자"],
+    TAGS: ["자기계발", "성공"],
     FILE_FORMAT: "EPUB",
     DRM_YN: "Y",
     SERVICE_REGION: "GLOBAL",
     BOOK_FILE_NAME: "",
     SERIES_NAME: "",
     SERIES_NUM: null,
+    RECOMMENDATION_TEXTS: ["#재테크", "#부자", "#투자"],
   },
   {
     key: "12",
@@ -502,13 +521,14 @@ export const initialBooks = [
     PLAY_TIME: "06:20:10",
     LEADER_NAME: "김상현",
     LEADER_JOB: "전문낭독가",
-    TAGS: ["심리학", "뇌과학", "인지오류"],
+    TAGS: ["자기계발", "성장"],
     FILE_FORMAT: "MP3",
     DRM_YN: "Y",
     SERVICE_REGION: "KR",
     BOOK_FILE_NAME: "",
     SERIES_NAME: "",
     SERIES_NUM: null,
+    RECOMMENDATION_TEXTS: ["#심리학", "#뇌과학", "#인지오류"],
   },
   {
     key: "13",
@@ -531,13 +551,14 @@ export const initialBooks = [
     ISBN: "9788983711892",
     PRICE: 20000,
     PAGE_COUNT: 752,
-    TAGS: ["우주", "과학", "칼 세이건"],
+    TAGS: ["공상과학", "우주"],
     FILE_FORMAT: "EPUB",
     DRM_YN: "Y",
     SERVICE_REGION: "GLOBAL",
     BOOK_FILE_NAME: "",
     SERIES_NAME: "",
     SERIES_NUM: null,
+    RECOMMENDATION_TEXTS: ["#우주", "#과학", "#칼 세이건"],
   },
   {
     key: "14",
@@ -560,13 +581,14 @@ export const initialBooks = [
     ISBN: "9788934986799",
     PRICE: 19800,
     PAGE_COUNT: 464,
-    TAGS: ["데이터", "통계", "세상읽기"],
+    TAGS: ["자기계발", "성장"],
     FILE_FORMAT: "EPUB",
     DRM_YN: "Y",
     SERVICE_REGION: "GLOBAL",
     BOOK_FILE_NAME: "",
     SERIES_NAME: "",
     SERIES_NUM: null,
+    RECOMMENDATION_TEXTS: ["#데이터", "#통계", "#세상읽기"],
   },
   // --- 추가 더미 데이터 (시리즈 테스트용) ---
   {
@@ -597,6 +619,7 @@ export const initialBooks = [
     SERIES_NAME: "나니아 연대기",
     SERIES_NUM: 1,
     VIDEO_URL: "",
+    RECOMMENDATION_TEXTS: ["#판타지", "#모험", "#고전"],
   },
   {
     key: "16",
@@ -626,6 +649,7 @@ export const initialBooks = [
     SERIES_NAME: "나니아 연대기",
     SERIES_NUM: 2,
     VIDEO_URL: "",
+    RECOMMENDATION_TEXTS: ["#판타지", "#모험"],
   },
   {
     key: "17",
@@ -655,6 +679,7 @@ export const initialBooks = [
     SERIES_NAME: "멋진 신세계 시리즈",
     SERIES_NUM: 1,
     VIDEO_URL: "https://sample.com/brave_new_world_trailer.mp4",
+    RECOMMENDATION_TEXTS: ["#SF", "#디스토피아", "#고전"],
   },
   {
     key: "18",
@@ -684,6 +709,7 @@ export const initialBooks = [
     SERIES_NAME: "반지의 제왕",
     SERIES_NUM: 1,
     VIDEO_URL: "",
+    RECOMMENDATION_TEXTS: ["#판타지", "#대서사시", "#모험"],
   },
   {
     key: "19",
@@ -713,6 +739,7 @@ export const initialBooks = [
     SERIES_NAME: "반지의 제왕",
     SERIES_NUM: 2,
     VIDEO_URL: "",
+    RECOMMENDATION_TEXTS: ["#판타지", "#대서사시", "#전쟁"],
   },
   {
     key: "20",
@@ -742,6 +769,7 @@ export const initialBooks = [
     SERIES_NAME: "반지의 제왕",
     SERIES_NUM: 3,
     VIDEO_URL: "",
+    RECOMMENDATION_TEXTS: ["#판타지", "#대서사시", "#결말"],
   },
   {
     key: "21",
@@ -764,13 +792,14 @@ export const initialBooks = [
     ISBN: "9788990674062",
     PRICE: 15000,
     PAGE_COUNT: 376,
-    TAGS: ["환경", "고전", "과학"],
+    TAGS: ["역사"],
     FILE_FORMAT: "EPUB",
     DRM_YN: "Y",
     SERVICE_REGION: "KR",
     SERIES_NAME: "",
     SERIES_NUM: null,
     VIDEO_URL: "",
+    RECOMMENDATION_TEXTS: ["#환경", "#고전", "#과학"],
   },
   {
     key: "22",
@@ -796,13 +825,14 @@ export const initialBooks = [
     ISBN: "9780751575628",
     PRICE: 22000,
     PAGE_COUNT: null,
-    TAGS: ["판타지", "마법", "오디오북"],
+    TAGS: ["판타지", "마법", "성장"],
     FILE_FORMAT: "MP3",
     DRM_YN: "Y",
     SERVICE_REGION: "GLOBAL",
     SERIES_NAME: "해리 포터 (오디오북)",
     SERIES_NUM: 1,
     VIDEO_URL: "",
+    RECOMMENDATION_TEXTS: ["#판타지", "#마법", "#오디오북"],
   },
   {
     key: "23",
@@ -828,13 +858,14 @@ export const initialBooks = [
     ISBN: "9780751575635",
     PRICE: 22000,
     PAGE_COUNT: null,
-    TAGS: ["판타지", "모험", "오디오북"],
+    TAGS: ["판타지", "모험"],
     FILE_FORMAT: "MP3",
     DRM_YN: "Y",
     SERVICE_REGION: "GLOBAL",
     SERIES_NAME: "해리 포터 (오디오북)",
     SERIES_NUM: 2,
     VIDEO_URL: "",
+    RECOMMENDATION_TEXTS: ["#판타지", "#모험", "#오디오북"],
   },
   {
     key: "24",
@@ -864,6 +895,7 @@ export const initialBooks = [
     SERIES_NAME: "클린 시리즈",
     SERIES_NUM: 1,
     VIDEO_URL: "",
+    RECOMMENDATION_TEXTS: ["#프로그래밍", "#소프트웨어 개발", "#클린코드"],
   },
   {
     key: "25",
@@ -893,12 +925,16 @@ export const initialBooks = [
     SERIES_NAME: "클린 시리즈",
     SERIES_NUM: 2,
     VIDEO_URL: "",
+    RECOMMENDATION_TEXTS: ["#소프트웨어 아키텍처", "#클린코드"],
   },
 ].map((book) => ({
   ...book,
   BOOK_TRANSLATOR: book.BOOK_TRANSLATOR || "",
   BOOK_FILE_NAME: book.BOOK_FILE_NAME || "",
   VIDEO_URL: book.VIDEO_URL || "",
+  RECOMMENDATION_TITLE: book.RECOMMENDATION_TITLE || "",
+  RECOMMENDATION_MESSAGE: book.RECOMMENDATION_MESSAGE || "",
+  RECOMMENDATION_TEXTS: book.RECOMMENDATION_TEXTS || [],
 })); // 모든 항목에 BOOK_TRANSLATOR, BOOK_FILE_NAME, VIDEO_URL 기본값 보장
 
 // Helper to get content type tag
@@ -955,6 +991,22 @@ const BookManagement = () => {
   const [bookFileList, setBookFileList] = useState([]); // 개별 도서 파일 첨부용 상태
   const [coverFileList, setCoverFileList] = useState([]); // 표지 썸네일 파일 첨부용 상태
   const [filteredSeriesOptions, setFilteredSeriesOptions] = useState([]); // 자동 완성 옵션 상태 추가
+  const [recommendationTextInput, setRecommendationTextInput] = useState("");
+
+  const availableKeywords = useMemo(() => {
+    const activeKeywords = new Set();
+    allKeywordsData.forEach(keyword => {
+        if (keyword.status === 'active') {
+            activeKeywords.add(keyword.name);
+            if (keyword.subKeywords) {
+                keyword.subKeywords.forEach(sub => {
+                    activeKeywords.add(sub.name);
+                });
+            }
+        }
+    });
+    return Array.from(activeKeywords).sort((a, b) => a.localeCompare(b));
+  }, []);
 
   // 기존 시리즈명 목록 및 권수 추출 (중복 제거 및 권수 계산)
   const seriesData = useMemo(() => {
@@ -1001,6 +1053,7 @@ const BookManagement = () => {
     form.resetFields();
     setBookFileList([]); // 파일 목록 초기화
     setCoverFileList([]); // 표지 파일 목록 초기화
+    setRecommendationTextInput("");
     setIsModalOpen(true);
   };
 
@@ -1049,6 +1102,7 @@ const BookManagement = () => {
     form.resetFields();
     setBookFileList([]); // 파일 목록 초기화
     setCoverFileList([]); // 표지 파일 목록 초기화
+    setRecommendationTextInput("");
   };
 
   // --- Form Submission ---
@@ -1102,6 +1156,9 @@ const BookManagement = () => {
           PRICE: values.PRICE,
           SERIES_NUM: values.SERIES_NUM,
           VIDEO_URL: values.VIDEO_URL,
+          RECOMMENDATION_TITLE: values.RECOMMENDATION_TITLE || "",
+          RECOMMENDATION_MESSAGE: values.RECOMMENDATION_MESSAGE || "",
+          RECOMMENDATION_TEXTS: values.RECOMMENDATION_TEXTS || [],
         };
 
         Object.keys(formattedValues).forEach((key) => {
@@ -1152,6 +1209,34 @@ const BookManagement = () => {
     setBooks(books.filter((book) => book.key !== key));
     message.success("도서가 삭제되었습니다.");
     console.log("Deleting book key:", key);
+  };
+
+  const handleAddRecommendationText = () => {
+    if (!recommendationTextInput.trim()) {
+      message.warning("추천 텍스트를 입력해주세요.");
+      return;
+    }
+    const currentTexts = form.getFieldValue("RECOMMENDATION_TEXTS") || [];
+    if (currentTexts.includes(recommendationTextInput.trim())) {
+      message.warning("이미 추가된 추천 텍스트입니다.");
+      return;
+    }
+    form.setFieldsValue({
+      RECOMMENDATION_TEXTS: [
+        ...currentTexts,
+        recommendationTextInput.trim(),
+      ],
+    });
+    setRecommendationTextInput("");
+  };
+
+  const handleRemoveRecommendationText = (textToRemove) => {
+    const currentTexts = form.getFieldValue("RECOMMENDATION_TEXTS") || [];
+    form.setFieldsValue({
+      RECOMMENDATION_TEXTS: currentTexts.filter(
+        (text) => text !== textToRemove
+      ),
+    });
   };
 
   // --- Import Modal Handling ---
@@ -2071,9 +2156,10 @@ const BookManagement = () => {
               <Form.Item name="TAGS" label="키워드">
                 <Select
                   mode="tags"
-                  placeholder="태그 입력 후 Enter"
+                  placeholder="키워드 선택 또는 입력 후 Enter"
                   style={{ width: "100%" }}
                   tokenSeparators={[","]}
+                  options={availableKeywords.map(kw => ({ label: kw, value: kw }))}
                 />
               </Form.Item>
             </Col>
@@ -2098,6 +2184,64 @@ const BookManagement = () => {
             <Col span={24}>
               <Form.Item name="SUMMARY" label="본문 요약(도입부)">
                 <TextArea rows={3} />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Divider orientation="left">추천 정보</Divider>
+          <Row gutter={[16, 16]}>
+            <Col span={24}>
+                <Form.Item name="RECOMMENDATION_TITLE" label="추천 제목">
+                    <Input placeholder="도서 추천 시 사용될 제목" />
+                </Form.Item>
+            </Col>
+            <Col span={24}>
+                <Form.Item name="RECOMMENDATION_MESSAGE" label="추천 메시지">
+                    <TextArea rows={3} placeholder="도서 추천 시 함께 표시될 메시지" />
+                </Form.Item>
+            </Col>
+            <Col span={24}>
+              <Form.Item label="추천 텍스트" tooltip="추천 문구를 입력하고 '추가' 버튼을 클릭하세요.">
+                <Space.Compact style={{ width: "100%" }}>
+                  <Input
+                    value={recommendationTextInput}
+                    onChange={(e) =>
+                      setRecommendationTextInput(e.target.value)
+                    }
+                    onPressEnter={(e) => {
+                      e.preventDefault();
+                      handleAddRecommendationText();
+                    }}
+                    placeholder="추천 문장을 입력하세요"
+                  />
+                  <Button type="primary" onClick={handleAddRecommendationText}>
+                    추가
+                  </Button>
+                </Space.Compact>
+                <Form.Item name="RECOMMENDATION_TEXTS" noStyle>
+                  <div style={{ marginTop: "8px" }}>
+                    {form
+                      .getFieldValue("RECOMMENDATION_TEXTS")
+                      ?.map((text, index) => (
+                        <Tag
+                          key={index}
+                          closable
+                          onClose={() => handleRemoveRecommendationText(text)}
+                          style={{
+                            whiteSpace: "normal",
+                            height: "auto",
+                            display: "inline-block",
+                            lineHeight: "20px",
+                            padding: "4px 8px",
+                            margin: "4px 4px 0 0",
+                            fontSize: "14px",
+                          }}
+                        >
+                          {text}
+                        </Tag>
+                      ))}
+                  </div>
+                </Form.Item>
               </Form.Item>
             </Col>
           </Row>

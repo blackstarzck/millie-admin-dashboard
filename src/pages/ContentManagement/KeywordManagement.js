@@ -1,150 +1,158 @@
-import React, { useState } from 'react';
 import {
-    Table,
-    Button,
-    Modal,
-    Form,
-    Input,
-    Space,
-    Typography,
-    message,
-    Tooltip,
-    Tag,
-    Select,
-    Popconfirm,
-} from 'antd';
-import {
-    PlusOutlined,
-    EditOutlined,
-    DownOutlined,
-    CloseOutlined,
-    DeleteOutlined,
+  DeleteOutlined,
+  EditOutlined,
+  PlusOutlined,
 } from '@ant-design/icons';
+import {
+  Button,
+  Form,
+  Input,
+  message,
+  Modal,
+  Popconfirm,
+  Space,
+  Switch,
+  Table,
+  Tag,
+  Tooltip,
+  Typography,
+} from 'antd';
+import React, { useState } from 'react';
 
 const { Title, Text } = Typography;
 const { TextArea } = Input;
 
 // --- Sample Data ---
-const initialKeywords = [
-    { 
-        key: '1', 
-        id: 1, 
-        name: '모험', 
-        description: '모험과 도전을 주제로 한 키워드', 
-        order: 1, 
+export const initialKeywords = [
+    {
+        key: '1',
+        id: 1,
+        name: '모험',
+        description: '모험과 도전을 주제로 한 키워드',
+        order: 1,
+        status: 'active',
         subKeywords: [
             { key: 'adv_sub_1', name: '탐험', description: '새로운 장소나 영역을 발견하는 모험', order: 1 },
             { key: 'adv_sub_2', name: '여행', description: '다양한 장소를 방문하며 경험하는 모험', order: 2 },
             { key: 'adv_sub_3', name: '생존', description: '극한의 상황에서 살아남는 모험', order: 3 },
-        ] 
+        ]
     },
-    { 
-        key: '2', 
-        id: 2, 
-        name: '로맨스', 
-        description: '사랑과 관계를 주제로 한 키워드', 
-        order: 2, 
+    {
+        key: '2',
+        id: 2,
+        name: '로맨스',
+        description: '사랑과 관계를 주제로 한 키워드',
+        order: 2,
+        status: 'active',
         subKeywords: [
             { key: 'rom_sub_1', name: '첫사랑', order: 1 },
             { key: 'rom_sub_2', name: '운명적 사랑', order: 2 },
             { key: 'rom_sub_3', name: '삼각관계', order: 3 },
-        ] 
+        ]
     },
-    { 
-        key: '3', 
-        id: 3, 
-        name: '성장', 
-        description: '인간의 성장과 발전을 다루는 키워드', 
-        order: 3, 
+    {
+        key: '3',
+        id: 3,
+        name: '성장',
+        description: '인간의 성장과 발전을 다루는 키워드',
+        order: 3,
+        status: 'active',
         subKeywords: [
             { key: 'growth_sub_1', name: '자아 발견', order: 1 },
             { key: 'growth_sub_2', name: '청춘', order: 2 },
             { key: 'growth_sub_3', name: '극복', order: 3 },
-        ] 
+        ]
     },
-    { 
-        key: '4', 
-        id: 4, 
-        name: '미스터리', 
-        description: '추리와 비밀을 다루는 키워드', 
-        order: 4, 
+    {
+        key: '4',
+        id: 4,
+        name: '미스터리',
+        description: '추리와 비밀을 다루는 키워드',
+        order: 4,
+        status: 'active',
         subKeywords: [
             { key: 'mys_sub_1', name: '추리', order: 1 },
             { key: 'mys_sub_2', name: '스릴러', order: 2 },
             { key: 'mys_sub_3', name: '반전', order: 3 },
-        ] 
+        ]
     },
-    { 
-        key: '5', 
-        id: 5, 
-        name: '판타지', 
-        description: '상상의 세계와 마법을 다루는 키워드', 
-        order: 5, 
+    {
+        key: '5',
+        id: 5,
+        name: '판타지',
+        description: '상상의 세계와 마법을 다루는 키워드',
+        order: 5,
+        status: 'active',
         subKeywords: [
             { key: 'fan_sub_1', name: '마법', order: 1 },
             { key: 'fan_sub_2', name: '신화', order: 2 },
             { key: 'fan_sub_3', name: '이세계', order: 3 },
-        ] 
+        ]
     },
-    { 
-        key: '6', 
-        id: 6, 
-        name: '가족', 
-        description: '가족 관계와 정을 다루는 키워드', 
-        order: 6, 
+    {
+        key: '6',
+        id: 6,
+        name: '가족',
+        description: '가족 관계와 정을 다루는 키워드',
+        order: 6,
+        status: 'active',
         subKeywords: [
             { key: 'fam_sub_1', name: '부모와 자식', order: 1 },
             { key: 'fam_sub_2', name: '형제애', order: 2 },
             { key: 'fam_sub_3', name: '가정 회복', order: 3 },
-        ] 
+        ]
     },
-    { 
-        key: '7', 
-        id: 7, 
-        name: '역사', 
-        description: '역사적 사건과 인물을 다루는 키워드', 
-        order: 7, 
+    {
+        key: '7',
+        id: 7,
+        name: '역사',
+        description: '역사적 사건과 인물을 다루는 키워드',
+        order: 7,
+        status: 'active',
         subKeywords: [
             { key: 'his_sub_1', name: '시대극', order: 1 },
             { key: 'his_sub_2', name: '실존 인물', order: 2 },
             { key: 'his_sub_3', name: '전쟁', order: 3 },
-        ] 
+        ]
     },
-    { 
-        key: '8', 
-        id: 8, 
-        name: '공상과학', 
-        description: '미래와 과학을 다루는 키워드', 
-        order: 8, 
+    {
+        key: '8',
+        id: 8,
+        name: '공상과학',
+        description: '미래와 과학을 다루는 키워드',
+        order: 8,
+        status: 'active',
         subKeywords: [
             { key: 'sci_sub_1', name: '우주', order: 1 },
             { key: 'sci_sub_2', name: '시간 여행', order: 2 },
             { key: 'sci_sub_3', name: '디스토피아', order: 3 },
-        ] 
+        ]
     },
-    { 
-        key: '9', 
-        id: 9, 
-        name: '자기계발', 
-        description: '개인의 성장과 발전을 다루는 키워드', 
-        order: 9, 
+    {
+        key: '9',
+        id: 9,
+        name: '자기계발',
+        description: '개인의 성장과 발전을 다루는 키워드',
+        order: 9,
+        status: 'inactive',
         subKeywords: [
             { key: 'dev_sub_1', name: '동기부여', order: 1 },
             { key: 'dev_sub_2', name: '습관', order: 2 },
             { key: 'dev_sub_3', name: '성공', order: 3 },
-        ] 
+        ]
     },
-    { 
-        key: '10', 
-        id: 10, 
-        name: '유머', 
-        description: '웃음과 재미를 다루는 키워드', 
-        order: 10, 
+    {
+        key: '10',
+        id: 10,
+        name: '유머',
+        description: '웃음과 재미를 다루는 키워드',
+        order: 10,
+        status: 'inactive',
         subKeywords: [
             { key: 'hum_sub_1', name: '코미디', order: 1 },
             { key: 'hum_sub_2', name: '풍자', order: 2 },
             { key: 'hum_sub_3', name: '가벼운 일상', order: 3 },
-        ] 
+        ]
     },
 ];
 
@@ -160,11 +168,21 @@ const KeywordManagement = () => {
     const [subKeywordDescription, setSubKeywordDescription] = useState('');
     const [expandedRowKey, setExpandedRowKey] = useState(null);
 
+    const handleStatusChange = (checked, record) => {
+        const newStatus = checked ? 'active' : 'inactive';
+        setKeywords(prevKeywords =>
+            prevKeywords.map(kw =>
+                kw.key === record.key ? { ...kw, status: newStatus } : kw
+            )
+        );
+        message.success(`'${record.name}' 키워드 상태가 '${newStatus === 'active' ? '노출' : '숨김'}'으로 변경되었습니다.`);
+    };
+
     const showAddModal = () => {
         setEditingKeyword(null);
         form.resetFields();
         const nextOrder = keywords.length > 0 ? Math.max(...keywords.map(k => k.order)) + 1 : 1;
-        form.setFieldsValue({ 
+        form.setFieldsValue({
             order: nextOrder,
             subKeywords: []
         });
@@ -173,8 +191,9 @@ const KeywordManagement = () => {
 
     const showEditModal = (keyword) => {
         setEditingKeyword(keyword);
-        form.setFieldsValue({ 
+        form.setFieldsValue({
             ...keyword,
+            status: keyword.status === 'active',
             subKeywords: keyword.subKeywords || []
         });
         setIsModalOpen(true);
@@ -236,6 +255,7 @@ const KeywordManagement = () => {
             .then((values) => {
                 const processedValues = {
                     ...values,
+                    status: values.status ? 'active' : 'inactive',
                     order: Number(values.order) || 0,
                     subKeywords: (values.subKeywords || []).map((sub, index) => ({
                         ...sub,
@@ -281,7 +301,7 @@ const KeywordManagement = () => {
     const handleSubKeywordModalOk = () => {
         subKeywordForm.validateFields().then(values => {
             const currentSubKeywords = form.getFieldValue('subKeywords');
-            const updatedSubKeywords = currentSubKeywords.map(s => 
+            const updatedSubKeywords = currentSubKeywords.map(s =>
                 s.key === editingSubKeyword.key ? { ...s, description: values.description } : s
             );
             form.setFieldsValue({ subKeywords: updatedSubKeywords });
@@ -302,6 +322,20 @@ const KeywordManagement = () => {
         { title: '순서', dataIndex: 'order', key: 'order', width: 80, sorter: (a, b) => a.order - b.order, defaultSortOrder: 'ascend' },
         { title: '키워드', dataIndex: 'name', key: 'name', sorter: (a, b) => a.name.localeCompare(b.name) },
         { title: '설명', dataIndex: 'description', key: 'description', ellipsis: true },
+        {
+            title: '상태',
+            dataIndex: 'status',
+            key: 'status',
+            width: 100,
+            render: (status, record) => (
+                <Switch
+                    checkedChildren="노출"
+                    unCheckedChildren="숨김"
+                    checked={status === 'active'}
+                    onChange={(checked) => handleStatusChange(checked, record)}
+                />
+            )
+        },
         {
             title: '하위 키워드 수',
             key: 'subKeywordsCount',
@@ -349,11 +383,11 @@ const KeywordManagement = () => {
                         <div>
                             <Space wrap>
                                 {record.subKeywords?.sort((a, b) => a.order - b.order).map(sub => (
-                                    <Tooltip 
+                                    <Tooltip
                                         key={sub.key}
                                         title={sub.description || '설명 없음'}
                                     >
-                                        <Tag 
+                                        <Tag
                                             color="blue"
                                             style={{ cursor: 'pointer' }}
                                             onClick={() => handleEditSubKeyword(sub)}
@@ -397,7 +431,7 @@ const KeywordManagement = () => {
                                 validator: (_, value) => {
                                     const lowerCaseValue = value && value.toLowerCase();
                                     const isDuplicate = keywords.some(
-                                        keyword => 
+                                        keyword =>
                                             keyword.name.toLowerCase() === lowerCaseValue &&
                                             (!editingKeyword || keyword.key !== editingKeyword.key)
                                     );
@@ -428,6 +462,15 @@ const KeywordManagement = () => {
                     </Form.Item>
 
                     <Form.Item
+                        name="status"
+                        label="상태"
+                        valuePropName="checked"
+                        initialValue={true}
+                    >
+                        <Switch checkedChildren="노출" unCheckedChildren="숨김" />
+                    </Form.Item>
+
+                    <Form.Item
                         label="하위 키워드 관리"
                         required
                         tooltip="하위 키워드명과 설명을 입력하고 추가 버튼을 클릭하세요."
@@ -455,8 +498,8 @@ const KeywordManagement = () => {
                                     autoSize={{ minRows: 2, maxRows: 4 }}
                                     style={{ width: '100%' }}
                                 />
-                                <Button 
-                                    type="primary" 
+                                <Button
+                                    type="primary"
                                     onClick={handleAddSubKeyword}
                                     style={{ width: '100%' }}
                                 >
@@ -510,8 +553,8 @@ const KeywordManagement = () => {
                             cancelText="취소"
                             okButtonProps={{ danger: true }}
                         >
-                            <Button 
-                                danger 
+                            <Button
+                                danger
                                 icon={<DeleteOutlined />}
                             >
                                 삭제
@@ -549,4 +592,4 @@ const KeywordManagement = () => {
     );
 };
 
-export default KeywordManagement; 
+export default KeywordManagement;
