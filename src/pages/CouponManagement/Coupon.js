@@ -1,9 +1,9 @@
 import {
   DeleteOutlined,
-  EditOutlined,
+  DownloadOutlined,
   MoreOutlined,
   PlusOutlined,
-  SearchOutlined,
+  SearchOutlined
 } from '@ant-design/icons';
 import {
   Button,
@@ -83,10 +83,80 @@ const dummyContentList = [
     { id: 'content-15', title: '데미안' },
 ];
 
+// 사용내역 더미 데이터
+const dummyUsageData = {
+  '1': [
+    {
+      key: 'usage-1-1',
+      userId: 'user001',
+      userName: '김철수',
+      userEmail: 'kimcs@example.com',
+      useDate: '2024-01-15 14:30:25',
+      discountAmount: '1,500원',
+      originalPrice: '15,000원',
+      finalPrice: '13,500원',
+      contentTitle: '달러구트 꿈 백화점',
+      contentId: 'content-1',
+    },
+    {
+      key: 'usage-1-2',
+      userId: 'user002',
+      userName: '이영희',
+      userEmail: 'leeyh@example.com',
+      useDate: '2024-01-16 09:15:40',
+      discountAmount: '2,000원',
+      originalPrice: '20,000원',
+      finalPrice: '18,000원',
+      contentTitle: '팩트풀니스',
+      contentId: 'content-3',
+    },
+    {
+      key: 'usage-1-3',
+      userId: 'user003',
+      userName: '박민수',
+      userEmail: 'parkms@example.com',
+      useDate: '2024-01-17 16:45:12',
+      discountAmount: '1,200원',
+      originalPrice: '12,000원',
+      finalPrice: '10,800원',
+      contentTitle: '달러구트 꿈 백화점',
+      contentId: 'content-1',
+    },
+  ],
+  '2': [
+    {
+      key: 'usage-2-1',
+      userId: 'user004',
+      userName: '정수진',
+      userEmail: 'jungsj@example.com',
+      useDate: '2024-06-15 11:20:15',
+      discountAmount: '5,000원',
+      originalPrice: '18,000원',
+      finalPrice: '13,000원',
+      contentTitle: '시간을 파는 상점',
+      contentId: 'content-2',
+    },
+    {
+      key: 'usage-2-2',
+      userId: 'user005',
+      userName: '최동훈',
+      userEmail: 'choidh@example.com',
+      useDate: '2024-06-20 15:33:28',
+      discountAmount: '5,000원',
+      originalPrice: '25,000원',
+      finalPrice: '20,000원',
+      contentTitle: '어린이라는 세계',
+      contentId: 'content-4',
+    },
+  ],
+};
 
 const Coupon = () => {
     const [coupons, setCoupons] = useState(initialCouponData);
     const [isModalVisible, setIsModalVisible] = useState(false);
+    const [isUsageModalVisible, setIsUsageModalVisible] = useState(false);
+    const [currentUsageData, setCurrentUsageData] = useState([]);
+    const [currentCouponName, setCurrentCouponName] = useState('');
     const [editingCoupon, setEditingCoupon] = useState(null);
     const [searchText, setSearchText] = useState('');
     const [form] = Form.useForm();
@@ -168,8 +238,117 @@ const Coupon = () => {
     };
 
     const handleViewUsage = (key) => {
-        alert(`'${key}' 쿠폰의 사용 내역 보기 기능은 현재 구현되지 않았습니다.`);
+        const coupon = coupons.find(c => c.key === key);
+        const usageData = dummyUsageData[key] || [];
+
+        setCurrentCouponName(coupon?.couponName || '');
+        setCurrentUsageData(usageData);
+        setIsUsageModalVisible(true);
+
         console.log('View usage for:', key);
+    };
+
+    const handleUsageModalCancel = () => {
+        setIsUsageModalVisible(false);
+        setCurrentUsageData([]);
+        setCurrentCouponName('');
+    };
+
+    const handleExcelDownload = () => {
+        if (currentUsageData.length === 0) {
+            Modal.warning({
+                title: '다운로드 불가',
+                content: '다운로드할 사용내역이 없습니다.',
+            });
+            return;
+        }
+
+        // 엑셀 헤더 정의
+        const headers = [
+            '사용자 ID',
+            '사용자명',
+            '이메일',
+            '사용일시',
+            '원가격',
+            '할인금액',
+            '결제금액',
+            '구매 컨텐츠'
+        ];
+
+        // 데이터를 CSV 형태로 변환 (엑셀에서 호환)
+        const csvData = [
+            headers,
+            ...currentUsageData.map(item => [
+                item.userId,
+                item.userName,
+                item.userEmail,
+                item.useDate,
+                item.originalPrice,
+                item.discountAmount,
+                item.finalPrice,
+                item.contentTitle
+            ])
+        ];
+
+        // CSV 문자열 생성
+        const csvContent = csvData.map(row =>
+            row.map(cell => `"${cell}"`).join(',')
+        ).join('\n');
+
+        // BOM 추가하여 한글 깨짐 방지
+        const BOM = '\uFEFF';
+        const blob = new Blob([BOM + csvContent], {
+            type: 'application/vnd.ms-excel;charset=utf-8;'
+        });
+
+        // 파일 다운로드
+        const link = document.createElement('a');
+        if (link.download !== undefined) {
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', `${currentCouponName}_상세사용내역_${new Date().toISOString().split('T')[0]}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+
+        console.log('Excel download completed for:', currentCouponName);
+    };
+
+    const handleDownloadUsage = (key) => {
+        const coupon = coupons.find(c => c.key === key);
+        if (!coupon) return;
+
+        // CSV 형태로 사용내역 데이터 생성 (실제로는 서버에서 데이터를 받아와야 함)
+        const csvData = [
+            ['쿠폰명', '사용자ID', '사용일시', '할인금액', '사용컨텐츠'],
+            [`${coupon.couponName}`, 'user001', '2024-01-15 14:30:00', '5000원', '달러구트 꿈 백화점'],
+            [`${coupon.couponName}`, 'user002', '2024-01-16 09:15:00', '5000원', '시간을 파는 상점'],
+            [`${coupon.couponName}`, 'user003', '2024-01-17 16:45:00', '5000원', '팩트풀니스'],
+        ];
+
+        // CSV 문자열 생성
+        const csvContent = csvData.map(row => row.join(',')).join('\n');
+
+        // BOM 추가하여 한글 깨짐 방지
+        const BOM = '\uFEFF';
+        const blob = new Blob([BOM + csvContent], { type: 'text/csv;charset=utf-8;' });
+
+        // 파일 다운로드
+        const link = document.createElement('a');
+        if (link.download !== undefined) {
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', `${coupon.couponName}_사용내역_${new Date().toISOString().split('T')[0]}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        console.log('Download usage for:', key);
     };
 
     const columns = [
@@ -220,7 +399,7 @@ const Coupon = () => {
                 <Dropdown
                     overlay={
                         <Menu>
-                            <Menu.Item key="edit" icon={<EditOutlined />} onClick={() => showModal(record)}>
+                            <Menu.Item key="edit" onClick={() => showModal(record)}>
                                 수정
                             </Menu.Item>
                             <Menu.Item key="cancel" onClick={() => handleCancelIssuance(record.key)}>
@@ -228,6 +407,9 @@ const Coupon = () => {
                             </Menu.Item>
                             <Menu.Item key="history" onClick={() => handleViewUsage(record.key)}>
                                 사용내역 보기
+                            </Menu.Item>
+                            <Menu.Item key="download" icon={<DownloadOutlined />} onClick={() => handleDownloadUsage(record.key)}>
+                                사용내역 다운로드
                             </Menu.Item>
                             <Menu.Item key="delete" icon={<DeleteOutlined />} danger onClick={() => handleDelete(record.key)}>
                                 삭제
@@ -239,6 +421,62 @@ const Coupon = () => {
                     <Button type="text" icon={<MoreOutlined />} />
                 </Dropdown>
             ),
+        },
+    ];
+
+    // 사용내역 테이블 컬럼 정의
+    const usageColumns = [
+        {
+            title: '사용자 ID',
+            dataIndex: 'userId',
+            key: 'userId',
+            width: '120px',
+        },
+        {
+            title: '사용자명',
+            dataIndex: 'userName',
+            key: 'userName',
+            width: '100px',
+        },
+        {
+            title: '이메일',
+            dataIndex: 'userEmail',
+            key: 'userEmail',
+            width: '200px',
+        },
+        {
+            title: '사용일시',
+            dataIndex: 'useDate',
+            key: 'useDate',
+            width: '150px',
+        },
+        {
+            title: '원가격',
+            dataIndex: 'originalPrice',
+            key: 'originalPrice',
+            width: '100px',
+            align: 'right',
+        },
+        {
+            title: '할인금액',
+            dataIndex: 'discountAmount',
+            key: 'discountAmount',
+            width: '100px',
+            align: 'right',
+            render: (text) => <span style={{ color: '#ff4d4f', fontWeight: 'bold' }}>-{text}</span>,
+        },
+        {
+            title: '결제금액',
+            dataIndex: 'finalPrice',
+            key: 'finalPrice',
+            width: '100px',
+            align: 'right',
+            render: (text) => <span style={{ fontWeight: 'bold' }}>{text}</span>,
+        },
+        {
+            title: '구매 컨텐츠',
+            dataIndex: 'contentTitle',
+            key: 'contentTitle',
         },
     ];
 
@@ -370,6 +608,48 @@ const Coupon = () => {
                         </Select>
                     </Form.Item>
                 </Form>
+            </Modal>
+
+            {/* 사용내역 보기 모달 */}
+            <Modal
+                title={`${currentCouponName} - 사용내역`}
+                visible={isUsageModalVisible}
+                onCancel={handleUsageModalCancel}
+                footer={[
+                    <Button
+                        key="download"
+                        type="primary"
+                        icon={<DownloadOutlined />}
+                        onClick={handleExcelDownload}
+                        style={{ marginRight: 8 }}
+                    >
+                        엑셀 다운로드
+                    </Button>,
+                    <Button key="close" onClick={handleUsageModalCancel}>
+                        닫기
+                    </Button>,
+                ]}
+                width={1200}
+                style={{ top: 20 }}
+            >
+                <div style={{ marginBottom: 16 }}>
+                    <span style={{ color: '#666' }}>
+                        총 {currentUsageData.length}건의 사용내역이 있습니다.
+                    </span>
+                </div>
+                <Table
+                    columns={usageColumns}
+                    dataSource={currentUsageData}
+                    rowKey="key"
+                    pagination={{
+                        pageSize: 10,
+                        showSizeChanger: true,
+                        showQuickJumper: true,
+                        showTotal: (total, range) => `${range[0]}-${range[1]} / 총 ${total}건`,
+                    }}
+                    scroll={{ x: 1000 }}
+                    size="middle"
+                />
             </Modal>
         </Space>
     );
