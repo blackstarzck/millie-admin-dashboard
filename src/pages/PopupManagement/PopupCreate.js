@@ -1,31 +1,29 @@
-import React, { useState } from 'react';
 import {
-    Form,
-    Input,
-    Button,
-    Select,
-    DatePicker,
-    Radio,
-    Upload,
-    Switch,
-    Space,
-    Typography,
-    message,
-    Row, Col,
-    InputNumber,
-} from 'antd';
-import {
-    UploadOutlined,
-    PlusOutlined, // Placeholder for adding template
-    LinkOutlined,
-    CalendarOutlined,
-    ClockCircleOutlined,
-    UserOutlined,
-    SaveOutlined,
-    FileImageOutlined,
-    ProfileOutlined, // Template icon
+  ClockCircleOutlined,
+  FileImageOutlined, // Placeholder for adding template
+  LinkOutlined,
+  ProfileOutlined,
+  SaveOutlined,
+  UploadOutlined,
+  UserOutlined
 } from '@ant-design/icons';
-import moment from 'moment';
+import {
+  Button,
+  Col,
+  DatePicker,
+  Form,
+  Input,
+  InputNumber,
+  message,
+  Radio,
+  Row,
+  Select,
+  Space,
+  Switch,
+  Typography,
+  Upload,
+} from 'antd';
+import React, { useState } from 'react';
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -192,7 +190,7 @@ const PopupCreate = () => {
                                 </Upload>
                             </Form.Item>
                          )}
-                         {/* Hidden field to store the final image URL */} 
+                         {/* Hidden field to store the final image URL */}
                          <Form.Item name="imageUrl" hidden><Input /></Form.Item>
 
                         {contentType === 'template' && (
@@ -288,4 +286,4 @@ const PopupCreate = () => {
     );
 };
 
-export default PopupCreate; 
+export default PopupCreate;

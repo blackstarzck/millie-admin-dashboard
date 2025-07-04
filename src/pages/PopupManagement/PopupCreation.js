@@ -1,33 +1,32 @@
-import React, { useState, useEffect } from 'react';
 import {
-    Form,
-    Input,
-    Button,
-    Select,
-    DatePicker,
-    Upload,
-    Radio,
-    InputNumber,
-    Typography,
-    Space,
-    Card,
-    message,
-    Row,
-    Col,
-    Switch,
-    Modal,
-} from 'antd';
-import {
-    PlusOutlined,
-    UploadOutlined,
-    LinkOutlined,
-    CalendarOutlined,
-    UsergroupAddOutlined,
-    CheckCircleOutlined,
-    FileImageOutlined, // Image content type
-    ProfileOutlined, // Template content type
-    EyeOutlined, // Preview Icon
+  CalendarOutlined,
+  CheckCircleOutlined, // Template content type
+  EyeOutlined,
+  FileImageOutlined,
+  LinkOutlined,
+  PlusOutlined, // Image content type
+  ProfileOutlined, // Preview Icon
+  PushpinOutlined,
+  UploadOutlined
 } from '@ant-design/icons';
+import {
+  Button,
+  Card,
+  Col,
+  DatePicker,
+  Form,
+  Input,
+  InputNumber,
+  message,
+  Modal,
+  Radio,
+  Row,
+  Select,
+  Space,
+  Typography,
+  Upload
+} from 'antd';
+import React, { useEffect, useState } from 'react';
 import { usePopupTemplates } from '../../context/PopupTemplateContext'; // Import template context hook
 
 const { Title, Text, Paragraph } = Typography;
@@ -49,6 +48,18 @@ const userSegments = [
     { id: 'new_7d', name: '신규 가입자 (7일)' },
     { id: 'vip', name: 'VIP 등급' },
     { id: 'group_A', name: '사용자 그룹 A' },
+];
+
+const pageList = [
+    { id: 'platform_main', name: '플랫폼 메인 홈' },
+    { id: 'search_result', name: '검색 결과' },
+    { id: 'book_detail', name: '도서 상세' },
+    { id: 'viewer', name: '뷰어' },
+    { id: 'my_library', name: '내 서재' },
+    { id: 'category_best', name: '카테고리/베스트' },
+    { id: 'event_detail', name: '이벤트 상세' },
+    { id: 'user_profile', name: '사용자 프로필' },
+    { id: 'subscription_info', name: '구독 정보' },
 ];
 
 // --- Component ---
@@ -330,6 +341,23 @@ const PopupCreation = () => {
                         </Col>
                     </Row>
 
+                    <Form.Item
+                        name="exposurePages"
+                        label={<><PushpinOutlined /> 노출 페이지</>}
+                        tooltip="팝업을 노출할 페이지를 선택합니다. 특정 페이지만 타겟팅할 수 있습니다."
+                    >
+                        <Select
+                            mode="multiple"
+                            allowClear
+                            style={{ width: '100%' }}
+                            placeholder="팝업을 노출할 페이지를 선택하세요 (선택하지 않으면 전체 노출)"
+                        >
+                            {pageList.map(page => (
+                                <Option key={page.id} value={page.id}>{page.name}</Option>
+                            ))}
+                        </Select>
+                    </Form.Item>
+
                     {/* Add field for initial priority */}
                     <Form.Item
                         name="priority"
@@ -456,4 +484,4 @@ const RenderImageFile = ({ file, linkUrl }) => { // Added linkUrl prop
      }
  };
 
-export default PopupCreation; 
+export default PopupCreation;
