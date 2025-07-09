@@ -6,6 +6,7 @@ import {
   CloseOutlined,
   DeleteOutlined,
   EditOutlined,
+  EllipsisOutlined,
   FileExcelOutlined,
   FileTextOutlined,
   PlusOutlined,
@@ -20,10 +21,13 @@ import {
   Col,
   DatePicker,
   Divider,
+  Dropdown,
   Form,
   Image,
   Input,
   InputNumber,
+  Menu,
+  message,
   Modal,
   Popconfirm,
   Row,
@@ -32,10 +36,8 @@ import {
   Switch,
   Table,
   Tag,
-  Tooltip,
   Typography,
-  Upload,
-  message,
+  Upload
 } from "antd";
 import moment from "moment";
 import React, { useMemo, useState } from "react";
@@ -45,7 +47,7 @@ import { initialKeywords as allKeywordsData } from "./KeywordManagement";
 
 const { Title, Text, Link } = Typography;
 const { Option } = Select;
-const { TextArea } = Input;
+const { Search, TextArea } = Input;
 
 // 카테고리별 하위 카테고리 데이터
 export const subCategoryMap = {
@@ -157,6 +159,9 @@ export const initialBooks = [
     RECOMMENDATION_TITLE: "이 시대의 필독서",
     RECOMMENDATION_MESSAGE: "최재천 교수와 함께하는 깊이 있는 토론의 장으로 여러분을 초대합니다. 생각을 넓히고 지적 대화를 나눌 수 있는 최고의 기회입니다.",
     RECOMMENDATION_TEXTS: ["#생각의_전환", "#지적_대화", "#필독서", "#최재천"],
+    DOWNLOAD_COUNT: Math.floor(Math.random() * 2000),
+    LIKE_COUNT: Math.floor(Math.random() * 1000),
+    REVIEW_COUNT: Math.floor(Math.random() * 500),
   },
   {
     key: "2",
@@ -198,6 +203,9 @@ export const initialBooks = [
     RECOMMENDATION_TITLE: "React 개발자 필독서",
     RECOMMENDATION_MESSAGE: "React의 모든 것을 담았습니다. 이 책 한 권으로 React 마스터가 되어보세요.",
     RECOMMENDATION_TEXTS: ["#React정복", "#프론트엔드_필수템", "#개발자_추천"],
+    DOWNLOAD_COUNT: Math.floor(Math.random() * 2000),
+    LIKE_COUNT: Math.floor(Math.random() * 1000),
+    REVIEW_COUNT: Math.floor(Math.random() * 500),
   },
   {
     key: "3",
@@ -239,6 +247,9 @@ export const initialBooks = [
     RECOMMENDATION_TITLE: "",
     RECOMMENDATION_MESSAGE: "",
     RECOMMENDATION_TEXTS: [],
+    DOWNLOAD_COUNT: Math.floor(Math.random() * 2000),
+    LIKE_COUNT: Math.floor(Math.random() * 1000),
+    REVIEW_COUNT: Math.floor(Math.random() * 500),
   },
   {
     key: "4",
@@ -282,6 +293,9 @@ export const initialBooks = [
     RECOMMENDATION_TITLE: "마음이 따뜻해지는 이야기",
     RECOMMENDATION_MESSAGE: "김유정 성우의 목소리로 듣는 '불편한 편의점', 잠시 쉬어가고 싶은 당신에게 위로를 선사합니다.",
     RECOMMENDATION_TEXTS: ["#오늘의_위로", "#따뜻한_목소리", "#스테디셀러"],
+    DOWNLOAD_COUNT: Math.floor(Math.random() * 2000),
+    LIKE_COUNT: Math.floor(Math.random() * 1000),
+    REVIEW_COUNT: Math.floor(Math.random() * 500),
   },
   // 나머지 initialBooks 데이터에도 BOOK_TRANSLATOR: '' (또는 실제값) 추가 필요
   {
@@ -313,6 +327,9 @@ export const initialBooks = [
     SERIES_NAME: "",
     SERIES_NUM: null,
     RECOMMENDATION_TEXTS: ["#데이터", "#Python", "#R"],
+    DOWNLOAD_COUNT: Math.floor(Math.random() * 2000),
+    LIKE_COUNT: Math.floor(Math.random() * 1000),
+    REVIEW_COUNT: Math.floor(Math.random() * 500),
   },
   {
     key: "6",
@@ -345,6 +362,9 @@ export const initialBooks = [
     SERIES_NAME: "",
     SERIES_NUM: null,
     RECOMMENDATION_TEXTS: ["#판타지", "#꿈"],
+    DOWNLOAD_COUNT: Math.floor(Math.random() * 2000),
+    LIKE_COUNT: Math.floor(Math.random() * 1000),
+    REVIEW_COUNT: Math.floor(Math.random() * 500),
   },
   {
     key: "7",
@@ -375,6 +395,9 @@ export const initialBooks = [
     SERIES_NAME: "",
     SERIES_NUM: null,
     RECOMMENDATION_TEXTS: ["#여행", "#에세이", "#김영하"],
+    DOWNLOAD_COUNT: Math.floor(Math.random() * 2000),
+    LIKE_COUNT: Math.floor(Math.random() * 1000),
+    REVIEW_COUNT: Math.floor(Math.random() * 500),
   },
   {
     key: "8",
@@ -405,6 +428,9 @@ export const initialBooks = [
     SERIES_NAME: "",
     SERIES_NUM: null,
     RECOMMENDATION_TEXTS: ["#역사", "#인류", "#빅 히스토리"],
+    DOWNLOAD_COUNT: Math.floor(Math.random() * 2000),
+    LIKE_COUNT: Math.floor(Math.random() * 1000),
+    REVIEW_COUNT: Math.floor(Math.random() * 500),
   },
   {
     key: "9",
@@ -437,6 +463,9 @@ export const initialBooks = [
     SERIES_NAME: "",
     SERIES_NUM: null,
     RECOMMENDATION_TEXTS: ["#판타지", "#인생", "#선택"],
+    DOWNLOAD_COUNT: Math.floor(Math.random() * 2000),
+    LIKE_COUNT: Math.floor(Math.random() * 1000),
+    REVIEW_COUNT: Math.floor(Math.random() * 500),
   },
   {
     key: "10",
@@ -467,6 +496,9 @@ export const initialBooks = [
     SERIES_NAME: "",
     SERIES_NUM: null,
     RECOMMENDATION_TEXTS: ["#Python", "#알고리즘", "#코딩테스트"],
+    DOWNLOAD_COUNT: Math.floor(Math.random() * 2000),
+    LIKE_COUNT: Math.floor(Math.random() * 1000),
+    REVIEW_COUNT: Math.floor(Math.random() * 500),
   },
   {
     key: "11",
@@ -497,6 +529,9 @@ export const initialBooks = [
     SERIES_NAME: "",
     SERIES_NUM: null,
     RECOMMENDATION_TEXTS: ["#재테크", "#부자", "#투자"],
+    DOWNLOAD_COUNT: Math.floor(Math.random() * 2000),
+    LIKE_COUNT: Math.floor(Math.random() * 1000),
+    REVIEW_COUNT: Math.floor(Math.random() * 500),
   },
   {
     key: "12",
@@ -529,6 +564,9 @@ export const initialBooks = [
     SERIES_NAME: "",
     SERIES_NUM: null,
     RECOMMENDATION_TEXTS: ["#심리학", "#뇌과학", "#인지오류"],
+    DOWNLOAD_COUNT: Math.floor(Math.random() * 2000),
+    LIKE_COUNT: Math.floor(Math.random() * 1000),
+    REVIEW_COUNT: Math.floor(Math.random() * 500),
   },
   {
     key: "13",
@@ -559,6 +597,9 @@ export const initialBooks = [
     SERIES_NAME: "",
     SERIES_NUM: null,
     RECOMMENDATION_TEXTS: ["#우주", "#과학", "#칼 세이건"],
+    DOWNLOAD_COUNT: Math.floor(Math.random() * 2000),
+    LIKE_COUNT: Math.floor(Math.random() * 1000),
+    REVIEW_COUNT: Math.floor(Math.random() * 500),
   },
   {
     key: "14",
@@ -589,6 +630,9 @@ export const initialBooks = [
     SERIES_NAME: "",
     SERIES_NUM: null,
     RECOMMENDATION_TEXTS: ["#데이터", "#통계", "#세상읽기"],
+    DOWNLOAD_COUNT: Math.floor(Math.random() * 2000),
+    LIKE_COUNT: Math.floor(Math.random() * 1000),
+    REVIEW_COUNT: Math.floor(Math.random() * 500),
   },
   // --- 추가 더미 데이터 (시리즈 테스트용) ---
   {
@@ -620,6 +664,9 @@ export const initialBooks = [
     SERIES_NUM: 1,
     VIDEO_URL: "",
     RECOMMENDATION_TEXTS: ["#판타지", "#모험", "#고전"],
+    DOWNLOAD_COUNT: Math.floor(Math.random() * 2000),
+    LIKE_COUNT: Math.floor(Math.random() * 1000),
+    REVIEW_COUNT: Math.floor(Math.random() * 500),
   },
   {
     key: "16",
@@ -650,6 +697,9 @@ export const initialBooks = [
     SERIES_NUM: 2,
     VIDEO_URL: "",
     RECOMMENDATION_TEXTS: ["#판타지", "#모험"],
+    DOWNLOAD_COUNT: Math.floor(Math.random() * 2000),
+    LIKE_COUNT: Math.floor(Math.random() * 1000),
+    REVIEW_COUNT: Math.floor(Math.random() * 500),
   },
   {
     key: "17",
@@ -680,6 +730,9 @@ export const initialBooks = [
     SERIES_NUM: 1,
     VIDEO_URL: "https://sample.com/brave_new_world_trailer.mp4",
     RECOMMENDATION_TEXTS: ["#SF", "#디스토피아", "#고전"],
+    DOWNLOAD_COUNT: Math.floor(Math.random() * 2000),
+    LIKE_COUNT: Math.floor(Math.random() * 1000),
+    REVIEW_COUNT: Math.floor(Math.random() * 500),
   },
   {
     key: "18",
@@ -710,6 +763,9 @@ export const initialBooks = [
     SERIES_NUM: 1,
     VIDEO_URL: "",
     RECOMMENDATION_TEXTS: ["#판타지", "#대서사시", "#모험"],
+    DOWNLOAD_COUNT: Math.floor(Math.random() * 2000),
+    LIKE_COUNT: Math.floor(Math.random() * 1000),
+    REVIEW_COUNT: Math.floor(Math.random() * 500),
   },
   {
     key: "19",
@@ -740,6 +796,9 @@ export const initialBooks = [
     SERIES_NUM: 2,
     VIDEO_URL: "",
     RECOMMENDATION_TEXTS: ["#판타지", "#대서사시", "#전쟁"],
+    DOWNLOAD_COUNT: Math.floor(Math.random() * 2000),
+    LIKE_COUNT: Math.floor(Math.random() * 1000),
+    REVIEW_COUNT: Math.floor(Math.random() * 500),
   },
   {
     key: "20",
@@ -770,6 +829,9 @@ export const initialBooks = [
     SERIES_NUM: 3,
     VIDEO_URL: "",
     RECOMMENDATION_TEXTS: ["#판타지", "#대서사시", "#결말"],
+    DOWNLOAD_COUNT: Math.floor(Math.random() * 2000),
+    LIKE_COUNT: Math.floor(Math.random() * 1000),
+    REVIEW_COUNT: Math.floor(Math.random() * 500),
   },
   {
     key: "21",
@@ -800,6 +862,9 @@ export const initialBooks = [
     SERIES_NUM: null,
     VIDEO_URL: "",
     RECOMMENDATION_TEXTS: ["#환경", "#고전", "#과학"],
+    DOWNLOAD_COUNT: Math.floor(Math.random() * 2000),
+    LIKE_COUNT: Math.floor(Math.random() * 1000),
+    REVIEW_COUNT: Math.floor(Math.random() * 500),
   },
   {
     key: "22",
@@ -833,6 +898,9 @@ export const initialBooks = [
     SERIES_NUM: 1,
     VIDEO_URL: "",
     RECOMMENDATION_TEXTS: ["#판타지", "#마법", "#오디오북"],
+    DOWNLOAD_COUNT: Math.floor(Math.random() * 2000),
+    LIKE_COUNT: Math.floor(Math.random() * 1000),
+    REVIEW_COUNT: Math.floor(Math.random() * 500),
   },
   {
     key: "23",
@@ -866,6 +934,9 @@ export const initialBooks = [
     SERIES_NUM: 2,
     VIDEO_URL: "",
     RECOMMENDATION_TEXTS: ["#판타지", "#모험", "#오디오북"],
+    DOWNLOAD_COUNT: Math.floor(Math.random() * 2000),
+    LIKE_COUNT: Math.floor(Math.random() * 1000),
+    REVIEW_COUNT: Math.floor(Math.random() * 500),
   },
   {
     key: "24",
@@ -896,6 +967,9 @@ export const initialBooks = [
     SERIES_NUM: 1,
     VIDEO_URL: "",
     RECOMMENDATION_TEXTS: ["#프로그래밍", "#소프트웨어 개발", "#클린코드"],
+    DOWNLOAD_COUNT: Math.floor(Math.random() * 2000),
+    LIKE_COUNT: Math.floor(Math.random() * 1000),
+    REVIEW_COUNT: Math.floor(Math.random() * 500),
   },
   {
     key: "25",
@@ -926,6 +1000,9 @@ export const initialBooks = [
     SERIES_NUM: 2,
     VIDEO_URL: "",
     RECOMMENDATION_TEXTS: ["#소프트웨어 아키텍처", "#클린코드"],
+    DOWNLOAD_COUNT: Math.floor(Math.random() * 2000),
+    LIKE_COUNT: Math.floor(Math.random() * 1000),
+    REVIEW_COUNT: Math.floor(Math.random() * 500),
   },
 ].map((book) => ({
   ...book,
@@ -935,6 +1012,9 @@ export const initialBooks = [
   RECOMMENDATION_TITLE: book.RECOMMENDATION_TITLE || "",
   RECOMMENDATION_MESSAGE: book.RECOMMENDATION_MESSAGE || "",
   RECOMMENDATION_TEXTS: book.RECOMMENDATION_TEXTS || [],
+  DOWNLOAD_COUNT: Math.floor(Math.random() * 2000),
+  LIKE_COUNT: Math.floor(Math.random() * 1000),
+  REVIEW_COUNT: Math.floor(Math.random() * 500),
 })); // 모든 항목에 BOOK_TRANSLATOR, BOOK_FILE_NAME, VIDEO_URL 기본값 보장
 
 // Helper to get content type tag
@@ -993,9 +1073,12 @@ const BookManagement = () => {
   const [filteredSeriesOptions, setFilteredSeriesOptions] = useState([]); // 자동 완성 옵션 상태 추가
   const [recommendationTextInput, setRecommendationTextInput] = useState("");
 
+  const [searchText, setSearchText] = useState("");
+  const [searchContentType, setSearchContentType] = useState("all");
+
   const availableKeywords = useMemo(() => {
     const activeKeywords = new Set();
-    allKeywordsData.forEach(keyword => {
+    allKeywordsData.forEach((keyword) => {
         if (keyword.status === 'active') {
             activeKeywords.add(keyword.name);
             if (keyword.subKeywords) {
@@ -1007,6 +1090,36 @@ const BookManagement = () => {
     });
     return Array.from(activeKeywords).sort((a, b) => a.localeCompare(b));
   }, []);
+
+  const filteredData = useMemo(() => {
+    const filtered = books
+      .filter((book) => {
+        // Content Type Filter
+        if (searchContentType === "all") return true;
+        return book.CONTENT_TYPE === searchContentType;
+      })
+      .filter((book) => {
+        // Text search filter
+        if (!searchText) return true;
+        const query = searchText.toLowerCase();
+        return (
+          book.BOOK_NAME.toLowerCase().includes(query) ||
+          book.BOOK_AUTHOR.toLowerCase().includes(query) ||
+          (book.BOOK_PUBLISHER &&
+            book.BOOK_PUBLISHER.toLowerCase().includes(query)) ||
+          book.ISBN.toLowerCase().includes(query)
+        );
+      });
+
+    // Default sort by registration date descending
+    filtered.sort(
+      (a, b) =>
+        moment(b.REGISTRATION_DATE).unix() -
+        moment(a.REGISTRATION_DATE).unix()
+    );
+
+    return filtered;
+  }, [books, searchText, searchContentType]);
 
   // 기존 시리즈명 목록 및 권수 추출 (중복 제거 및 권수 계산)
   const seriesData = useMemo(() => {
@@ -1191,6 +1304,10 @@ const BookManagement = () => {
           const newBook = {
             key: `book_${Date.now()}`,
             BOOK_ID: `new_${Date.now()}`,
+            TAKE_COUNT: 0,
+            DOWNLOAD_COUNT: 0,
+            LIKE_COUNT: 0,
+            REVIEW_COUNT: 0,
             ...formattedValues,
           };
           setBooks([...books, newBook]);
@@ -1455,6 +1572,10 @@ const BookManagement = () => {
       key: `imported_${Date.now()}_${index}`, // Generate a unique key
       BOOK_ID: `imported_id_${Date.now()}_${index}`, // Generate a unique ID (should be better)
       // Apply default values or transformations if needed
+      TAKE_COUNT: parseInt(bookData.TAKE_COUNT, 10) || 0,
+      DOWNLOAD_COUNT: parseInt(bookData.DOWNLOAD_COUNT, 10) || 0,
+      LIKE_COUNT: parseInt(bookData.LIKE_COUNT, 10) || 0,
+      REVIEW_COUNT: parseInt(bookData.REVIEW_COUNT, 10) || 0,
       BOOK_SERVICE_YN: bookData.BOOK_SERVICE_YN || "N",
       BOOK_EBOOK_RENT_YN: bookData.BOOK_EBOOK_RENT_YN || "N",
       DRM_YN: bookData.DRM_YN || "N",
@@ -1539,6 +1660,13 @@ const BookManagement = () => {
           fallback="https://via.placeholder.com/40x60.png?text=Err"
         />
       ),
+    },
+    {
+      title: "ID",
+      dataIndex: "BOOK_ID",
+      key: "bookId",
+      width: 150,
+      ellipsis: true,
     },
     {
       title: "카테고리",
@@ -1674,28 +1802,42 @@ const BookManagement = () => {
       fixed: "right",
       width: 100,
       align: "center",
-      render: (_, record) => (
-        <Space size="small">
-          <Tooltip title="수정">
-            <Button
-              icon={<EditOutlined />}
-              onClick={() => showEditModal(record)}
-              size="small"
-            />
-          </Tooltip>
-          <Tooltip title="삭제">
-            <Popconfirm
-              title={`'${record.BOOK_NAME}' 도서를 삭제하시겠습니까?`}
-              description="삭제 작업은 되돌릴 수 없습니다."
-              onConfirm={() => handleDelete(record.key)}
-              okText="삭제"
-              cancelText="취소"
-            >
-              <Button icon={<DeleteOutlined />} danger size="small" />
-            </Popconfirm>
-          </Tooltip>
-        </Space>
-      ),
+      render: (_, record) => {
+        const menu = (
+          <Menu
+            items={[
+              {
+                key: "1",
+                label: "수정",
+                icon: <EditOutlined />,
+                onClick: () => showEditModal(record),
+              },
+              {
+                key: "2",
+                label: (
+                  <Popconfirm
+                    title={`'${record.BOOK_NAME}' 도서를 삭제하시겠습니까?`}
+                    description="삭제 작업은 되돌릴 수 없습니다."
+                    onConfirm={() => handleDelete(record.key)}
+                    okText="삭제"
+                    cancelText="취소"
+                  >
+                    삭제
+                  </Popconfirm>
+                ),
+                icon: <DeleteOutlined />,
+                danger: true,
+              },
+            ]}
+          />
+        );
+
+        return (
+          <Dropdown overlay={menu} trigger={["click"]}>
+            <Button icon={<EllipsisOutlined />} size="small" />
+          </Dropdown>
+        );
+      },
     },
   ];
 
@@ -1764,15 +1906,27 @@ const BookManagement = () => {
         style={{
           display: "flex",
           justifyContent: "space-between",
-          alignItems: "center",
+          alignItems: "flex-start",
           flexWrap: "wrap",
           gap: "10px",
         }}
       >
-        <Input.Search
+        <Search
           placeholder="도서명, 저자, 출판사, ISBN 검색..."
-          style={{ width: 300 }}
+          onSearch={setSearchText}
           allowClear
+          addonBefore={
+            <Select
+              value={searchContentType}
+              onChange={(value) => setSearchContentType(value)}
+              style={{ width: 100 }}
+            >
+              <Option value="all">전체</Option>
+              <Option value="10">전자책</Option>
+              <Option value="20">오디오북</Option>
+            </Select>
+          }
+          style={{ minWidth: "300px", flex: 1, maxWidth: "600px" }}
         />
         <Space>
           {/* Import Button */}
@@ -1787,7 +1941,7 @@ const BookManagement = () => {
 
       <Table
         columns={columns}
-        dataSource={books}
+        dataSource={filteredData}
         pagination={{
           pageSize: 10,
           showSizeChanger: true,

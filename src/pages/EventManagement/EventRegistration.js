@@ -1,44 +1,41 @@
-import React, { useState, useEffect } from "react";
 import {
-  Form,
-  Input,
-  Button,
-  Select,
-  DatePicker,
-  Switch,
-  Typography,
-  Space,
-  Card,
-  message,
-  Upload,
-  InputNumber,
-  Modal,
-  Row,
-  Col,
-  Divider,
-  Tooltip,
-  List,
-  Empty,
-  Collapse,
-  ColorPicker,
-  Image,
-  Radio,
-} from "antd";
-import {
+  AppstoreAddOutlined,
   CalendarOutlined,
-  UploadOutlined,
-  LinkOutlined,
-  SendOutlined,
+  DeleteOutlined,
+  DragOutlined,
   EditOutlined,
   EyeOutlined,
-  UpOutlined,
-  DownOutlined,
-  DragOutlined,
-  DeleteOutlined,
-  AppstoreAddOutlined,
-  ProfileOutlined,
   InfoCircleOutlined,
+  LinkOutlined,
+  ProfileOutlined,
+  SendOutlined,
+  UploadOutlined
 } from "@ant-design/icons";
+import {
+  Button,
+  Card,
+  Col,
+  Collapse,
+  ColorPicker,
+  DatePicker,
+  Empty,
+  Form,
+  Image,
+  Input,
+  List,
+  message,
+  Modal,
+  Radio,
+  Row,
+  Select,
+  Space,
+  Switch,
+  Table,
+  Tooltip,
+  Typography,
+  Upload
+} from "antd";
+import React, { useEffect, useRef, useState } from "react";
 import { DndProvider, useDrag, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 
@@ -46,6 +43,52 @@ const { Title, Text } = Typography;
 const { Option } = Select;
 const { TextArea } = Input;
 const { RangePicker } = DatePicker;
+
+// Mock Data for Books
+const MOCK_BOOKS = [
+  {
+    id: "book_01",
+    title: "트렌드 코리아 2024",
+    author: "김난도",
+    coverUrl: "https://via.placeholder.com/150x220?text=Book1",
+  },
+  {
+    id: "book_02",
+    title: "세이노의 가르침",
+    author: "세이노",
+    coverUrl: "https://via.placeholder.com/150x220?text=Book2",
+  },
+  {
+    id: "book_03",
+    title: "도시와 그 불확실한 벽",
+    author: "무라카미 하루키",
+    coverUrl: "https://via.placeholder.com/150x220?text=Book3",
+  },
+  {
+    id: "book_04",
+    title: "퓨처 셀프",
+    author: "벤저민 하디",
+    coverUrl: "https://via.placeholder.com/150x220?text=Book4",
+  },
+  {
+    id: "book_05",
+    title: "원씽(THE ONE THING)",
+    author: "게리 켈러",
+    coverUrl: "https://via.placeholder.com/150x220?text=Book5",
+  },
+  {
+    id: "book_06",
+    title: "일론 머스크",
+    author: "월터 아이작슨",
+    coverUrl: "https://via.placeholder.com/150x220?text=Book6",
+  },
+  {
+    id: "book_07",
+    title: "데일 카네기 인간관계론",
+    author: "데일 카네기",
+    coverUrl: "https://via.placeholder.com/150x220?text=Book7",
+  },
+];
 
 // Template types and preview components
 const TEMPLATE_TYPES = {
@@ -68,13 +111,13 @@ const TEMPLATE_TYPES = {
           alt="Hero Banner"
           style={{ width: "100%", height: "200px", objectFit: "cover" }}
         />
-        <h2>{title || "제목"}</h2>
-        <p>{description || "설명"}</p>
+        <h2>{title || "섹션 제목"}</h2>
+        <p>{description || "섹션 설명"}</p>
       </div>
     ),
     fields: [
-      { name: "title", label: "제목", type: "text" },
-      { name: "description", label: "설명", type: "textarea" },
+      { name: "title", label: "섹션 제목", type: "text" },
+      { name: "description", label: "섹션 설명", type: "textarea" },
       { name: "imageUrl", label: "이미지 URL", type: "text" },
     ],
   },
@@ -82,29 +125,65 @@ const TEMPLATE_TYPES = {
     id: "product_grid",
     displayId: "TEMPLATE_02",
     name: "상품 그리드",
-    description: "상품을 그리드 형태로 보여주는 템플릿",
-    preview: ({ products = [] }) => (
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(3, 1fr)",
-          gap: "10px",
-        }}
-      >
-        {products.map((_, index) => (
-          <div
-            key={index}
-            style={{ border: "1px solid #ddd", padding: "10px" }}
-          >
-            <div style={{ height: "100px", background: "#f0f0f0" }}></div>
-            <h3>상품 {index + 1}</h3>
-          </div>
-        ))}
+    description: "상품(도서)을 그리드 형태로 보여주는 템플릿",
+    preview: ({ title, description, selectedBooksInfo = [] }) => (
+      <div style={{ padding: "20px" }}>
+        <h2>{title || "상품 그리드"}</h2>
+        <p style={{ color: "#555" }}>
+          {description || "여기에 섹션 설명이 들어갑니다."}
+        </p>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fill, minmax(120px, 1fr))",
+            gap: "10px",
+          }}
+        >
+          {(selectedBooksInfo.length > 0
+            ? selectedBooksInfo
+            : Array(3).fill({})
+          ).map((book, index) => (
+            <div
+              key={book.id || index}
+              style={{
+                border: "1px solid #ddd",
+                padding: "10px",
+                textAlign: "center",
+              }}
+            >
+              <Image
+                src={
+                  book.coverUrl || "https://via.placeholder.com/120x170?text=Grid"
+                }
+                alt={book.title}
+                style={{
+                  width: "100%",
+                  height: "170px",
+                  objectFit: "cover",
+                  marginBottom: "5px",
+                }}
+                preview={false}
+              />
+              <Text strong ellipsis style={{ display: "block" }}>
+                {book.title || `상품 ${index + 1}`}
+              </Text>
+              <Text type="secondary" size="small" ellipsis>
+                {book.author}
+              </Text>
+            </div>
+          ))}
+        </div>
       </div>
     ),
     fields: [
       { name: "title", label: "섹션 제목", type: "text" },
-      { name: "productIds", label: "상품 ID 목록", type: "text" },
+      {
+        name: "description",
+        label: "섹션 설명",
+        type: "textarea",
+        optional: true,
+      },
+      { name: "bookIds", label: "도서 선택", type: "book" },
     ],
   },
   TEXT_SECTION: {
@@ -135,6 +214,69 @@ const TEMPLATE_TYPES = {
       { name: "title", label: "제목", type: "text" },
       { name: "content", label: "내용", type: "textarea" },
       { name: "imageUrl", label: "이미지 URL", type: "text" },
+    ],
+  },
+  BOOK_SELECTOR: {
+    id: "book_selector",
+    displayId: "TEMPLATE_04",
+    name: "도서 선택",
+    description: "도서 목록을 선택하여 보여주는 템플릿",
+    preview: ({ title, description, selectedBooksInfo = [] }) => (
+      <div style={{ padding: "20px" }}>
+        <h2>{title || "추천 도서"}</h2>
+        <p style={{ color: "#555" }}>
+          {description || "여기에 섹션 설명이 들어갑니다."}
+        </p>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fill, minmax(120px, 1fr))",
+            gap: "10px",
+          }}
+        >
+          {(selectedBooksInfo.length > 0
+            ? selectedBooksInfo
+            : Array(3).fill({})
+          ).map((book, index) => (
+            <div
+              key={book.id || index}
+              style={{
+                border: "1px solid #ddd",
+                padding: "10px",
+                textAlign: "center",
+              }}
+            >
+              <Image
+                src={book.coverUrl || "https://via.placeholder.com/120x170"}
+                alt={book.title}
+                style={{
+                  width: "100%",
+                  height: "170px",
+                  objectFit: "cover",
+                  marginBottom: "5px",
+                }}
+                preview={false}
+              />
+              <Text strong ellipsis style={{ display: "block" }}>
+                {book.title || `도서 ${index + 1}`}
+              </Text>
+              <Text type="secondary" size="small" ellipsis>
+                {book.author}
+              </Text>
+            </div>
+          ))}
+        </div>
+      </div>
+    ),
+    fields: [
+      { name: "title", label: "섹션 제목", type: "text" },
+      {
+        name: "description",
+        label: "섹션 설명",
+        type: "textarea",
+        optional: true,
+      },
+      { name: "bookIds", label: "선택된 도서", type: "book" }, // Custom type
     ],
   },
 };
@@ -176,12 +318,124 @@ const TemplateSelector = ({ onSelect, onPreview }) => {
   );
 };
 
+const DraggableBookListItem = ({ book, index, moveBook }) => {
+  const ref = useRef(null);
+
+  const [{ isDragging }, drag] = useDrag({
+    type: "BOOK",
+    item: { index },
+    collect: (monitor) => ({
+      isDragging: monitor.isDragging(),
+    }),
+  });
+
+  const [, drop] = useDrop({
+    accept: "BOOK",
+    hover: (item, monitor) => {
+      if (!ref.current) {
+        return;
+      }
+      const dragIndex = item.index;
+      const hoverIndex = index;
+      if (dragIndex === hoverIndex) {
+        return;
+      }
+      moveBook(dragIndex, hoverIndex);
+      item.index = hoverIndex;
+    },
+  });
+
+  drag(drop(ref));
+
+  return (
+    <List.Item
+      ref={ref}
+      style={{
+        cursor: "move",
+        opacity: isDragging ? 0.5 : 1,
+      }}
+    >
+      <List.Item.Meta
+        avatar={
+          <Space>
+            <DragOutlined style={{ color: "#999" }} />
+            <Image src={book.coverUrl} width={30} preview={false} />
+          </Space>
+        }
+        title={book.title}
+        description={book.author}
+      />
+    </List.Item>
+  );
+};
+
+const BookField = ({ formInstance, index, field, onBookSelect, onMoveBook }) => {
+  const selectedBooksInfo =
+    Form.useWatch(
+      ["templates", index, "data", "selectedBooksInfo"],
+      formInstance
+    ) || [];
+
+  const moveBook = (fromIndex, toIndex) => {
+    onMoveBook(index, fromIndex, toIndex);
+  };
+
+  return (
+    <Form.Item
+      key={field.name}
+      label={
+        <Space>
+          <span>{field.label}</span>
+          <Tooltip title="사용자는 선택된 도서의 상세페이지로 이동할 수 있습니다">
+            <InfoCircleOutlined style={{ color: "rgba(0,0,0,.45)" }} />
+          </Tooltip>
+        </Space>
+      }
+    >
+      <Button
+        icon={<AppstoreAddOutlined />}
+        onClick={() => onBookSelect(index)}
+      >
+        도서 선택하기
+      </Button>
+      <Form.Item name={["templates", index, "data", field.name]} hidden>
+        <Input />
+      </Form.Item>
+      <Form.Item
+        name={["templates", index, "data", "selectedBooksInfo"]}
+        hidden
+      >
+        <Input />
+      </Form.Item>
+      {selectedBooksInfo.length > 0 && (
+        <List
+          style={{ marginTop: 8 }}
+          header={<div>선택된 도서: {selectedBooksInfo.length}권</div>}
+          size="small"
+          bordered
+          dataSource={selectedBooksInfo}
+          renderItem={(item, bookIndex) => (
+            <DraggableBookListItem
+              key={item.id}
+              index={bookIndex}
+              book={item}
+              moveBook={moveBook}
+            />
+          )}
+        />
+      )}
+    </Form.Item>
+  );
+};
+
 const TemplateInputArea = ({
   template,
   index,
   moveTemplate,
   onRemove,
   formInstance,
+  onBookSelect,
+  onMoveBook,
 }) => {
   const [{ isDragging }, drag] = useDrag({
     type: "TEMPLATE",
@@ -266,7 +520,14 @@ const TemplateInputArea = ({
 
             <Form.Item
               name={["templates", index, "isClickable"]}
-              label="클릭 연결 사용"
+              label={
+                <Space>
+                  <span>클릭 연결 사용</span>
+                  <Tooltip title="이 설정을 활성화하면 템플릿에 버튼이 생성되고 URL을 입력하면 해당 URL로 이동합니다.">
+                    <InfoCircleOutlined style={{ color: "rgba(0,0,0,.45)" }} />
+                  </Tooltip>
+                </Space>
+              }
               valuePropName="checked"
               initialValue={false}
             >
@@ -279,10 +540,6 @@ const TemplateInputArea = ({
                 label="연결 URL"
                 rules={[
                   {
-                    required: true,
-                    message: "연결 URL을 입력해주세요.",
-                  },
-                  {
                     type: "url",
                     message: "유효한 URL 형식이 아닙니다.",
                   },
@@ -292,33 +549,41 @@ const TemplateInputArea = ({
               </Form.Item>
             )}
 
-            {template.fields.map((field) => (
-              <Form.Item
-                key={field.name}
-                name={["templates", index, "data", field.name]}
-                label={field.label}
-                rules={[
-                  {
-                    required: true,
-                    message: `${field.label}을(를) 입력해주세요.`,
-                  },
-                ]}
-              >
-                {field.type === "textarea" ? (
-                  <TextArea rows={4} />
-                ) : field.type === "image" ? (
-                  <Upload
-                    listType="picture-card"
-                    maxCount={1}
-                    beforeUpload={() => false}
-                  >
-                    <Button icon={<UploadOutlined />}>이미지 업로드</Button>
-                  </Upload>
-                ) : (
-                  <Input />
-                )}
-              </Form.Item>
-            ))}
+            {template.fields.map((field) => {
+              if (field.type === "book") {
+                return (
+                  <BookField
+                    key={field.name}
+                    field={field}
+                    formInstance={formInstance}
+                    index={index}
+                    onBookSelect={onBookSelect}
+                    onMoveBook={onMoveBook}
+                  />
+                );
+              }
+              return (
+                <Form.Item
+                  key={field.name}
+                  name={["templates", index, "data", field.name]}
+                  label={field.label}
+                >
+                  {field.type === "textarea" ? (
+                    <TextArea rows={4} />
+                  ) : field.type === "image" ? (
+                    <Upload
+                      listType="picture-card"
+                      maxCount={1}
+                      beforeUpload={() => false}
+                    >
+                      <Button icon={<UploadOutlined />}>이미지 업로드</Button>
+                    </Upload>
+                  ) : (
+                    <Input />
+                  )}
+                </Form.Item>
+              );
+            })}
           </Space>
         </Collapse.Panel>
       </Collapse>
@@ -335,6 +600,77 @@ const getBase64 = (file) =>
     reader.onerror = (error) => reject(error);
   });
 
+const BookSelector = ({
+  visible,
+  onCancel,
+  onOk,
+  initialSelectedIds = [],
+}) => {
+  const [selectedRowKeys, setSelectedRowKeys] = useState(initialSelectedIds);
+  const [searchTerm, setSearchTerm] = useState("");
+
+  useEffect(() => {
+    setSelectedRowKeys(initialSelectedIds);
+  }, [initialSelectedIds, visible]);
+
+  const handleOk = () => {
+    const selectedBooks = MOCK_BOOKS.filter((book) =>
+      selectedRowKeys.includes(book.id)
+    );
+    onOk(selectedRowKeys, selectedBooks);
+  };
+
+  const rowSelection = {
+    selectedRowKeys,
+    onChange: (keys) => setSelectedRowKeys(keys),
+  };
+
+  const filteredBooks = MOCK_BOOKS.filter(
+    (book) =>
+      book.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      book.author.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  return (
+    <Modal
+      title="도서 선택"
+      open={visible}
+      onCancel={onCancel}
+      onOk={handleOk}
+      width={800}
+      okText="선택 완료"
+      cancelText="취소"
+      destroyOnClose
+    >
+      <Input.Search
+        placeholder="도서명 또는 저자로 검색"
+        onSearch={(value) => setSearchTerm(value)}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        style={{ marginBottom: 16 }}
+        allowClear
+      />
+      <Table
+        rowSelection={rowSelection}
+        columns={[
+          {
+            title: "표지",
+            dataIndex: "coverUrl",
+            key: "coverUrl",
+            render: (url, record) => (
+              <Image src={url} alt={record.title} width={40} />
+            ),
+          },
+          { title: "도서명", dataIndex: "title", key: "title" },
+          { title: "저자", dataIndex: "author", key: "author" },
+        ]}
+        dataSource={filteredBooks}
+        rowKey="id"
+        pagination={{ pageSize: 5 }}
+      />
+    </Modal>
+  );
+};
+
 const EVENT_TYPE_INTERNAL = "internal";
 const EVENT_TYPE_EXTERNAL = "external";
 
@@ -349,6 +685,8 @@ const EventRegistration = () => {
   const [thumbnailPreviewOpen, setThumbnailPreviewOpen] = useState(false);
   const [thumbnailPreviewImage, setThumbnailPreviewImage] = useState("");
   const [eventType, setEventType] = useState(EVENT_TYPE_INTERNAL);
+  const [bookSelectorVisible, setBookSelectorVisible] = useState(false);
+  const [bookSelectorIndex, setBookSelectorIndex] = useState(null);
 
   // Sample data for target audience (replace with actual data/API)
   const userSegments = [
@@ -460,10 +798,16 @@ const EventRegistration = () => {
         isClickable: false,
         clickThroughUrl: "",
         backgroundColor: "#ffffff",
-        data: template.fields.reduce(
-          (acc, field) => ({ ...acc, [field.name]: "" }),
-          {}
-        ),
+        data: template.fields.reduce((acc, field) => {
+          let defaultValue = "";
+          if (field.type === "book") {
+            // book 타입 필드는 'bookIds'와 'selectedBooksInfo'를 초기화
+            acc.bookIds = [];
+            acc.selectedBooksInfo = [];
+            return acc;
+          }
+          return { ...acc, [field.name]: defaultValue };
+        }, {}),
       };
       setSelectedTemplates((prev) => [...prev, newTemplate]);
       const currentValues = form.getFieldsValue();
@@ -527,15 +871,20 @@ const EventRegistration = () => {
   const renderTemplatePreview = () => {
     if (!previewTemplate) return null;
     try {
-      return previewTemplate.preview(
-        previewTemplate.fields.reduce(
-          (acc, field) => ({
-            ...acc,
-            [field.name]: field.name,
-          }),
-          {}
-        )
-      );
+      const isBookTemplate =
+        previewTemplate.id === "book_selector" ||
+        previewTemplate.id === "product_grid";
+      const sampleData = isBookTemplate
+        ? {
+            title: "샘플 섹션 제목",
+            description: "이곳에 섹션에 대한 설명이 표시됩니다.",
+            selectedBooksInfo: MOCK_BOOKS.slice(0, 3),
+          }
+        : previewTemplate.fields.reduce(
+            (acc, field) => ({ ...acc, [field.name]: `[${field.label}]` }),
+            {}
+          );
+      return previewTemplate.preview(sampleData);
     } catch (error) {
       console.error("Error rendering template preview:", error);
       return <Text type="danger">미리보기를 표시할 수 없습니다.</Text>;
@@ -645,6 +994,59 @@ const EventRegistration = () => {
   };
 
   const handleThumbnailCancel = () => setThumbnailPreviewOpen(false);
+
+  const handleOpenBookSelector = (index) => {
+    setBookSelectorIndex(index);
+    setBookSelectorVisible(true);
+  };
+
+  const handleBookSelectorOk = (selectedIds, selectedBooks) => {
+    if (bookSelectorIndex !== null) {
+      const currentValues = form.getFieldsValue();
+      const templates = [...(currentValues.templates || [])];
+      if (templates[bookSelectorIndex]) {
+        templates[bookSelectorIndex].data = {
+          ...templates[bookSelectorIndex].data,
+          bookIds: selectedIds,
+          selectedBooksInfo: selectedBooks.map((b) => ({
+            id: b.id,
+            title: b.title,
+            author: b.author,
+            coverUrl: b.coverUrl,
+          })),
+        };
+        form.setFieldsValue({ ...currentValues, templates });
+      }
+    }
+    setBookSelectorVisible(false);
+    setBookSelectorIndex(null);
+  };
+
+  const handleBookSelectorCancel = () => {
+    setBookSelectorVisible(false);
+    setBookSelectorIndex(null);
+  };
+
+  const handleMoveBook = (templateIndex, fromIndex, toIndex) => {
+    const currentValues = form.getFieldsValue();
+    const templates = [...(currentValues.templates || [])];
+    if (
+      templates[templateIndex] &&
+      templates[templateIndex].data &&
+      templates[templateIndex].data.selectedBooksInfo
+    ) {
+      const books = [...templates[templateIndex].data.selectedBooksInfo];
+      const [movedBook] = books.splice(fromIndex, 1);
+      books.splice(toIndex, 0, movedBook);
+
+      const bookIds = books.map((b) => b.id);
+
+      templates[templateIndex].data.selectedBooksInfo = books;
+      templates[templateIndex].data.bookIds = bookIds;
+
+      form.setFieldsValue({ ...currentValues, templates });
+    }
+  };
 
   const uploadButton = (
     <button style={{ border: 0, background: "none" }} type="button">
@@ -1031,6 +1433,8 @@ const EventRegistration = () => {
                           moveTemplate={moveTemplate}
                           onRemove={() => moveTemplate(index, -1)}
                           formInstance={form}
+                          onBookSelect={handleOpenBookSelector}
+                          onMoveBook={handleMoveBook}
                         />
                       ))
                     )}
@@ -1084,6 +1488,22 @@ const EventRegistration = () => {
         >
           {renderEventPreview()}
         </Modal>
+
+        <BookSelector
+          visible={bookSelectorVisible}
+          onCancel={handleBookSelectorCancel}
+          onOk={handleBookSelectorOk}
+          initialSelectedIds={
+            bookSelectorIndex !== null
+              ? form.getFieldValue([
+                  "templates",
+                  bookSelectorIndex,
+                  "data",
+                  "bookIds",
+                ]) || []
+              : []
+          }
+        />
       </Space>
     </DndProvider>
   );

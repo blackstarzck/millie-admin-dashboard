@@ -1,38 +1,42 @@
-import React, { useState, useEffect, useMemo } from 'react';
 import {
-    Typography,
-    Row,
-    Col,
-    Card,
-    Table,
-    Tag,
-    Space,
-    Statistic,
-    List,
-    Avatar,
-    Skeleton,
-    Tooltip,
-    DatePicker,
-    Select,
-} from 'antd';
-import InfiniteScroll from 'react-infinite-scroll-component';
-import { Line, Bar, Pie } from 'react-chartjs-2';
-import {
-    Chart as ChartJS,
-    CategoryScale,
-    LinearScale,
-    PointElement,
-    LineElement,
-    BarElement,
-    Title as ChartTitle,
-    Tooltip as ChartTooltip,
-    Legend,
-    ArcElement,
-} from 'chart.js';
-import {
-    ReadOutlined,
-    AudioOutlined,
+  AudioOutlined,
+  DownOutlined,
+  ReadOutlined,
+  SearchOutlined,
+  UpOutlined,
 } from '@ant-design/icons';
+import {
+  Button,
+  Card,
+  Col,
+  DatePicker,
+  Divider,
+  Dropdown,
+  Form,
+  Input,
+  InputNumber,
+  Row,
+  Select,
+  Space,
+  Statistic,
+  Table,
+  Tag,
+  Typography
+} from 'antd';
+import {
+  ArcElement,
+  BarElement,
+  CategoryScale,
+  Chart as ChartJS,
+  Title as ChartTitle,
+  Tooltip as ChartTooltip,
+  Legend,
+  LinearScale,
+  LineElement,
+  PointElement,
+} from 'chart.js';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Bar, Pie } from 'react-chartjs-2';
 
 ChartJS.register(
     CategoryScale,
@@ -49,55 +53,112 @@ ChartJS.register(
 const { Title, Text } = Typography;
 const { RangePicker } = DatePicker;
 const { Option } = Select;
+const { Search } = Input;
+
+// BookManagement.js의 subCategoryMap을 기반으로 새로운 rawCategoryData 생성
+const subCategoryMapForStats = {
+    '소설': ['한국 소설', '영미 소설', '일본 소설', '추리/미스터리', 'SF', '판타지', '역사 소설', '로맨스'],
+    '시/에세이': ['한국 시', '해외 시', '에세이', '여행 에세이', '인물/자전적'],
+    '인문': ['철학', '심리학', '역사일반', '동양사상', '서양사상', '종교', '예술/문화'],
+    '사회과학': ['정치/사회', '법률', '경제학(일반)', '사회학', '교육학', '언론/미디어'],
+    '경영/경제': ['경영일반', '마케팅/세일즈', '재테크/투자', '창업/취업', '경제이론'],
+    '자기계발': ['성공/처세', '인간관계', '시간관리', '리더십', '코칭'], // BookManagement.js에 따르면 '자기계발'도 하위 카테고리가 있습니다.
+    'IT/컴퓨터': ['프로그래밍 언어', 'OS/데이터베이스', '네트워크/보안', '웹 개발', '모바일 앱 개발', 'AI/머신러닝', '데이터 분석', 'IT자격증'],
+    // 예시: 하위 카테고리가 없는 단독 상위 카테고리가 있다면
+    // '단독카테고리': [], // 또는 null
+};
 
 // 더미 데이터 생성 함수 수정
-const generateDummyContent = (count = 20, daysRange = 365) => { // 아이템 수 줄이고, 생성일 범위 지정
+const generateDummyContent = (count = 20, daysRange = 365) => {
+  // 아이템 수 줄이고, 생성일 범위 지정
     const items = [];
     const today = new Date();
+
+  // 카테고리 데이터 준비
+  const categories = Object.keys(subCategoryMapForStats);
 
     for (let i = 1; i <= count; i++) {
         const dailyMetrics = [];
         // 기본 트렌드 값을 위한 초기값 (아이템마다 다르게)
-        let baseViews = Math.floor(Math.random() * 500) + 50; 
+        let baseViews = Math.floor(Math.random() * 500) + 50;
         let baseLikes = Math.floor(Math.random() * 50) + 5;
         let baseShares = Math.floor(Math.random() * 10) + 1;
         let basePosts = Math.floor(Math.random() * 5) + 0;
         let baseReviews = Math.floor(Math.random() * 20) + 1;
+    let baseDownloads = Math.floor(Math.random() * 100) + 10;
 
         for (let d = 0; d < daysRange; d++) {
             const date = new Date(today);
             date.setDate(today.getDate() - d);
-            const dateStr = date.toISOString().split('T')[0]; // YYYY-MM-DD
+      const dateStr = date.toISOString().split("T")[0]; // YYYY-MM-DD
 
             // 약간의 변동성 추가 (예: +/- 10~30%)
             dailyMetrics.push({
                 date: dateStr,
-                views: Math.max(0, baseViews + Math.floor((Math.random() - 0.5) * baseViews * 0.4)),
-                likes: Math.max(0, baseLikes + Math.floor((Math.random() - 0.5) * baseLikes * 0.5)),
-                shares: Math.max(0, baseShares + Math.floor((Math.random() - 0.5) * baseShares * 0.6)),
-                posts: Math.max(0, basePosts + Math.floor((Math.random() - 0.5) * (basePosts * 0.8) + (Math.random() > 0.8 ? 1: 0))),
-                reviews: Math.max(0, baseReviews + Math.floor((Math.random() - 0.5) * baseReviews * 0.5)),
+        views: Math.max(
+          0,
+          baseViews + Math.floor((Math.random() - 0.5) * baseViews * 0.4)
+        ),
+        likes: Math.max(
+          0,
+          baseLikes + Math.floor((Math.random() - 0.5) * baseLikes * 0.5)
+        ),
+        shares: Math.max(
+          0,
+          baseShares + Math.floor((Math.random() - 0.5) * baseShares * 0.6)
+        ),
+        posts: Math.max(
+          0,
+          basePosts +
+            Math.floor(
+              (Math.random() - 0.5) * (basePosts * 0.8) +
+                (Math.random() > 0.8 ? 1 : 0)
+            )
+        ),
+        reviews: Math.max(
+          0,
+          baseReviews + Math.floor((Math.random() - 0.5) * baseReviews * 0.5)
+        ),
+        downloads: Math.max(
+          0,
+          baseDownloads +
+            Math.floor((Math.random() - 0.5) * baseDownloads * 0.5)
+        ),
             });
-            
+
             // 다음 날짜의 기본값에 약간의 트렌드 반영 (매우 단순화된 방식)
-            if (d % 30 === 0 && Math.random() > 0.3) { // 한 달에 한 번 정도 트렌드 변경 시도
-                baseViews += Math.floor((Math.random() - 0.4) * 50); 
+      if (d % 30 === 0 && Math.random() > 0.3) {
+        // 한 달에 한 번 정도 트렌드 변경 시도
+                baseViews += Math.floor((Math.random() - 0.4) * 50);
                 baseLikes += Math.floor((Math.random() - 0.4) * 5);
-            }
-        }
+        baseDownloads += Math.floor((Math.random() - 0.4) * 10);
+      }
+    }
+
+    const registrationDate = new Date(today);
+    registrationDate.setDate(today.getDate() - daysRange);
+    const categoryName = categories[i % categories.length];
+    const subCategories = subCategoryMapForStats[categoryName];
+    const subCategoryName = subCategories.length > 0 ? subCategories[i % subCategories.length] : "";
+
 
         items.push({
             key: `content_${i}`,
             title: `인기 콘텐츠 ${i}`,
-            contentType: Math.random() < 0.5 ? '10' : '20', // '10' (전자책), '20' (오디오북)으로 변경
-            dailyMetrics: dailyMetrics.sort((a,b) => new Date(a.date) - new Date(b.date)), // 날짜순 정렬
+      contentType: Math.random() < 0.5 ? "10" : "20", // '10' (전자책), '20' (오디오북)으로 변경
+      dailyMetrics: dailyMetrics.sort(
+        (a, b) => new Date(a.date) - new Date(b.date)
+      ), // 날짜순 정렬
             completionRate: Math.floor(Math.random() * 81) + 20, // 20% ~ 100% 사이의 완독률
             estimatedReadingTime: Math.floor(Math.random() * 56) + 5, // 5분 ~ 60분 사이의 예상 완독 시간
+      registrationDate: registrationDate.toISOString().split("T")[0],
+      categoryName: categoryName,
+      subCategoryName: subCategoryName,
             // 테이블 표시에 사용할 대표값 (예: 최근 30일 합계 또는 평균) - loadInitialData에서 계산하도록 변경
         });
     }
     // 초기 아이템 정렬 기준은 일단 제거 (테이블별로 loadInitialData에서 처리)
-    return items; 
+    return items;
 };
 
 const allDummyContent = generateDummyContent(50); // 아이템 수 증가 예시
@@ -132,6 +193,7 @@ const getContentTypeTagForStats = (contentType) => {
 const metricDisplayNames = {
     views: '조회수',
     likes: '관심등록',
+    downloads: '다운로드',
     shares: '공유',
     posts: '포스트',
     reviews: '리뷰',
@@ -143,6 +205,7 @@ const metricDisplayNames = {
 const metricChartColors = {
     views: LINE_CHART_BORDER_COLOR,
     likes: BAR_CHART_COLORS[0],
+    downloads: 'rgba(255, 99, 132, 0.7)',
     shares: BAR_CHART_COLORS[1],
     posts: BAR_CHART_COLORS[2],
     reviews: BAR_CHART_COLORS[3],
@@ -151,18 +214,6 @@ const metricChartColors = {
 };
 
 // BookManagement.js의 subCategoryMap을 기반으로 새로운 rawCategoryData 생성
-const subCategoryMapForStats = {
-    '소설': ['한국 소설', '영미 소설', '일본 소설', '추리/미스터리', 'SF', '판타지', '역사 소설', '로맨스'],
-    '시/에세이': ['한국 시', '해외 시', '에세이', '여행 에세이', '인물/자전적'],
-    '인문': ['철학', '심리학', '역사일반', '동양사상', '서양사상', '종교', '예술/문화'],
-    '사회과학': ['정치/사회', '법률', '경제학(일반)', '사회학', '교육학', '언론/미디어'],
-    '경영/경제': ['경영일반', '마케팅/세일즈', '재테크/투자', '창업/취업', '경제이론'],
-    '자기계발': ['성공/처세', '인간관계', '시간관리', '리더십', '코칭'], // BookManagement.js에 따르면 '자기계발'도 하위 카테고리가 있습니다.
-    'IT/컴퓨터': ['프로그래밍 언어', 'OS/데이터베이스', '네트워크/보안', '웹 개발', '모바일 앱 개발', 'AI/머신러닝', '데이터 분석', 'IT자격증'],
-    // 예시: 하위 카테고리가 없는 단독 상위 카테고리가 있다면
-    // '단독카테고리': [], // 또는 null
-};
-
 const generateNewRawCategoryData = () => {
     const newRawData = [];
     Object.entries(subCategoryMapForStats).forEach(([parentCatName, childCatNames], parentIndex) => {
@@ -217,34 +268,69 @@ const categoryChartColors = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#AF69E
 const ContentStatistics = () => {
     const [combinedTableData, setCombinedTableData] = useState({ items: [], loading: false, hasMore: false });
     const [tableSortConfig, setTableSortConfig] = useState({ metricKey: 'views', order: 'desc' });
-    const [globalDateRange, setGlobalDateRange] = useState([null, null]);
     const [selectedChartItem, setSelectedChartItem] = useState(null);
     const [selectedMetricKey, setSelectedMetricKey] = useState(null);
+
+    const [searchText, setSearchText] = useState("");
+    const [searchContentType, setSearchContentType] = useState("all");
+    const [isDetailedSearchVisible, setIsDetailedSearchVisible] = useState(false);
+    const [detailedFilters, setDetailedFilters] = useState({});
+    const [detailForm] = Form.useForm();
+
+    const handleDetailedSearch = (values) => {
+        setDetailedFilters(values);
+    };
+
+    const handleResetDetailedSearch = () => {
+        detailForm.resetFields();
+        setDetailedFilters({});
+    };
 
     const loadCombinedTableData = () => {
         setCombinedTableData(prev => ({ ...prev, loading: true, items: [] }));
 
-        let processedItems = allDummyContent.map(item => {
-            let views = 0, likes = 0, shares = 0, posts = 0, reviews = 0;
+        const {
+            CATEGORY_NAME,
+            SUB_CATEGORY_NAME,
+            REGISTRATION_DATE,
+            VIEWS_MIN,
+            VIEWS_MAX,
+            DOWNLOADS_MIN,
+            DOWNLOADS_MAX,
+            LIKES_MIN,
+            LIKES_MAX,
+            REVIEWS_MIN,
+            REVIEWS_MAX,
+        } = detailedFilters;
+
+        const filteredByDetail = allDummyContent.filter(item => {
+            if (searchContentType !== 'all' && item.contentType !== searchContentType) return false;
+
+            if (searchText && !item.title.toLowerCase().includes(searchText.toLowerCase())) return false;
+
+            if (CATEGORY_NAME && item.categoryName !== CATEGORY_NAME) return false;
+            if (SUB_CATEGORY_NAME && item.subCategoryName !== SUB_CATEGORY_NAME) return false;
+
+            if (REGISTRATION_DATE && REGISTRATION_DATE[0] && REGISTRATION_DATE[1]) {
+                const itemDate = new Date(item.registrationDate);
+                if (itemDate < REGISTRATION_DATE[0].startOf('day').toDate() || itemDate > REGISTRATION_DATE[1].endOf('day').toDate()) {
+                    return false;
+                }
+            }
+            return true;
+        });
+
+        let processedItems = filteredByDetail.map(item => {
+            let views = 0, likes = 0, shares = 0, posts = 0, reviews = 0, downloads = 0;
             let filteredMetrics = item.dailyMetrics;
 
-            if (globalDateRange && globalDateRange[0] && globalDateRange[1] && 
-                globalDateRange[0].isValid() && globalDateRange[1].isValid()) {
-                const startDate = globalDateRange[0].startOf('day').toDate();
-                const endDate = globalDateRange[1].endOf('day').toDate();
-                
-                filteredMetrics = item.dailyMetrics.filter(metric => {
-                    const metricDate = new Date(metric.date);
-                    return metricDate >= startDate && metricDate <= endDate;
-                });
-            }
-            
             filteredMetrics.forEach(metric => {
                 views += metric.views;
                 likes += metric.likes;
                 shares += metric.shares;
                 posts += metric.posts;
                 reviews += metric.reviews;
+                downloads += metric.downloads;
             });
 
             return {
@@ -254,21 +340,35 @@ const ContentStatistics = () => {
                 totalShares: shares,
                 totalPosts: posts,
                 totalReviews: reviews,
+                totalDownloads: downloads,
                 completionRate: item.completionRate,
                 estimatedReadingTime: item.estimatedReadingTime,
             };
         });
-        
-        const { metricKey: sortKey, order: sortOrder } = tableSortConfig;
-        const sortDataIndex = `total${sortKey.charAt(0).toUpperCase() + sortKey.slice(1)}`;
 
-        processedItems.sort((a, b) => {
-            const valA = a[sortDataIndex];
-            const valB = b[sortDataIndex];
+        const finalFilteredItems = processedItems.filter(item => {
+            const checkRange = (value, min, max) => (min === undefined || min === null || value >= min) && (max === undefined || max === null || value <= max);
+
+            if (!checkRange(item.totalViews, VIEWS_MIN, VIEWS_MAX)) return false;
+            if (!checkRange(item.totalDownloads, DOWNLOADS_MIN, DOWNLOADS_MAX)) return false;
+            if (!checkRange(item.totalLikes, LIKES_MIN, LIKES_MAX)) return false;
+            if (!checkRange(item.totalReviews, REVIEWS_MIN, REVIEWS_MAX)) return false;
+
+            return true;
+        });
+
+        const { metricKey: sortKey, order: sortOrder } = tableSortConfig;
+        const sortDataIndex = sortKey === 'completionRate' || sortKey === 'estimatedReadingTime'
+            ? sortKey
+            : `total${sortKey.charAt(0).toUpperCase() + sortKey.slice(1)}`;
+
+        finalFilteredItems.sort((a, b) => {
+            const valA = a[sortDataIndex] || 0;
+            const valB = b[sortDataIndex] || 0;
             return sortOrder === 'desc' ? valB - valA : valA - valB;
         });
 
-        const rankedItems = processedItems.map((item, index) => ({ ...item, rank: index + 1 }));
+        const rankedItems = finalFilteredItems.map((item, index) => ({ ...item, rank: index + 1 }));
 
         setCombinedTableData({
             items: rankedItems.map(i=>({...i, dailyMetrics:undefined})),
@@ -276,19 +376,19 @@ const ContentStatistics = () => {
             hasMore: false,
         });
     };
-    
+
     useEffect(() => {
         setSelectedChartItem(null);
-        // selectedMetricKey will be derived from tableSortConfig for chart context
         loadCombinedTableData();
-    }, [globalDateRange, tableSortConfig]);
+    }, [tableSortConfig, detailedFilters, searchText, searchContentType]);
 
     const { combinedChartData, combinedChartOptions } = useMemo(() => {
         let chartLabels = [];
-        if (globalDateRange && globalDateRange[0] && globalDateRange[1] &&
-            globalDateRange[0].isValid() && globalDateRange[1].isValid()) {
-            const startDate = globalDateRange[0].startOf('day').toDate();
-            const endDate = globalDateRange[1].endOf('day').toDate();
+        const dateRange = detailedFilters.REGISTRATION_DATE;
+        if (dateRange && dateRange[0] && dateRange[1] &&
+            dateRange[0].isValid() && dateRange[1].isValid()) {
+            const startDate = dateRange[0].startOf('day').toDate();
+            const endDate = dateRange[1].endOf('day').toDate();
             let currentDate = new Date(startDate);
             while(currentDate <= endDate) {
                 chartLabels.push(currentDate.toISOString().split('T')[0]);
@@ -340,7 +440,7 @@ const ContentStatistics = () => {
                 });
 
                 // 2. Other metrics as Bars (Likes, Shares, Posts, Reviews)
-                const otherMetricKeys = ['likes', 'shares', 'posts', 'reviews'];
+                const otherMetricKeys = ['likes', 'downloads', 'shares', 'posts', 'reviews'];
                 let hasOtherMetrics = false;
 
                 otherMetricKeys.forEach((metricKey, index) => {
@@ -379,7 +479,7 @@ const ContentStatistics = () => {
 
 
         const data = { labels: chartLabels, datasets: datasets };
-        const options = { 
+        const options = {
             responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false, },
             plugins: {
                 legend: { display: legendDisplay, labels: { filter: null } },
@@ -387,37 +487,37 @@ const ContentStatistics = () => {
                 tooltip: { callbacks: { label: function(context) { let label = context.dataset.label || ''; if (label) { label += ': '; } if (context.parsed.y !== null) { label += context.parsed.y.toLocaleString(); } return label; } } }
             },
             scales: {
-                x: { 
-                    title: { display: true, text: '날짜' }, 
-                    ticks: { 
-                        autoSkip: true, 
+                x: {
+                    title: { display: true, text: '날짜' },
+                    ticks: {
+                        autoSkip: true,
                         maxTicksLimit: chartLabels.length > 30 ? 15 : 30,
                         callback: function(value, index, ticks) {
-                            const label = this.getLabelForValue(value); 
+                            const label = this.getLabelForValue(value);
                             if (typeof label === 'string' && label.includes('-')) {
-                                const parts = label.split('-'); 
+                                const parts = label.split('-');
                                 if (parts.length === 3) {
-                                    return `${parts[1]}/${parts[2]}`; 
+                                    return `${parts[1]}/${parts[2]}`;
                                 }
                             }
-                            return label; 
+                            return label;
                         }
-                    } 
+                    }
                 },
                 yViews: { type: 'linear', display: yViewsDisplay, position: 'left', title: { display: true, text: metricDisplayNames.views }, ticks: { callback: function(value) { return value.toLocaleString(); } }, beginAtZero: true },
-                yOthers: { 
-                    type: 'linear', 
-                    display: ySelectedDisplay, 
-                    position: 'right', 
-                    title: { display: true, text: ySelectedTitleText }, 
-                    ticks: { callback: function(value) { return value.toLocaleString(); } }, 
-                    beginAtZero: true, 
-                    grid: { drawOnChartArea: false } 
+                yOthers: {
+                    type: 'linear',
+                    display: ySelectedDisplay,
+                    position: 'right',
+                    title: { display: true, text: ySelectedTitleText },
+                    ticks: { callback: function(value) { return value.toLocaleString(); } },
+                    beginAtZero: true,
+                    grid: { drawOnChartArea: false }
                 }
             },
         };
         return { combinedChartData: data, combinedChartOptions: options };
-    }, [globalDateRange, selectedChartItem]); // Removed selectedMetricKey and tableSortConfig, as chart is now solely driven by selectedChartItem for multi-metric view
+    }, [detailedFilters.REGISTRATION_DATE, selectedChartItem]); // Removed selectedMetricKey and tableSortConfig, as chart is now solely driven by selectedChartItem for multi-metric view
 
     const combinedTableColumns = [
         { title: '순위', dataIndex: 'rank', key: 'rank', width: 60, align: 'center' },
@@ -425,15 +525,15 @@ const ContentStatistics = () => {
             title: '타입',
             dataIndex: 'contentType',
             key: 'contentType',
-            width: 120, 
+            width: 120,
             render: (contentType) => getContentTypeTagForStats(contentType),
         },
-        { 
-            title: '제목', 
-            dataIndex: 'title', 
-            key: 'title', 
-            ellipsis: true, 
-            fixed: 'left', 
+        {
+            title: '제목',
+            dataIndex: 'title',
+            key: 'title',
+            ellipsis: true,
+            fixed: 'left',
             width: 180,
             onCell: (record) => {
                 const isSelected = selectedChartItem?.key === record.key;
@@ -442,7 +542,10 @@ const ContentStatistics = () => {
                 };
             }
         },
-        ...Object.keys(metricDisplayNames).map(metricKey => ({
+    ];
+
+    for (const mKey of Object.keys(metricDisplayNames)) {
+        combinedTableColumns.push({
             title: (
                 <Space size={4}>
                     <span style={{
@@ -450,26 +553,27 @@ const ContentStatistics = () => {
                         width: '8px',
                         height: '8px',
                         borderRadius: '50%',
-                        backgroundColor: metricChartColors[metricKey] || '#ccc', 
+                        backgroundColor: metricChartColors[mKey] || '#ccc',
                     }} />
-                    {metricDisplayNames[metricKey]}
+                    {metricDisplayNames[mKey]}
                 </Space>
             ),
-            dataIndex: metricKey === 'completionRate' || metricKey === 'estimatedReadingTime' 
-                       ? metricKey 
-                       : `total${metricKey.charAt(0).toUpperCase() + metricKey.slice(1)}`,
-            key: metricKey, 
+            dataIndex: mKey === 'completionRate' || mKey === 'estimatedReadingTime'
+                       ? mKey
+                       : `total${mKey.charAt(0).toUpperCase() + mKey.slice(1)}`,
+            key: mKey,
             render: (text, record) => {
-                if (metricKey === 'completionRate') return record.completionRate !== undefined ? `${record.completionRate}%` : '-';
-                if (metricKey === 'estimatedReadingTime') return record.estimatedReadingTime !== undefined ? `${record.estimatedReadingTime} 분` : '-';
+                if (mKey === 'completionRate') return record.completionRate !== undefined ? `${record.completionRate}%` : '-';
+                if (mKey === 'estimatedReadingTime') return record.estimatedReadingTime !== undefined ? `${record.estimatedReadingTime} 분` : '-';
                 return text?.toLocaleString() ?? '-';
             },
             align: 'right',
-            width: metricKey === 'views' ? 110 : 
-                   metricKey === 'estimatedReadingTime' ? 140 :
-                   metricKey === 'completionRate' ? 100 : 110, 
-        })),
-    ];
+            width: mKey === 'views' ? 110 :
+                   mKey === 'estimatedReadingTime' ? 140 :
+                   mKey === 'completionRate' ? 100 : 110,
+        });
+    }
+
 
     // Memo for Category Distribution Chart
     const { categoryChartData, categoryChartOptions } = useMemo(() => {
@@ -528,15 +632,6 @@ const ContentStatistics = () => {
       <Title level={4}>콘텐츠 통계 분석</Title>
 
             <Card title="콘텐츠 데이터 분석 차트">
-                 <Row justify="end" style={{ marginBottom: 16 }}>
-                    <Col>
-                        <Text style={{ marginRight: 8 }}>기간 선택:</Text>
-                        <RangePicker 
-                            value={globalDateRange}
-                            onChange={(dates) => setGlobalDateRange(dates)} 
-                        />
-                    </Col>
-                </Row>
                  <div style={{ height: '350px' }}>
                     <Bar options={combinedChartOptions} data={combinedChartData} />
                 </div>
@@ -545,30 +640,182 @@ const ContentStatistics = () => {
             <Row gutter={[16, 16]}>
                 <Col span={24}>
                     <Card title="콘텐츠 데이터 테이블">
-                        <Space style={{ marginBottom: 16 }}>
-                            <Text>정렬 기준:</Text>
-                            <Select
-                                value={tableSortConfig.metricKey}
-                                onChange={(value) => setTableSortConfig(prev => ({ ...prev, metricKey: value, order: prev.order }))}
-                                style={{ width: 150 }}
-                            >
-                                {Object.entries(metricDisplayNames).map(([key, name]) => (
-                                    <Option key={key} value={key}>{name}</Option>
-                                ))}
-                            </Select>
-                            <Select
-                                value={tableSortConfig.order}
-                                onChange={(value) => setTableSortConfig(prev => ({ ...prev, order: value }))}
-                                style={{ width: 120 }}
-                            >
-                                <Option value="desc">내림차순</Option>
-                                <Option value="asc">오름차순</Option>
-                            </Select>
-                        </Space>
-         <Table
+                        <Row gutter={[16,16]} justify="space-between" align="middle" style={{ marginBottom: 24 }}>
+                            <Col>
+                                <Search
+                                    placeholder="콘텐츠 제목 검색..."
+                                    value={searchText}
+                                    onChange={(e) => setSearchText(e.target.value)}
+                                    allowClear
+                                    addonBefore={
+                                        <Select
+                                        value={searchContentType}
+                                        onChange={(value) => setSearchContentType(value)}
+                                        style={{ width: 100 }}
+                                        >
+                                        <Option value="all">전체</Option>
+                                        <Option value="10">전자책</Option>
+                                        <Option value="20">오디오북</Option>
+                                        </Select>
+                                    }
+                                    suffix={
+                                        <Dropdown
+                                            overlay={
+                                                <div
+                                                style={{
+                                                    width: 600,
+                                                    backgroundColor: "white",
+                                                    boxShadow: "0 2px 8px rgba(0, 0, 0, 0.15)",
+                                                    borderRadius: "4px",
+                                                    padding: "16px",
+                                                }}
+                                                onClick={(e) => e.stopPropagation()}
+                                                >
+                                                <Form
+                                                    form={detailForm}
+                                                    layout="vertical"
+                                                    onFinish={(values) => {
+                                                        handleDetailedSearch(values);
+                                                        setIsDetailedSearchVisible(false);
+                                                    }}
+                                                >
+                                                    <Row gutter={24}>
+                                                    <Col span={12}>
+                                                        <Form.Item name="CATEGORY_NAME" label="카테고리">
+                                                        <Select
+                                                            allowClear
+                                                            placeholder="카테고리 선택"
+                                                            onChange={() => {
+                                                            detailForm.setFieldsValue({
+                                                                SUB_CATEGORY_NAME: undefined,
+                                                            });
+                                                            }}
+                                                        >
+                                                            {Object.keys(subCategoryMapForStats).map((cat) => (
+                                                            <Option key={cat} value={cat}>
+                                                                {cat}
+                                                            </Option>
+                                                            ))}
+                                                        </Select>
+                                                        </Form.Item>
+                                                    </Col>
+                                                    <Col span={12}>
+                                                        <Form.Item
+                                                        noStyle
+                                                        shouldUpdate={(prevValues, currentValues) =>
+                                                            prevValues.CATEGORY_NAME !==
+                                                            currentValues.CATEGORY_NAME
+                                                        }
+                                                        >
+                                                        {({ getFieldValue }) => (
+                                                            <Form.Item
+                                                            name="SUB_CATEGORY_NAME"
+                                                            label="하위 카테고리"
+                                                            >
+                                                            <Select
+                                                                allowClear
+                                                                placeholder="하위 카테고리 선택"
+                                                                disabled={!getFieldValue("CATEGORY_NAME")}
+                                                            >
+                                                                {(
+                                                                subCategoryMapForStats[
+                                                                    getFieldValue("CATEGORY_NAME")
+                                                                ] || []
+                                                                ).map((sub) => (
+                                                                <Option key={sub} value={sub}>
+                                                                    {sub}
+                                                                </Option>
+                                                                ))}
+                                                            </Select>
+                                                            </Form.Item>
+                                                        )}
+                                                        </Form.Item>
+                                                    </Col>
+                                                    </Row>
+                                                    <Row>
+                                                    <Col span={24}>
+                                                        <Form.Item name="REGISTRATION_DATE" label="등록일">
+                                                        <DatePicker.RangePicker style={{ width: "100%" }} />
+                                                        </Form.Item>
+                                                    </Col>
+                                                    </Row>
+                                                    <Divider style={{ margin: "12px 0" }} />
+                                                    <Row gutter={24}>
+                                                        <Col span={12}>
+                                                            <Form.Item label="조회수">
+                                                            <Input.Group compact>
+                                                                <Form.Item name="VIEWS_MIN" noStyle><InputNumber style={{ width: "45%", textAlign: "center" }} placeholder="Min" /></Form.Item>
+                                                                <Input style={{ width: "10%", borderLeft: 0, borderRight: 0, pointerEvents: "none", background: "#fff" }} placeholder="~" disabled />
+                                                                <Form.Item name="VIEWS_MAX" noStyle><InputNumber style={{ width: "45%", textAlign: "center", borderLeft: 0 }} placeholder="Max" /></Form.Item>
+                                                            </Input.Group>
+                                                            </Form.Item>
+                                                        </Col>
+                                                        <Col span={12}>
+                                                            <Form.Item label="다운로드수">
+                                                                <Input.Group compact>
+                                                                    <Form.Item name="DOWNLOADS_MIN" noStyle><InputNumber style={{ width: "45%", textAlign: "center" }} placeholder="Min" /></Form.Item>
+                                                                    <Input style={{ width: "10%", borderLeft: 0, borderRight: 0, pointerEvents: "none", background: "#fff" }} placeholder="~" disabled />
+                                                                    <Form.Item name="DOWNLOADS_MAX" noStyle><InputNumber style={{ width: "45%", textAlign: "center", borderLeft: 0 }} placeholder="Max" /></Form.Item>
+                                                                </Input.Group>
+                                                            </Form.Item>
+                                                        </Col>
+                                                    </Row>
+                                                    <Row gutter={24}>
+                                                        <Col span={12}>
+                                                            <Form.Item label="관심등록">
+                                                                <Input.Group compact>
+                                                                    <Form.Item name="LIKES_MIN" noStyle><InputNumber style={{ width: "45%", textAlign: "center" }} placeholder="Min" /></Form.Item>
+                                                                    <Input style={{ width: "10%", borderLeft: 0, borderRight: 0, pointerEvents: "none", background: "#fff" }} placeholder="~" disabled />
+                                                                    <Form.Item name="LIKES_MAX" noStyle><InputNumber style={{ width: "45%", textAlign: "center", borderLeft: 0 }} placeholder="Max" /></Form.Item>
+                                                                </Input.Group>
+                                                            </Form.Item>
+                                                        </Col>
+                                                        <Col span={12}>
+                                                            <Form.Item label="리뷰수">
+                                                                <Input.Group compact>
+                                                                    <Form.Item name="REVIEWS_MIN" noStyle><InputNumber style={{ width: "45%", textAlign: "center" }} placeholder="Min" /></Form.Item>
+                                                                    <Input style={{ width: "10%", borderLeft: 0, borderRight: 0, pointerEvents: "none", background: "#fff" }} placeholder="~" disabled />
+                                                                    <Form.Item name="REVIEWS_MAX" noStyle><InputNumber style={{ width: "45%", textAlign: "center", borderLeft: 0 }} placeholder="Max" /></Form.Item>
+                                                                </Input.Group>
+                                                            </Form.Item>
+                                                        </Col>
+                                                    </Row>
+                                                    <Row justify="end">
+                                                    <Space>
+                                                        <Button onClick={() => { handleResetDetailedSearch(); setIsDetailedSearchVisible(false); }}>초기화</Button>
+                                                        <Button type="primary" htmlType="submit"><SearchOutlined /> 검색</Button>
+                                                    </Space>
+                                                    </Row>
+                                                </Form>
+                                                </div>
+                                            }
+                                            trigger={["click"]}
+                                            open={isDetailedSearchVisible}
+                                            onOpenChange={setIsDetailedSearchVisible}
+                                        >
+                                            <Button type="link" onClick={(e) => e.preventDefault()}>
+                                            상세{" "}{isDetailedSearchVisible ? <UpOutlined /> : <DownOutlined />}
+                                            </Button>
+                                        </Dropdown>
+                                    }
+                                    style={{ flex: 1, maxWidth: 500 }}
+                                />
+                            </Col>
+                            <Col>
+                                <Select
+                                    value={tableSortConfig.order}
+                                    onChange={(value) => setTableSortConfig(prev => ({ ...prev, order: value }))}
+                                    style={{ width: 120 }}
+                                >
+                                    <Option value="desc">내림차순</Option>
+                                    <Option value="asc">오름차순</Option>
+                                </Select>
+                            </Col>
+                        </Row>
+                        <Table
                             columns={combinedTableColumns}
                             dataSource={combinedTableData.items}
-           rowKey="key"
+                            rowKey="key"
                             pagination={false}
                             size="small"
                             loading={combinedTableData.loading && combinedTableData.items.length === 0}
@@ -583,8 +830,8 @@ const ContentStatistics = () => {
                                     style: isSelected ? { backgroundColor: '#e6f7ff' } : {},
                                 };
                             }}
-         />
-      </Card>
+                        />
+                    </Card>
                 </Col>
             </Row>
 
@@ -622,4 +869,4 @@ const ContentStatistics = () => {
   );
 };
 
-export default ContentStatistics; 
+export default ContentStatistics;

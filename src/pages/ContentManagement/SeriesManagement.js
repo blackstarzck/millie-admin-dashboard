@@ -1,37 +1,107 @@
-import React, { useState, useMemo, useCallback } from "react";
 import {
-  Table,
+  BookOutlined,
+  DeleteOutlined,
+  EditOutlined,
+  InfoCircleOutlined,
+  PlusOutlined,
+} from "@ant-design/icons";
+import {
   Button,
-  Modal,
   Form,
   Input,
-  Typography,
-  Space,
-  Popconfirm,
   message,
-  Tag,
-  List,
-  Tooltip,
-  InputNumber,
-  AutoComplete,
-  Row,
-  Col,
+  Modal,
+  Popconfirm,
   Select,
+  Space,
   Switch,
+  Table,
+  Tag,
+  Tooltip,
+  Transfer,
+  Typography
 } from "antd";
-import {
-  PlusOutlined,
-  EditOutlined,
-  DeleteOutlined,
-  BookOutlined,
-  InfoCircleOutlined,
-} from "@ant-design/icons";
-import { initialBooks as allBookData } from "./BookManagement"; // BookManagement에서 initialBooks 가져오기
-import { subCategoryMap } from "./BookManagement"; // subCategoryMap 가져오기
+import React, { useCallback, useMemo, useState } from "react";
+import { initialBooks as allBookData, subCategoryMap } from "./BookManagement"; // BookManagement에서 initialBooks 가져오기
 
 const { Title, Text, Link } = Typography;
 const { Option } = Select;
 const { TextArea } = Input;
+
+// Transfer 컴포넌트에 표시할 테이블 UI 정의
+const BookTransfer = ({ leftColumns, rightColumns, ...restProps }) => (
+  <Transfer {...restProps}>
+    {({
+      direction,
+      filteredItems,
+      onItemSelectAll,
+      onItemSelect,
+      selectedKeys: listSelectedKeys,
+      disabled: listDisabled,
+    }) => {
+      const columns = direction === "left" ? leftColumns : rightColumns;
+      const rowSelection = {
+        getCheckboxProps: () => ({ disabled: listDisabled }),
+        onSelectAll(selected, selectedRows, changeRows) {
+          const treeSelectedKeys = selectedRows
+            .filter((item) => !item.disabled)
+            .map(({ key }) => key);
+          onItemSelectAll(treeSelectedKeys, selected);
+        },
+        onSelect({ key }, selected) {
+          onItemSelect(key, selected);
+        },
+        selectedRowKeys: listSelectedKeys,
+      };
+      return (
+        <Table
+          rowSelection={rowSelection}
+          columns={columns}
+          dataSource={filteredItems}
+          size="small"
+          style={{ pointerEvents: listDisabled ? "none" : undefined }}
+          onRow={({ key, disabled: itemDisabled }) => ({
+            onClick: () => {
+              if (itemDisabled || listDisabled) return;
+              onItemSelect(key, !listSelectedKeys.includes(key));
+            },
+          })}
+        />
+      );
+    }}
+  </Transfer>
+);
+
+const bookTableColumns = [
+  {
+    dataIndex: "BOOK_NAME",
+    title: "도서명",
+    ellipsis: true,
+  },
+  {
+    dataIndex: "AUTHOR",
+    title: "저자",
+    width: 80,
+    ellipsis: true,
+  },
+  {
+    dataIndex: "CATEGORY",
+    title: "카테고리",
+    width: 90,
+    ellipsis: true,
+  },
+];
+
+const bookFilterOption = (inputValue, item) =>
+  item.BOOK_NAME.includes(inputValue) ||
+  item.AUTHOR.includes(inputValue) ||
+  item.CATEGORY.includes(inputValue);
+
+// allBookData에 title 속성 추가 (Transfer 컴포넌트의 검색 기능이 title 속성을 사용하기 때문)
+const transferDataSource = allBookData.map((book) => ({
+  ...book,
+  title: book.BOOK_NAME, // 검색을 위해 title 속성 추가
+}));
 
 // 초기 시리즈 데이터 가공 함수 (useMemo 내부로 이동하여 allBookData 변경에 반응하도록 수정)
 const processSeriesData = (books) => {
@@ -154,6 +224,7 @@ const SeriesManagement = () => {
       category: series.category,
       subCategory: series.subCategory,
       introduction: series.introduction,
+      books: series.booksInCurrentList.map((book) => book.bookKey),
     });
     setSelectedCategory(series.category); // 수정 시 기존 카테고리 설정
     setIsModalOpen(true);
@@ -170,11 +241,32 @@ const SeriesManagement = () => {
     form
       .validateFields()
       .then((values) => {
+        // 도서 선택 처리 (Transfer 컴포넌트의 targetKeys가 values.books로 넘어옴)
+        const selectedBooks = values.books
+          ? allBookData
+              .filter((book) => values.books.includes(book.key))
+              .map((book) => ({
+                bookKey: book.key,
+                bookName: book.BOOK_NAME,
+                seriesNum: book.SERIES_NUM,
+                bookServiceYN: book.BOOK_SERVICE_YN,
+              }))
+          : [];
+
+        // 도서를 seriesNum 기준으로 정렬
+        selectedBooks.sort((a, b) => {
+          if (a.seriesNum == null) return 1;
+          if (b.seriesNum == null) return -1;
+          return a.seriesNum - b.seriesNum;
+        });
+
         const seriesData = {
           name: values.name,
           category: values.category,
           subCategory: values.subCategory,
           introduction: values.introduction,
+          booksInCurrentList: selectedBooks,
+          bookCount: selectedBooks.length,
         };
 
         if (editingSeries) {
@@ -205,8 +297,8 @@ const SeriesManagement = () => {
             id: newId,
             key: newId,
             ...seriesData,
-            bookCount: 0,
-            booksInCurrentList: [],
+            bookCount: seriesData.bookCount, // bookCount도 seriesData에서 가져옴
+            booksInCurrentList: seriesData.booksInCurrentList, // booksInCurrentList도 seriesData에서 가져옴
             firstRegistrationDate: new Date().toISOString().split("T")[0],
           };
           setSeriesDisplayList((prevList) =>
@@ -508,6 +600,7 @@ const SeriesManagement = () => {
         okText={editingSeries ? "수정" : "추가"}
         cancelText="취소"
         destroyOnClose
+        width={800} // 모달 너비 확장
       >
         <Form form={form} layout="vertical" name="series_form">
           <Form.Item
@@ -560,7 +653,10 @@ const SeriesManagement = () => {
             name="subCategory"
             label="하위 카테고리"
             rules={[
-              { required: true, message: "하위 카테고리를 선택해주세요." },
+              {
+                required: true,
+                message: "하위 카테고리를 선택해주세요.",
+              },
             ]}
           >
             <Select
@@ -581,6 +677,17 @@ const SeriesManagement = () => {
             <TextArea
               rows={4}
               placeholder="시리즈에 대한 간략한 소개를 입력해주세요."
+            />
+          </Form.Item>
+          <Form.Item name="books" label="도서 선택">
+            <BookTransfer
+              dataSource={transferDataSource}
+              showSearch
+              filterOption={bookFilterOption}
+              targetKeys={form.getFieldValue("books") || []}
+              onChange={(keys) => form.setFieldsValue({ books: keys })}
+              leftColumns={bookTableColumns}
+              rightColumns={bookTableColumns}
             />
           </Form.Item>
         </Form>
