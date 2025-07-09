@@ -1,6 +1,6 @@
 import { ConfigProvider } from 'antd';
 import koKR from 'antd/locale/ko_KR';
-import React from 'react';
+import React, { useState } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import AppLayout from './components/Layout';
 import { GroupProvider } from './context/GroupContext';
@@ -14,6 +14,7 @@ import CurationManagement from './pages/ContentManagement/CurationManagement';
 import KeywordManagement from './pages/ContentManagement/KeywordManagement';
 import MetadataManagement from './pages/ContentManagement/MetadataManagement';
 import SeriesManagement from './pages/ContentManagement/SeriesManagement';
+import UnsubscribeManagement from './pages/ContentManagement/UnsubscribeManagement';
 import Dashboard from './pages/Dashboard';
 import CampaignEffect from './pages/DataAnalysis/CampaignEffect';
 import ContentStatistics from './pages/DataAnalysis/ContentStatistics';
@@ -38,6 +39,7 @@ import PopupExposureSettings from './pages/PopupManagement/ExposureSettings';
 import PopupCreation from './pages/PopupManagement/PopupCreation';
 import PopupTemplateManagement from './pages/PopupManagement/TemplateManagement';
 import AuthorInfoManagement from './pages/SelfPublishing/AuthorInfoManagement';
+import AdminActivityLog from './pages/SystemSettings/AdminActivityLog'; // 새로 추가
 import ApiManagement from './pages/SystemSettings/ApiManagement';
 import PermissionManagement from './pages/SystemSettings/PermissionManagement';
 import SecuritySettings from './pages/SystemSettings/SecuritySettings';
@@ -48,14 +50,95 @@ import MemberInfo from './pages/UserManagement/MemberInfo';
 import SubscriptionHistory from './pages/UserManagement/SubscriptionHistory';
 
 // 새로 추가된 신고 관리 페이지 컴포넌트 임포트
+import BookRankingManagement from "./pages/ContentManagement/BookRankingManagement";
 import ReportList from './pages/ReportManagement/ReportList';
 import ReportSettings from './pages/ReportManagement/ReportSettings';
 import WorksList from './pages/SelfPublishing/WorksList';
 
 // 쿠폰 관리 페이지
 import Coupon from './pages/CouponManagement/Coupon';
+import CouponForm from './pages/CouponManagement/CouponForm';
 
 function App() {
+  const [coupons, setCoupons] = useState([
+      {
+        key: '1',
+        couponName: '7월 신규회원 자동발행 쿠폰',
+        couponType: 'auto',
+        autoIssueRule: 'new_member', // 첫 회원가입
+        benefitType: 'amount_discount',
+        discountType: 'percentage',
+        discountValue: 10,
+        maxDiscountAmount: 5000,
+        minOrderAmount: 20000,
+        issueTarget: 'all_members',
+        usagePeriodType: 'days_from_issue',
+        usagePeriodDays: 30,
+        issuanceDate: '2024-07-01',
+        issuedCount: 150,
+        usedCount: 25,
+        status: 'active',
+      },
+      {
+        key: '2',
+        couponName: '여름맞이 고객 다운로드 쿠폰',
+        couponType: 'download',
+        benefitType: 'amount_discount',
+        discountType: 'fixed',
+        discountValue: 3000,
+        minOrderAmount: 30000,
+        issueTarget: 'group',
+        issueTargetGroup: 'group-1', // VIP 회원
+        issueLimit: 1000, // 발행수량
+        isUnlimitedIssue: false,
+        perPersonLimit: 1, // 1인당 사용횟수
+        isUnlimitedPerPerson: false,
+        usagePeriodType: 'fixed_period',
+        startDate: '2024-07-01',
+        endDate: '2024-08-31',
+        issuedCount: 800,
+        usedCount: 450,
+        status: 'active',
+      },
+      {
+        key: '3',
+        couponName: 'VVIP 고객 지정발행 쿠폰',
+        couponType: 'direct',
+        benefitType: 'fix_price',
+        fixedPrice: 10000,
+        issueTarget: 'individual',
+        issueTargetIndividual: 'user-vip-001, user-vip-002',
+        usagePeriodType: 'fixed_period',
+        issuanceDate: '2024-07-15',
+        startDate: '2024-07-15',
+        endDate: '2024-08-14', // 생성일로부터 30일
+        issuedCount: 2,
+        usedCount: 1,
+        perPersonLimit: 1, // 지정발행은 1회 사용
+        applicableContentType: 'product',
+        applicableContent: ['content-5'],
+        status: 'active',
+      },
+      {
+        key: '4',
+        couponName: '썸머 세일 쿠폰코드',
+        couponType: 'code',
+        benefitType: 'amount_discount',
+        discountType: 'percentage',
+        discountValue: 15,
+        maxDiscountAmount: 10000,
+        issueTarget: 'all_users', // 회원+비회원
+        couponCodeType: 'single',
+        couponCode: 'SUMMERSALE',
+        usagePeriodType: 'fixed_period',
+        startDate: '2024-07-20',
+        endDate: '2024-07-31',
+        issuedCount: 0, // 코드 쿠폰은 발행수량 개념이 다름
+        usedCount: 78,
+        status: 'scheduled',
+      },
+    ]);
+
   return (
     <ConfigProvider locale={koKR}>
       <GroupProvider>
@@ -76,6 +159,8 @@ function App() {
               <Route path="content/metadata" element={<MetadataManagement />} />
               <Route path="content/analysis" element={<ContentStatistics />} />
               <Route path="content/curation" element={<CurationManagement />} />
+              <Route path="content/unsubscribe" element={<UnsubscribeManagement />} />
+              <Route path="content/book-ranking" element={<BookRankingManagement />} />
 
               {/* 자가출판 */}
               <Route path="self-publishing/approval" element={<ContentApproval />} />
@@ -111,7 +196,11 @@ function App() {
               {/* 이벤트 관리 */}
               <Route path="events/register" element={<EventRegistration />} />
               <Route path="events/status" element={<EventStatus />} />
-              <Route path="events/coupons" element={<Coupon />} />
+
+              {/* 쿠폰 관리 */}
+              <Route path="coupons/list" element={<Coupon coupons={coupons} setCoupons={setCoupons} />} />
+              <Route path="coupons/register" element={<CouponForm coupons={coupons} setCoupons={setCoupons} />} />
+              <Route path="coupons/register/:id" element={<CouponForm coupons={coupons} setCoupons={setCoupons} />} />
 
               {/* 문의사항 관리 */}
               <Route path="inquiries/list" element={<InquiryLookup />} />
@@ -127,6 +216,7 @@ function App() {
 
               {/* 시스템 설정 */}
               <Route path="settings/permissions" element={<PermissionManagement />} />
+              <Route path="settings/admin-activity-log" element={<AdminActivityLog />} /> {/* 새로 추가 */}
               <Route path="settings/api" element={<ApiManagement />} />
               <Route path="settings/security" element={<SecuritySettings />} />
               <Route path="settings/policy" element={<ServicePolicy />} />

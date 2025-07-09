@@ -1,0 +1,1953 @@
+지정발행 구조는 아래와 같습니다.
+
+<div class="col-md-12">
+						<div class="card">
+							<div class="card-head">
+								<header>쿠폰정보</header>
+							</div>
+							<div class="card-body form-horizontal border-top">
+																<div class="form-group">
+									<label class="col-sm-2 control-label required">쿠폰명										<i class="required-icon"></i>
+										<a href="javascript:;" class="text-gray html-popover" tabindex="0" role="button" data-toggle="popover" data-trigger="focus" data-placement="right" title="" data-content="고객에게 표시되는 쿠폰 이름입니다. 쿠폰 생성 후에도 수정 가능합니다." data-original-title="쿠폰명"><i class="btm bt-question-circle"></i></a></label>
+									<div class="col-sm-10">
+										<input type="text" tabindex="1" placeholder="예: 사이트 오픈 1주년 할인 쿠폰" autocomplete="off" class="form-control" name="name" maxlength="80"><div class="form-control-line"></div>
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-sm-2 control-label">쿠폰형식										<a href="javascript:;" class="text-gray html-popover" tabindex="0" role="button" data-toggle="popover" data-trigger="focus" data-placement="right" title="" data-content="&lt;p&gt;쿠폰 발행 방식을 선택합니다.&lt;/p&gt;&lt;p&gt;&lt;strong&gt;지정 발행: &lt;/strong&gt;발행대상을 지정하여 일괄 발행하는 쿠폰입니다. 그룹발행시 쿠폰 생성시점의 회원을 대상으로 발행됩니다. 발행 후 설정하신 사용기간에 맞춰 고객이 마이페이지에서 쿠폰을 확인할 수 있고, 결제 페이지에서 쿠폰을 사용할 수 있습니다. 발급대상 회원수에 따라 최대 30분까지 발급시간이 소요될 수 있습니다.&lt;/p&gt; &lt;p&gt;&lt;strong&gt;고객 다운로드:&lt;/strong&gt; 쿠폰을 발행하면 고객이 마이페이지 또는 쿠폰 다운로드 URL을 통해 받을 수 있습니다. 쿠폰 다운로드 URL은 쿠폰 목록에서 확인 및 복사할 수 있습니다.&lt;/p&gt;&lt;p&gt;&lt;strong&gt;자동 발행:&lt;/strong&gt; 회원가입, 첫 주문완료 등 특정 조건을 만족하면 쿠폰이 자동 발행됩니다. 고객이 마이페이지에서 쿠폰을 확인할 수 있고, 결제 페이지에서 쿠폰을 사용할 수 있습니다.&lt;/p&gt;&lt;p&gt;&lt;strong&gt;쿠폰코드 입력:&lt;/strong&gt; 판매자가 쿠폰 코드를 생성하면 고객은 결제 페이지에서 코드를 입력해 사용합니다. 단, 1개 코드만 입력 가능합니다.&lt;/p&gt;" data-original-title="쿠폰형식">
+											<i class="btm bt-question-circle"></i>
+										</a>
+									</label>
+									<div class="col-sm-10" style="">
+										<div class="radio radio-styled">
+											<label>
+												<input type="radio" name="type" value="targeted" checked="">
+												<span>지정 발행</span>
+											</label>
+										</div>
+										<div class="radio radio-styled">
+											<label>
+												<input type="radio" name="type" value="down">
+												<span>고객 다운로드</span>
+											</label>
+										</div>
+										<div class="radio radio-styled">
+											<label>
+												<input type="radio" name="type" value="auto">
+												<span>자동 발행</span>
+											</label>
+										</div>
+										<div class="radio radio-styled">
+											<label>
+												<input type="radio" name="type" value="create">
+												<span>쿠폰코드 생성</span>
+											</label>
+										</div>
+									</div>
+																	</div>
+																<div class="form-group _type_is_mult_coupon display-none" style="display: none;">
+									<label class="col-sm-2 control-label">쿠폰코드</label>
+									<div class="col-sm-10">
+										<div class="input-group input-group-padding">
+																							<div class="input-group-content vertical-bottom">
+													<select class="form-control" tabindex="3" name="type_is_mult_coupon" style="width: 200px;">
+														<option value="N" selected="">단일 쿠폰코드</option>
+														<option value="Y">여러 쿠폰코드</option>
+													</select><div class="form-control-line"></div>
+												</div>
+																																															<div class="input-group-content vertical-bottom width-7 _type_coupon_code" style="display: none;">
+														<input class="form-control" tabindex="7" type="text" placeholder="쿠폰코드 입력 (입력하지 않으면 랜덤 생성)" name="type_coupon_code"><div class="form-control-line"></div>
+													</div>
+																																			<div class="input-group-content vertical-bottom width-4 _type_coupon_create_count display-none" style="display: none;">
+													<input type="text" class="form-control" tabindex="7" placeholder="발급수량(최대 10000개)" name="type_coupon_create_count"><div class="form-control-line"></div>
+												</div>
+																					</div>
+									</div>
+								</div>
+								<div class="form-group _type_target" style="display: block;">
+									<label class="col-sm-2 control-label">발행대상										<a href="javascript:;" class="text-gray html-popover" tabindex="0" role="button" data-toggle="popover" data-trigger="focus" data-placement="right" title="" data-content="&lt;p&gt;쿠폰 발행 대상을 지정합니다.&lt;/p&gt;&lt;p&gt;&lt;strong&gt;고객 다운로드&lt;/strong&gt;&lt;/p&gt;&lt;ul class='description-list'&gt;&lt;li&gt;전체회원: 모든 회원에게 발행합니다.&lt;/li&gt;&lt;li&gt;특정 회원그룹에게 발행합니다. 회원그룹은 &lt;a href='/admin/member/list' target='_blank' class='text-primary'&gt;사용자 목록&lt;/a&gt;에서 관리할 수 있습니다.&lt;/li&gt;&lt;li&gt;고객 행동 관리 그룹: &lt;a href='/admin/crm_marketing' target='_blank' class='text-primary'&gt;고객 행동 관리&lt;/a&gt;에서 생성한 그룹을 지정합니다.&lt;/li&gt;&lt;li&gt;개별회원: 단일 회원을 특정하여 쿠폰을 발행합니다.&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;strong&gt;자동 발행&lt;/strong&gt;&lt;/p&gt;&lt;ul class='description-list'&gt;&lt;li&gt;첫 회원가입: 신규 가입 회원에게 쿠폰 발행합니다. 같은 계정으로 재가입 하거나 동일 본인인증 데이터로 재가입 시 쿠폰이 발행되지 않습니다.&lt;/li&gt;&lt;li&gt;첫 주문완료: 회원의 첫 주문 배송완료일의 23:00 에 지급 됩니다. 부분취소 등으로 인하여 부분 배송완료된 주문이 있는 경우에도 발행됩니다. 단, 동일인(동일 계정, 이메일, 본인인증)이 재주문하거나 구매완료전 전체취소시 쿠폰이 발행되지 않습니다. 첫 주문완료 후 반품/교환 신청 후 다시 쿠폰 발급을 막으려면 쇼핑 &gt; &lt;a href='/admin/shopping/config' target='_blank' class='text-primary'&gt;환경설정&lt;/a&gt;에서 반품/교환 가능 기간을 무제한이 아닌 특정 기간으로 사용을 권장합니다.&lt;/li&gt;&lt;li&gt;생일: 생일을 맞은 회원이 있을 때 쿠폰을 발행합니다. [환경설정 &gt; 회원가입·그룹·등급 &gt; 가입 폼 관리]에서 생년월일을 기준으로 판단합니다. 생일 정보 변경 후 동일한 쿠폰이 재발행 되는 것을 막기 위해 1년에 한번만 발행 됩니다. 생일 쿠폰을 만든 다음날부터 발행이 시작됩니다.&lt;/li&gt;&lt;li&gt;쇼핑등급 변경: 선택한 쇼핑등급으로 변경될 때 쿠폰을 발행합니다. 이미 해당 등급에 속한 회원에게는 발행되지 않습니다. 높은 등급으로 변경되는 경우만 쿠폰을 발행하고 싶으면, ‘높은 자동 등급으로 변경되었을 때만 발행’ 옵션을 사용하세요.&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;strong&gt;쿠폰코드 생성&lt;/strong&gt;&lt;/p&gt;&lt;ul class='description-list'&gt;&lt;li&gt;회원: 모든 회원이 결제 시 사용 가능합니다.&lt;/li&gt;&lt;li&gt;회원+비회원: 회원과 비회원 모두 결제시 사용 가능합니다.&lt;/li&gt;&lt;/ul&gt;" data-original-title="발행대상"><i class="btm bt-question-circle"></i></a></label>
+									<div class="col-sm-10 _type_down display-none">
+										<div class="input-group input-group-padding">
+			<div class="input-group-content">
+			<select class="form-control" tabindex="3" name="type_down_target" style="width: 200px;" onchange="COUPON.changeCouponTypeTarget('type_down_target');">
+				<option value="all">전체회원</option><option value="group">지정그룹</option><option value="specific_member">개별회원</option>			</select><div class="form-control-line"></div>
+		</div>
+
+		<div class="input-group-content _type_group_code _type_input display-none display-m-row" style="display: none;">
+			<div class="form-control" style="z-index: 3; width: 200px;">
+				<a href="javascript:;" data-toggle="dropdown" class="_group_name text-nowrap" style="line-height: 29px; display: block" aria-expanded="false">
+					<span class="_group_name_text">그룹 선택</span>
+					<span class="text-primary _group_count"></span>
+				</a>
+				<ul class="dropdown-menu animation-dock check" role="menu" aria-labelledby="dLabel">
+					<div class="select_group _check_drop_group_list">
+											</div>
+				</ul>
+			</div><div class="form-control-line"></div>
+		</div>
+
+		<div class="input-group-content _type_crm _type_input display-none display-m-row" style="display: none;">
+			<div class="form-control" style="z-index: 3; width: 200px;">
+				<a href="javascript:;" data-toggle="dropdown" class="_group_name text-nowrap" style="line-height: 29px; display: block" aria-expanded="false">
+					<span class="_group_name_text">그룹 선택</span>
+					<span class="text-primary _group_count"></span>
+				</a>
+				<ul class="dropdown-menu animation-dock check" role="menu" aria-labelledby="dLabel">
+					<div class="select_group _check_drop_group_list">
+											</div>
+				</ul>
+			</div><div class="form-control-line"></div>
+		</div>
+
+    <div class="input-group-content display-none _type_input vertical-bottom tw-w-[200px] _type_specific_member_id" style="display: none;">
+      <label>
+        <input class="form-control" type="text" placeholder="회원 ID를 입력해주세요." name="type_specific_member_id"><div class="form-control-line"></div>
+      </label>
+    </div>
+
+		</div>									</div>
+									<div class="col-sm-10 _type_targeted">
+										<div class="input-group input-group-padding">
+			<div class="input-group-content">
+			<select class="form-control" tabindex="3" name="type_targeted_target" style="width: 200px;" onchange="COUPON.changeCouponTypeTarget('type_targeted_target');">
+				<option value="all">전체회원</option><option value="group">지정그룹</option><option value="specific_member">개별회원</option>			</select><div class="form-control-line"></div>
+		</div>
+
+		<div class="input-group-content _type_group_code _type_input display-none display-m-row" style="display: none;">
+			<div class="form-control" style="z-index: 3; width: 200px;">
+				<a href="javascript:;" data-toggle="dropdown" class="_group_name text-nowrap" style="line-height: 29px; display: block" aria-expanded="false">
+					<span class="_group_name_text">그룹 선택</span>
+					<span class="text-primary _group_count"></span>
+				</a>
+				<ul class="dropdown-menu animation-dock check" role="menu" aria-labelledby="dLabel">
+					<div class="select_group _check_drop_group_list">
+											</div>
+				</ul>
+			</div><div class="form-control-line"></div>
+		</div>
+
+		<div class="input-group-content _type_crm _type_input display-none display-m-row" style="display: none;">
+			<div class="form-control" style="z-index: 3; width: 200px;">
+				<a href="javascript:;" data-toggle="dropdown" class="_group_name text-nowrap" style="line-height: 29px; display: block" aria-expanded="false">
+					<span class="_group_name_text">그룹 선택</span>
+					<span class="text-primary _group_count"></span>
+				</a>
+				<ul class="dropdown-menu animation-dock check" role="menu" aria-labelledby="dLabel">
+					<div class="select_group _check_drop_group_list">
+											</div>
+				</ul>
+			</div><div class="form-control-line"></div>
+		</div>
+
+    <div class="input-group-content display-none _type_input vertical-bottom tw-w-[200px] _type_specific_member_id" style="display: none;">
+      <label>
+        <input class="form-control" type="text" placeholder="회원 ID를 입력해주세요." name="type_specific_member_id"><div class="form-control-line"></div>
+      </label>
+    </div>
+
+		</div>									</div>
+									<div class="col-sm-10 _type_auto display-none">
+										<div class="input-group input-group-padding">
+																							<div class="input-group-content">
+													<select name="type_auto_target" class="form-control" style="width: 200px" onchange="COUPON.changeCouponTypeTarget('type_auto_target');">
+														<option value="join" selected="">첫 회원가입</option>
+														<option value="order">첫 주문완료</option>
+														<option value="birthday">생일</option>
+														<option value="grade_change">쇼핑등급 변경</option>
+													</select><div class="form-control-line"></div>
+												</div>
+												<div class="input-group-content _auto_order_list display-none">
+													<select class="form-control" name="auto_data_order_type" style="width: 200px">
+
+																													<option value="1">배송완료 1일 후</option>
+																													<option value="2">배송완료 2일 후</option>
+																													<option value="3">배송완료 3일 후</option>
+																													<option value="4">배송완료 4일 후</option>
+																													<option value="5">배송완료 5일 후</option>
+																													<option value="7">배송완료 7일 후</option>
+																													<option value="10">배송완료 10일 후</option>
+																													<option value="14">배송완료 14일 후</option>
+																													<option value="20">배송완료 20일 후</option>
+																													<option value="30">배송완료 30일 후</option>
+																													<option value="60">배송완료 60일 후</option>
+																													<option value="90">배송완료 90일 후</option>
+																											</select><div class="form-control-line"></div>
+												</div>
+												<div class="input-group-content _type_group_code display-none display-m-row" style="width: 200px; display: none;">
+													<select class="form-control _use_auto_change" name="auto_data_use_auto_change_group" style="height: 29px; padding: 0; margin: 0; width: 100%;" onchange="COUPON.changeUseAutoChangeGroup(this.value)">
+														<option value="Y">자동 등급 사용</option>
+														<option value="N">자동 등급 미사용</option>
+													</select><div class="form-control-line"></div>
+												</div>
+												<div class="input-group-content _type_group_code display-none display-m-row" style="display: none;">
+													<div class="form-control" style="z-index: 3; width: 200px;">
+														<a href="javascript:;" data-toggle="dropdown" class="_group_name text-nowrap" style="line-height: 29px; display: block" aria-expanded="false">
+															<span class="_group_name_text">그룹 선택</span>
+															<span class="text-primary _group_count"></span>
+														</a>
+														<ul class="dropdown-menu animation-dock check" role="menu" aria-labelledby="dLabel">
+															<div class="select_group _check_drop_group_list">
+																															</div>
+														</ul>
+													</div><div class="form-control-line"></div>
+												</div>
+																					</div>
+																					<div class="input-group-content checkbox checkbox-styled _type_group_code display-none" style="display: none;">
+												<label>													<input type="checkbox" name="auto_data_is_only_grade_up" value="Y" checked="">
+													<span class="no-margin-bottom">높은 자동 등급으로 변경되었을 때만 발행</span>
+												</label>
+											</div>
+																			</div>
+									<div class="col-sm-10 _type_create display-none">
+																					<div class="radio radio-styled">
+												<label>
+													<input class="_member" type="radio" name="type_create_target" value="member" checked="" onclick="COUPON.changeCouponTypeTarget('type_create_target', 'member');">
+													<span>회원</span>
+												</label>
+											</div>
+											<div class="radio radio-styled">
+												<label>
+													<input class="_is_member" type="radio" name="type_create_target" value="all" onclick="COUPON.changeCouponTypeTarget('type_create_target', 'isMember');">
+													<span>회원 + 비회원</span>
+												</label>
+											</div>
+																			</div>
+								</div>
+								<div class="form-group _type_down display-none" style="">
+									<label class="col-sm-2 control-label">발행수량										<a href="javascript:;" class="text-gray html-popover" tabindex="0" role="button" data-toggle="popover" data-trigger="focus" data-placement="right" title="" data-content="쿠폰의 발급 가능 총 수량을 제한하여 선착순으로 한정된 인원에게 쿠폰을 지급하고 싶을 때 사용합니다. 발행수량을 10개로 지정하면 선착순으로 10명의 회원만 쿠폰을 다운로드 받을 수 있습니다." data-original-title="발행수량">
+											<i class="btm bt-question-circle"></i>
+										</a>
+									</label>
+									<div class="col-sm-10">
+										<div>
+											<div class="input-group input-group-padding">
+												<div class="input-group-content vertical-bottom width-1">
+													<input type="text" class="limit-count form-control" name="limit_count" placeholder="0" disabled="disabled" value="0"><div class="form-control-line"></div>
+												</div>
+												<div class="padding-left-4 checkbox checkbox-styled _is_limit_toggle">
+													<label>
+														<input type="checkbox" name="is_limit" value="N" checked="">
+														<span class="no-margin-bottom">개수제한 없음</span>
+													</label>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+
+								<div class="form-group _type_down display-none">
+									<label class="col-sm-2 control-label">쿠폰 숨김										<a href="javascript:;" class="text-gray html-popover" tabindex="0" role="button" data-toggle="popover" data-trigger="focus" data-placement="right" title="" data-content="마이페이지의 다운로드 쿠폰 리스트와 상품 상세페이지에서 쿠폰을 숨깁니다." data-original-title="쿠폰 숨김">
+											<i class="btm bt-question-circle"></i>
+										</a>
+									</label>
+									<div class="col-sm-10">
+										<div>
+											<div class="input-group input-group-padding">
+												<div class="padding-left-4 checkbox checkbox-styled">
+													<label>
+														<input type="checkbox" name="is_hide" value="Y" onclick="COUPON.toggleAlarmWrap()">
+														<span class="no-margin-bottom">숨김</span>
+													</label>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+																<div class="form-group _alarm_wrap">
+									<label class="col-sm-2 control-label">발행알림										<a href="javascript:;" class="text-gray html-popover" tabindex="0" role="button" data-toggle="popover" data-trigger="focus" data-placement="right" title="" data-content="발행대상에게 웹과 앱 푸시 알림(앱 사용 시에만)을 발송합니다.&lt;br/&gt;&lt;strong&gt;고객 다운로드:&lt;/strong&gt; 관리자가 지정한 쿠폰 사용 시작일에 알림을 발송합니다.&lt;br/&gt;&lt;strong&gt;자동 발행:&lt;/strong&gt; 자동으로 발행된 발행일에 알림을 발송합니다." data-original-title="발행알림">
+											<i class="btm bt-question-circle"></i>
+										</a>
+									</label>
+									<div class="col-sm-10 _type_down display-none">
+										<div class="input-group input-group-padding">
+											<select class="form-control" tabindex="3" name="is_down_alarm" style="width: 200px;">
+												<option value="Y" selected="">사용 시작일에 알림</option>
+												<option value="N">알림 안함</option>
+											</select><div class="form-control-line"></div>
+										</div>
+									</div>
+									<div class="col-sm-10 _type_targeted">
+										<div class="input-group input-group-padding">
+											<select class="form-control" tabindex="3" name="is_targeted_alarm" style="width: 200px;">
+												<option value="Y" selected="">사용 시작일에 알림</option>
+												<option value="N">알림 안함</option>
+											</select><div class="form-control-line"></div>
+										</div>
+									</div>
+									<div class="col-sm-10 _type_auto display-none">
+										<div class="input-group input-group-padding">
+											<select class="form-control" tabindex="3" name="is_auto_alarm" style="width: 200px;">
+												<option value="Y" selected="">발행 시작일에 알림</option>
+												<option value="N">알림 안함</option>
+											</select><div class="form-control-line"></div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="card">
+							<div class="card-head">
+								<header>사용정보</header>
+							</div>
+							<div class="card-body form-horizontal border-top">
+								<div class="form-group">
+									<label for="" class="col-sm-2 control-label required">사용혜택 <i class="required-icon"></i>
+										<a href="javascript:;" class="text-gray html-popover" tabindex="0" role="button" data-toggle="popover" data-trigger="focus" data-placement="top" title="" data-content="쿠폰 사용 시 어떤 혜택을 줄지 지정합니다.&lt;br&gt;&lt;strong&gt;금액 할인&lt;/strong&gt;: 주문 금액에 적용할 할인 금액 또는 할인율을 지정합니다. 할인율(%)은 결제금액에 비례하여 할인 금액이 책정됩니다.&lt;br&gt;&lt;strong&gt;배송비 무료&lt;/strong&gt;: 주문서의 모든 배송비를 무료로 적용합니다. 주문서당 1개의 배송비 무료 쿠폰만 적용할 수 있습니다. 반품/교환 배송비는 면제되지 않습니다. &lt;br&gt;&lt;strong&gt;지정금액&lt;/strong&gt;: 지정된 금액으로 구매할 수 있습니다. 주문서당 지정금액 쿠폰 1개만 적용할 수 있고 다른 쿠폰과 함께 사용할 수 없습니다. 쿠폰 적용 범위는 ‘지정상품'에 대해서 사용할 수 있습니다. 지정 상품이 여러 개라면 가장 판매가가 높은 상품에 자동 적용됩니다." data-original-title="사용혜택"><i class="btm bt-question-circle"></i></a>
+									</label>
+									<div class="col-sm-10">
+										<div class="input-group input-group-padding">
+											<div class="input-group-content m-block" style="width: 200px;">
+												<select class="form-control" tabindex="3" name="benefit_type" id="">
+													<option value="discount">금액 할인</option>
+													<option value="delivery">배송비 무료</option>
+																											<option value="fix_price">지정금액</option>
+																									</select><div class="form-control-line"></div>
+											</div>
+											<div class="_sale_wrap m-block">
+												<div class="input-group-content vertical-bottom" style="width: 120px;">
+													<input type="text" class="form-control" tabindex="9" name="apply_sale_price" maxlength="10"><div class="form-control-line"></div>
+												</div>
+												<div class="input-group-content vertical-bottom width-2" style="width: 80px;">
+													<select name="sale_amount_type" tabindex="10" class="form-control _sale_amount_type">
+																											<option value="price" id="sale_amount_type_price">KRW</option>
+														<option value="percent" id="sale_amount_type_percent" class="" style="display: block;">%</option>
+													</select><div class="form-control-line"></div>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div>
+										<div class="coupon-edit-selected" style="display: none">
+										</div>
+									</div>
+								</div>
+								<div class="form-group _apply_sale_type_max_price" style="display: none;">
+									<label class="col-sm-2 control-label required">최대 할인 금액 <i class="required-icon"></i><a href="javascript:;" class="text-gray html-popover" tabindex="0" role="button" data-toggle="popover" data-trigger="focus" data-placement="right" title="" data-content="정률(%) 할인의 경우 결제금액에 비례하여 할인 금액이 책정됩니다. 배송비 무료 쿠폰의 경우 배송비 정책(지역별 배송비, 무게별 차등 배송비 등)에 따라 할인 금액이 다르게 책정됩니다. 정률(%) 할인과 배송비 무료 혜택 쿠폰에 최대 할인 금액 한도를 설정하여 너무 많은 할인이 되지 않도록 해주는 장치입니다. " data-original-title="최대 할인 금액 "><i class="btm bt-question-circle"></i></a></label>
+									<div class="col-sm-10">
+										<div class="holder">
+											<input type="text" class="form-control" tabindex="11" style="padding-left: 45px; width: 200px;" value="" name="apply_sale_type_max_price"><div class="form-control-line"></div>
+											<span class="form-control-krw text-gray-bright" style="left:0; top:7px;">KRW</span>
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-sm-2 control-label required">최소 주문금액 <i class="required-icon"></i><a href="javascript:;" class="text-gray html-popover" tabindex="0" role="button" data-toggle="popover" data-trigger="focus" data-placement="right" title="" data-content="쿠폰 사용을 위해 필요한 최소 주문금액을 지정합니다. 주문금액은 주문하려는 상품금액의 합계를 의미하며, 즉시/기간할인이 적용되있는 경우 할인이 적용된 상품금액으로 계산합니다." data-original-title="최소 주문금액 "><i class="btm bt-question-circle"></i></a></label>
+									<div class="col-sm-10">
+										<div class="holder">
+											<input type="text" class="form-control" tabindex="12" style="padding-left: 45px; width: 200px;" name="apply_sale_type_minimum_price" maxlength="10"><div class="form-control-line"></div>
+											<span class="form-control-krw text-gray-bright" style="left:0; top:7px">KRW</span>
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-sm-2 control-label">쿠폰 적용 범위 <a href="javascript:;" class="text-gray html-popover" tabindex="0" role="button" data-toggle="popover" data-trigger="focus" data-placement="right" title="" data-content="쿠폰을 사용할 수 있는 상품의 조건을 지정합니다. &lt;br/&gt;· 모든 상품: 모든 상품과 카테고리에 쿠폰을 적용할 수 있습니다.&lt;br/&gt;· 지정 카테고리: 특정 카테고리에 포함된 상품을 구매할 때만 쿠폰을 적용할 수 있습니다.&lt;br/&gt;· 지정 상품: 특정 상품 구매 시에만 쿠폰을 적용할 수 있습니다." data-original-title="쿠폰 적용 범위 "><i class="btm bt-question-circle"></i></a></label>
+									<div class="col-sm-8">
+										<div class="input-group input-group-padding">
+																							<div class="input-group-content vertical-bottom">
+													<select class="form-control" tabindex="8" name="apply_type" style="width: 200px;">
+														<option value="all">모든 상품</option><option value="category">지정 카테고리</option><option value="product">지정 상품</option>													</select><div class="form-control-line"></div>
+												</div>
+																																	<div class="input-group-content vertical-bottom _apply_type" style="padding-right: 15px; display: none;">
+												<div class="form-control" style="z-index: 3; width: 200px;">
+													<a href="javascript:;" data-toggle="dropdown" class="_group_name" style="line-height: 29px; display: block" aria-expanded="false">
+														<span class="_category_name_text"></span>
+														<span class="text-primary _category_count"></span>
+													</a>
+													<ul class="dropdown-menu animation-dock check" role="menu" aria-labelledby="dLabel" onclick="event.stopPropagation()" style="margin-top:3px;">
+														<div class="select_group coupon_category_select_list _check_drop_category_list checkbox-styled">
+															<ul class="checkbox_group_first"><li class="first_parent_list"><label class="first_wrap"><input class="_coupon_checkbox-0" type="checkbox" data-code="s20220818e0cc55678c51c" value="Photography"><span>Photography</span></label></li></ul><ul class="checkbox_group_first"><li class="first_parent_list"><label class="first_wrap"><input class="_coupon_checkbox-1" type="checkbox" data-code="s20220818172ff6637ac85" value="Music"><span>Music</span></label></li></ul><ul class="checkbox_group_first"><li class="first_parent_list"><label class="first_wrap"><input class="_coupon_checkbox-2" type="checkbox" data-code="s20220831b6744f9e6a174" value="Productivity"><span>Productivity</span></label></li></ul><ul class="checkbox_group_first"><li class="first_parent_list"><label class="first_wrap"><input class="_coupon_checkbox-3" type="checkbox" data-code="s20220831d6fb67666de41" value="Marketing"><span>Marketing</span></label></li></ul><ul class="checkbox_group_first"><li class="first_parent_list"><label class="first_wrap"><input class="_coupon_checkbox-4" type="checkbox" data-code="s202208316f552712ad47b" value="Investment"><span>Investment</span></label></li></ul><ul class="checkbox_group_first"><li class="first_parent_list"><label class="first_wrap"><input class="_coupon_checkbox-5" type="checkbox" data-code="s202208316c77f3e6a385a" value="Programming"><span>Programming</span></label></li></ul><ul class="checkbox_group_first"><li class="first_parent_list"><label class="first_wrap"><input class="_coupon_checkbox-6" type="checkbox" data-code="s202208239603deeac4538" value="3D"><span>3D</span></label></li></ul><ul class="checkbox_group_first"><li class="first_parent_list"><label class="first_wrap"><input class="_coupon_checkbox-7" type="checkbox" data-code="s20220822af86ef1af3ea0" value="Writing"><span>Writing</span></label></li></ul><ul class="checkbox_group_first"><li class="first_parent_list"><label class="first_wrap"><input class="_coupon_checkbox-8" type="checkbox" data-code="s20220818589088395d996" value="IT"><span>IT</span></label></li></ul><ul class="checkbox_group_first"><li class="first_parent_list"><label class="first_wrap"><input class="_coupon_checkbox-9" type="checkbox" data-code="s2022081839a7c483700ea" value="Video contents"><span>Video contents</span></label></li></ul><ul class="checkbox_group_first"><li class="first_parent_list"><label class="first_wrap"><input class="_coupon_checkbox-10" type="checkbox" data-code="s20220818c901efcdd8a6c" value="Drawing"><span>Drawing</span></label></li></ul><ul class="checkbox_group_first"><li class="first_parent_list"><label class="first_wrap"><input class="_coupon_checkbox-11" type="checkbox" data-code="s2022081835c965ccb1d83" value="Handicraft"><span>Handicraft</span></label></li></ul><ul class="checkbox_group_first"><li class="first_parent_list"><label class="first_wrap"><input class="_coupon_checkbox-12" type="checkbox" data-code="s2022081874795cc75a0c3" value="Food"><span>Food</span></label></li></ul><ul class="checkbox_group_first"><li class="first_parent_list"><label class="first_wrap"><input class="_coupon_checkbox-13" type="checkbox" data-code="s20220818f0ec92be5e199" value="Design"><span>Design</span></label></li></ul>														</div>
+													</ul>
+												</div><div class="form-control-line"></div>
+											</div>
+										</div>
+										<div class="_product_list" style="display: none;">
+											<div class="btn btn-file btn-sm ink-reaction btn-raised btn-default-bright _product_search_btn" style="margin:8px 0">
+												쿠폰 적용 상품 선택											</div>
+										</div>
+										<div class="_product_list" style="clear: both; display: none;">
+											<div class="shop-table order _product_apply_list"></div>
+										</div>
+									</div>
+								</div>
+								<div class="form-group _excluded_product_form">
+									<label class="col-sm-2 control-label">사용제외 상품 <a href="javascript:;" class="text-gray html-popover" tabindex="0" role="button" data-toggle="popover" data-trigger="focus" data-placement="right" title="" data-content="쿠폰을 적용할 수 없는 상품을 지정합니다. 사용제외 상품이 주문에 포함되어 있더라도 주문서의 총 주문 금액이 최소 주문금액을 충족하면 쿠폰 사용이 가능합니다. 다만, 쿠폰 사용이 가능한 상품에만 할인이 적용됩니다. 배송비 무료 쿠폰은 주문서의 모든 배송비에 적용하기 때문에 사용가능 상품이 주문에 1개라도 포함되어 있으면 배송비 전체가 할인됩니다." data-original-title="사용제외 상품 "><i class="btm bt-question-circle"></i></a></label>
+									<div class="col-sm-8">
+										<div class="btn btn-file btn-sm ink-reaction btn-raised btn-default-bright _excluded_product_search_btn" style="margin:8px 0;">
+											쿠폰 적용 제외 상품 선택										</div>
+										<div class="shop-table order _excluded_product_list"></div>
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-sm-2 control-label">사용기간										<a href="javascript:;" class="text-gray html-popover" tabindex="0" role="button" data-toggle="popover" data-trigger="focus" data-placement="right" title="" data-content="쿠폰의 사용 가능 기간을 지정합니다. &lt;br&gt;&lt;strong&gt;지정 발행&lt;/strong&gt;: 쿠폰 생성일 기준으로 최대 40일까지 사용기간을 설정할 수 있습니다. 미사용된 쿠폰은 사용기간을 초과시 자동 삭제됩니다.&lt;br&gt;&lt;strong&gt;고객 다운로드&lt;/strong&gt;: 기간설정과 만료일을 설정할 수 있습니다. 기간설정 시 사용 시작일과 종료일을 입력하고 만료일 설정 시 다운로드 후 사용기간을 설정합니다. 사용가능기간을 초과한 경우 마이페이지에서 쿠폰을 확인할 수 없고 결제 페이지에서 사용이 불가합니다.&lt;br&gt;&lt;strong&gt;쿠폰코드 입력&lt;/strong&gt;: 사용 시작일과 종료일을 입력합니다. 사용 종료일 이후에는 마이페이지에서 쿠폰을 확인할 수 없고 결제 페이지에서 사용이 불가합니다.&lt;br&gt;&lt;strong&gt;자동 발행&lt;/strong&gt;: 쿠폰 발행일 기준으로 몇일 후까지 사용 가능하게 할지 입력합니다. 발행상태가 종료됨이라도 이미 발행된 쿠폰은 사용기간까지 마이페이지에서 확인할 수 있고 결제 시 사용할 수 있습니다." data-original-title="사용기간">
+											<i class="btm bt-question-circle"></i>
+										</a>
+									</label>
+
+									<div class="col-sm-10">
+										<div class="_duration_type_wrap display-none">
+											<div class="radio-inline radio-styled">
+												<label>
+													<input type="radio" name="duration_type" value="date_range">
+													<span>기간 설정</span>
+												</label>
+											</div>
+											<div class="radio-inline radio-styled">
+												<label>
+													<input type="radio" name="duration_type" value="validity_period">
+													<span>만료일 설정</span>
+												</label>
+											</div>
+										</div>
+										<div class="_calendar_view">
+											<div class="input-group input-group-padding">
+												<div class="m-block">
+													<div class="input-group-content calendar-wrap">
+														<i class="icon-calendar icons"></i>
+														<input class="_calendar_limit form-control" type="text" name="start_date"><div class="form-control-line"></div>
+													</div>
+													<div class="input-group-content">
+														<div style="margin-top: 5px;">~</div>
+													</div>
+													<div class="input-group-content calendar-wrap">
+														<i class="icon-calendar icons _icon_last"></i>
+														<input class="_calendar_limit form-control" type="text" name="end_date"><div class="form-control-line"></div>
+													</div>
+												</div>
+												<div class="padding-left-4 checkbox checkbox-styled _calendar_limit_toggle display-none">
+													<label>
+														<input type="checkbox" name="is_unlimited_date" value="ok">
+														<span>기간제한 없음															<a href="javascript:;" class="text-gray html-popover" tabindex="0" role="button" data-toggle="popover" data-trigger="focus" data-placement="right" title="" data-content="쿠폰의 종료일을 무기한으로 설정하고 싶은 경우 사용합니다." data-original-title="기간제한 없음"><i class="btm bt-question-circle"></i></a></span>
+													</label>
+												</div>
+											</div>
+										</div>
+
+										<div class="_type_auto _validity_period display-none">
+											<div class="input-group input-group-padding">
+												<div class="m-block">
+													<div class="input-group-content vertical-bottom" style="padding-bottom:5px;">
+														<span class="_auto_data_day_limit_prefix">쿠폰이 발행된 날부터</span>
+													</div>
+													<div class="input-group-content vertical-bottom width-1">
+														<input type="text" class="form-control limit-count" name="auto_data_day_limit" value="15" placeholder=""><div class="form-control-line"></div>
+													</div>
+													<div class="input-group-content vertical-bottom" style="padding-bottom:5px;">
+														<span>일 후 까지 사용 가능</span>
+													</div>
+												</div>
+												<div class="padding-left-4 checkbox checkbox-styled _day_limit_toggle m-block">
+													<label>
+														<input class="_is_unlimited_date" type="checkbox" name="is_auto_unlimited_date" value="ok">
+														<span class="no-margin-bottom">기간제한 없음															<a href="javascript:;" class="text-gray html-popover" tabindex="0" role="button" data-toggle="popover" data-trigger="focus" data-placement="right" title="" data-content="쿠폰의 종료일을 무기한으로 설정하고 싶은 경우 사용합니다." data-original-title="기간제한 없음"><i class="btm bt-question-circle"></i></a></span>
+													</label>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="form-group _used_count" style="display: none;">
+									<label class="col-sm-2 control-label">사용횟수										<a href="javascript:;" class="text-gray html-popover" tabindex="0" role="button" data-toggle="popover" data-trigger="focus" data-placement="right" title="" data-content="한 고객이 동일한 쿠폰을 사용 기간 내 설정한 횟수만큼 사용할 수 있습니다. 단, 한 주문에 한번만 적용 가능합니다. 0이나 공백 입력 시 1개로 자동 저장됩니다. &lt;br/&gt;&lt;strong&gt;고객 다운로드:&lt;/strong&gt; 사용 후 소멸되지 않고 사용 종료일 전까지 설정한 횟수만큼 사용 가능합니다.&lt;br/&gt; &lt;strong&gt;자동 발행:&lt;/strong&gt; 사용 후 소멸되지 않고 사용 종료일 전까지 설정한 횟수만큼 사용 가능합니다. &lt;br/&gt;&lt;strong&gt;쿠폰코드 입력:&lt;/strong&gt; 단일 쿠폰코드는 동일 회원이 사용 종료일 전까지 사용 횟수만큼 사용 가능합니다. 여러 쿠폰코드는 다른 쿠폰코드로 사용 횟수만큼 사용 가능합니다. 예를 들어, 단일 쿠폰코드로 DISCOUNT 코드를 사용할 경우 해당 코드로 한 회원이 2번 이상 사용 가능합니다. 여러 쿠폰코드로 SALE1, SALE2가 생성된 경우 SALE1을 2번 이상 사용할 수는 없으나 SALE1, SALE2를 2개의 주문에서 사용할 수는 있습니다." data-original-title="사용횟수"><i class="btm bt-question-circle"></i></a>
+									</label>
+																			<div class="col-sm-10">
+											<div class="input-group input-group-padding member_limit_count">
+												<div class="m-block">
+													<div class="input-group-content vertical-bottom" style="padding-bottom:5px;">
+														<span>동일 회원이 최대</span>
+													</div>
+													<div class="input-group-content vertical-bottom width-1">
+														<input type="text" class="form-control _member_limit_count" name="member_limit_count" value="1"><div class="form-control-line"></div>
+													</div>
+													<div class="input-group-content vertical-bottom" style="padding-bottom:5px;">
+														<span>회 까지 사용 가능</span>
+													</div>
+												</div>
+												<div class="padding-left-4 checkbox checkbox-styled m-block">
+													<label class="_member_limit_toggle">
+														<input class="_is_member_limit" type="checkbox" name="is_duplication" value="ok">
+														<span class="no-margin-bottom">횟수제한 없음 </span>
+													</label>
+												</div>
+											</div>
+										</div>
+																	</div>
+								<div class="form-group">
+									<label class="col-sm-2 control-label">사용 옵션</label>
+									<div class="col-sm-10">
+										<div class="">
+											<div class="checkbox checkbox-styled">
+												<label>
+													<input type="checkbox" name="is_overlap" value="ok">
+													<span>추가 할인 가능 <a href="javascript:;" class="text-gray html-popover" tabindex="0" role="button" data-toggle="popover" data-trigger="focus" data-placement="right" title="" data-content="이미 쿠폰이 적용된 주문에 추가로 쿠폰 할인을 받을 수 있습니다. 이 기능에 체크한 쿠폰과 체크하지 않은 쿠폰이 함께 사용될 경우, 2개 쿠폰 할인이 모두 적용됩니다. 하지만 체크하지 않은 쿠폰끼리는 함께 사용할 수 없습니다. 자칫 상품을 무료 또는 원가 이하로 판매할 수 있기 때문에 주의하여 사용해야 합니다.&lt;br&gt;‘지정금액’ 혜택 선택 시 해당 옵션은 비활성화 됩니다." data-original-title="추가 할인 가능 "><i class="btm bt-question-circle"></i></a></span>
+												</label>
+											</div>
+										</div>
+																			</div>
+								</div>
+							</div>
+						</div>
+					</div>
+고객 다운로드 쿠폰의 구조는 아래와 같습니다.
+
+<div class="col-md-12">
+						<div class="card">
+							<div class="card-head">
+								<header>쿠폰정보</header>
+							</div>
+							<div class="card-body form-horizontal border-top">
+																<div class="form-group">
+									<label class="col-sm-2 control-label required">쿠폰명										<i class="required-icon"></i>
+										<a href="javascript:;" class="text-gray html-popover" tabindex="0" role="button" data-toggle="popover" data-trigger="focus" data-placement="right" title="" data-content="고객에게 표시되는 쿠폰 이름입니다. 쿠폰 생성 후에도 수정 가능합니다." data-original-title="쿠폰명"><i class="btm bt-question-circle"></i></a></label>
+									<div class="col-sm-10">
+										<input type="text" tabindex="1" placeholder="예: 사이트 오픈 1주년 할인 쿠폰" autocomplete="off" class="form-control" name="name" maxlength="80"><div class="form-control-line"></div>
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-sm-2 control-label">쿠폰형식										<a href="javascript:;" class="text-gray html-popover" tabindex="0" role="button" data-toggle="popover" data-trigger="focus" data-placement="right" title="" data-content="&lt;p&gt;쿠폰 발행 방식을 선택합니다.&lt;/p&gt;&lt;p&gt;&lt;strong&gt;지정 발행: &lt;/strong&gt;발행대상을 지정하여 일괄 발행하는 쿠폰입니다. 그룹발행시 쿠폰 생성시점의 회원을 대상으로 발행됩니다. 발행 후 설정하신 사용기간에 맞춰 고객이 마이페이지에서 쿠폰을 확인할 수 있고, 결제 페이지에서 쿠폰을 사용할 수 있습니다. 발급대상 회원수에 따라 최대 30분까지 발급시간이 소요될 수 있습니다.&lt;/p&gt; &lt;p&gt;&lt;strong&gt;고객 다운로드:&lt;/strong&gt; 쿠폰을 발행하면 고객이 마이페이지 또는 쿠폰 다운로드 URL을 통해 받을 수 있습니다. 쿠폰 다운로드 URL은 쿠폰 목록에서 확인 및 복사할 수 있습니다.&lt;/p&gt;&lt;p&gt;&lt;strong&gt;자동 발행:&lt;/strong&gt; 회원가입, 첫 주문완료 등 특정 조건을 만족하면 쿠폰이 자동 발행됩니다. 고객이 마이페이지에서 쿠폰을 확인할 수 있고, 결제 페이지에서 쿠폰을 사용할 수 있습니다.&lt;/p&gt;&lt;p&gt;&lt;strong&gt;쿠폰코드 입력:&lt;/strong&gt; 판매자가 쿠폰 코드를 생성하면 고객은 결제 페이지에서 코드를 입력해 사용합니다. 단, 1개 코드만 입력 가능합니다.&lt;/p&gt;" data-original-title="쿠폰형식">
+											<i class="btm bt-question-circle"></i>
+										</a>
+									</label>
+									<div class="col-sm-10" style="">
+										<div class="radio radio-styled">
+											<label>
+												<input type="radio" name="type" value="targeted" checked="">
+												<span>지정 발행</span>
+											</label>
+										</div>
+										<div class="radio radio-styled">
+											<label>
+												<input type="radio" name="type" value="down">
+												<span>고객 다운로드</span>
+											</label>
+										</div>
+										<div class="radio radio-styled">
+											<label>
+												<input type="radio" name="type" value="auto">
+												<span>자동 발행</span>
+											</label>
+										</div>
+										<div class="radio radio-styled">
+											<label>
+												<input type="radio" name="type" value="create">
+												<span>쿠폰코드 생성</span>
+											</label>
+										</div>
+									</div>
+																	</div>
+																<div class="form-group _type_is_mult_coupon display-none" style="display: none;">
+									<label class="col-sm-2 control-label">쿠폰코드</label>
+									<div class="col-sm-10">
+										<div class="input-group input-group-padding">
+																							<div class="input-group-content vertical-bottom">
+													<select class="form-control" tabindex="3" name="type_is_mult_coupon" style="width: 200px;">
+														<option value="N" selected="">단일 쿠폰코드</option>
+														<option value="Y">여러 쿠폰코드</option>
+													</select><div class="form-control-line"></div>
+												</div>
+																																															<div class="input-group-content vertical-bottom width-7 _type_coupon_code" style="display: none;">
+														<input class="form-control" tabindex="7" type="text" placeholder="쿠폰코드 입력 (입력하지 않으면 랜덤 생성)" name="type_coupon_code"><div class="form-control-line"></div>
+													</div>
+																																			<div class="input-group-content vertical-bottom width-4 _type_coupon_create_count display-none" style="display: none;">
+													<input type="text" class="form-control" tabindex="7" placeholder="발급수량(최대 10000개)" name="type_coupon_create_count"><div class="form-control-line"></div>
+												</div>
+																					</div>
+									</div>
+								</div>
+								<div class="form-group _type_target" style="display: block;">
+									<label class="col-sm-2 control-label">발행대상										<a href="javascript:;" class="text-gray html-popover" tabindex="0" role="button" data-toggle="popover" data-trigger="focus" data-placement="right" title="" data-content="&lt;p&gt;쿠폰 발행 대상을 지정합니다.&lt;/p&gt;&lt;p&gt;&lt;strong&gt;고객 다운로드&lt;/strong&gt;&lt;/p&gt;&lt;ul class='description-list'&gt;&lt;li&gt;전체회원: 모든 회원에게 발행합니다.&lt;/li&gt;&lt;li&gt;특정 회원그룹에게 발행합니다. 회원그룹은 &lt;a href='/admin/member/list' target='_blank' class='text-primary'&gt;사용자 목록&lt;/a&gt;에서 관리할 수 있습니다.&lt;/li&gt;&lt;li&gt;고객 행동 관리 그룹: &lt;a href='/admin/crm_marketing' target='_blank' class='text-primary'&gt;고객 행동 관리&lt;/a&gt;에서 생성한 그룹을 지정합니다.&lt;/li&gt;&lt;li&gt;개별회원: 단일 회원을 특정하여 쿠폰을 발행합니다.&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;strong&gt;자동 발행&lt;/strong&gt;&lt;/p&gt;&lt;ul class='description-list'&gt;&lt;li&gt;첫 회원가입: 신규 가입 회원에게 쿠폰 발행합니다. 같은 계정으로 재가입 하거나 동일 본인인증 데이터로 재가입 시 쿠폰이 발행되지 않습니다.&lt;/li&gt;&lt;li&gt;첫 주문완료: 회원의 첫 주문 배송완료일의 23:00 에 지급 됩니다. 부분취소 등으로 인하여 부분 배송완료된 주문이 있는 경우에도 발행됩니다. 단, 동일인(동일 계정, 이메일, 본인인증)이 재주문하거나 구매완료전 전체취소시 쿠폰이 발행되지 않습니다. 첫 주문완료 후 반품/교환 신청 후 다시 쿠폰 발급을 막으려면 쇼핑 &gt; &lt;a href='/admin/shopping/config' target='_blank' class='text-primary'&gt;환경설정&lt;/a&gt;에서 반품/교환 가능 기간을 무제한이 아닌 특정 기간으로 사용을 권장합니다.&lt;/li&gt;&lt;li&gt;생일: 생일을 맞은 회원이 있을 때 쿠폰을 발행합니다. [환경설정 &gt; 회원가입·그룹·등급 &gt; 가입 폼 관리]에서 생년월일을 기준으로 판단합니다. 생일 정보 변경 후 동일한 쿠폰이 재발행 되는 것을 막기 위해 1년에 한번만 발행 됩니다. 생일 쿠폰을 만든 다음날부터 발행이 시작됩니다.&lt;/li&gt;&lt;li&gt;쇼핑등급 변경: 선택한 쇼핑등급으로 변경될 때 쿠폰을 발행합니다. 이미 해당 등급에 속한 회원에게는 발행되지 않습니다. 높은 등급으로 변경되는 경우만 쿠폰을 발행하고 싶으면, ‘높은 자동 등급으로 변경되었을 때만 발행’ 옵션을 사용하세요.&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;strong&gt;쿠폰코드 생성&lt;/strong&gt;&lt;/p&gt;&lt;ul class='description-list'&gt;&lt;li&gt;회원: 모든 회원이 결제 시 사용 가능합니다.&lt;/li&gt;&lt;li&gt;회원+비회원: 회원과 비회원 모두 결제시 사용 가능합니다.&lt;/li&gt;&lt;/ul&gt;" data-original-title="발행대상"><i class="btm bt-question-circle"></i></a></label>
+									<div class="col-sm-10 _type_down">
+										<div class="input-group input-group-padding">
+			<div class="input-group-content">
+			<select class="form-control" tabindex="3" name="type_down_target" style="width: 200px;" onchange="COUPON.changeCouponTypeTarget('type_down_target');">
+				<option value="all">전체회원</option><option value="group">지정그룹</option><option value="specific_member">개별회원</option>			</select><div class="form-control-line"></div>
+		</div>
+
+		<div class="input-group-content _type_group_code _type_input display-none display-m-row" style="display: none;">
+			<div class="form-control" style="z-index: 3; width: 200px;">
+				<a href="javascript:;" data-toggle="dropdown" class="_group_name text-nowrap" style="line-height: 29px; display: block" aria-expanded="false">
+					<span class="_group_name_text">그룹 선택</span>
+					<span class="text-primary _group_count"></span>
+				</a>
+				<ul class="dropdown-menu animation-dock check" role="menu" aria-labelledby="dLabel">
+					<div class="select_group _check_drop_group_list">
+											</div>
+				</ul>
+			</div><div class="form-control-line"></div>
+		</div>
+
+		<div class="input-group-content _type_crm _type_input display-none display-m-row" style="display: none;">
+			<div class="form-control" style="z-index: 3; width: 200px;">
+				<a href="javascript:;" data-toggle="dropdown" class="_group_name text-nowrap" style="line-height: 29px; display: block" aria-expanded="false">
+					<span class="_group_name_text">그룹 선택</span>
+					<span class="text-primary _group_count"></span>
+				</a>
+				<ul class="dropdown-menu animation-dock check" role="menu" aria-labelledby="dLabel">
+					<div class="select_group _check_drop_group_list">
+											</div>
+				</ul>
+			</div><div class="form-control-line"></div>
+		</div>
+
+    <div class="input-group-content display-none _type_input vertical-bottom tw-w-[200px] _type_specific_member_id" style="display: none;">
+      <label>
+        <input class="form-control" type="text" placeholder="회원 ID를 입력해주세요." name="type_specific_member_id"><div class="form-control-line"></div>
+      </label>
+    </div>
+
+		</div>									</div>
+									<div class="col-sm-10 _type_targeted display-none">
+										<div class="input-group input-group-padding">
+			<div class="input-group-content">
+			<select class="form-control" tabindex="3" name="type_targeted_target" style="width: 200px;" onchange="COUPON.changeCouponTypeTarget('type_targeted_target');">
+				<option value="all">전체회원</option><option value="group">지정그룹</option><option value="specific_member">개별회원</option>			</select><div class="form-control-line"></div>
+		</div>
+
+		<div class="input-group-content _type_group_code _type_input display-none display-m-row" style="display: none;">
+			<div class="form-control" style="z-index: 3; width: 200px;">
+				<a href="javascript:;" data-toggle="dropdown" class="_group_name text-nowrap" style="line-height: 29px; display: block" aria-expanded="false">
+					<span class="_group_name_text">그룹 선택</span>
+					<span class="text-primary _group_count"></span>
+				</a>
+				<ul class="dropdown-menu animation-dock check" role="menu" aria-labelledby="dLabel">
+					<div class="select_group _check_drop_group_list">
+											</div>
+				</ul>
+			</div><div class="form-control-line"></div>
+		</div>
+
+		<div class="input-group-content _type_crm _type_input display-none display-m-row" style="display: none;">
+			<div class="form-control" style="z-index: 3; width: 200px;">
+				<a href="javascript:;" data-toggle="dropdown" class="_group_name text-nowrap" style="line-height: 29px; display: block" aria-expanded="false">
+					<span class="_group_name_text">그룹 선택</span>
+					<span class="text-primary _group_count"></span>
+				</a>
+				<ul class="dropdown-menu animation-dock check" role="menu" aria-labelledby="dLabel">
+					<div class="select_group _check_drop_group_list">
+											</div>
+				</ul>
+			</div><div class="form-control-line"></div>
+		</div>
+
+    <div class="input-group-content display-none _type_input vertical-bottom tw-w-[200px] _type_specific_member_id" style="display: none;">
+      <label>
+        <input class="form-control" type="text" placeholder="회원 ID를 입력해주세요." name="type_specific_member_id"><div class="form-control-line"></div>
+      </label>
+    </div>
+
+		</div>									</div>
+									<div class="col-sm-10 _type_auto display-none">
+										<div class="input-group input-group-padding">
+																							<div class="input-group-content">
+													<select name="type_auto_target" class="form-control" style="width: 200px" onchange="COUPON.changeCouponTypeTarget('type_auto_target');">
+														<option value="join" selected="">첫 회원가입</option>
+														<option value="order">첫 주문완료</option>
+														<option value="birthday">생일</option>
+														<option value="grade_change">쇼핑등급 변경</option>
+													</select><div class="form-control-line"></div>
+												</div>
+												<div class="input-group-content _auto_order_list display-none">
+													<select class="form-control" name="auto_data_order_type" style="width: 200px">
+
+																													<option value="1">배송완료 1일 후</option>
+																													<option value="2">배송완료 2일 후</option>
+																													<option value="3">배송완료 3일 후</option>
+																													<option value="4">배송완료 4일 후</option>
+																													<option value="5">배송완료 5일 후</option>
+																													<option value="7">배송완료 7일 후</option>
+																													<option value="10">배송완료 10일 후</option>
+																													<option value="14">배송완료 14일 후</option>
+																													<option value="20">배송완료 20일 후</option>
+																													<option value="30">배송완료 30일 후</option>
+																													<option value="60">배송완료 60일 후</option>
+																													<option value="90">배송완료 90일 후</option>
+																											</select><div class="form-control-line"></div>
+												</div>
+												<div class="input-group-content _type_group_code display-none display-m-row" style="width: 200px; display: none;">
+													<select class="form-control _use_auto_change" name="auto_data_use_auto_change_group" style="height: 29px; padding: 0; margin: 0; width: 100%;" onchange="COUPON.changeUseAutoChangeGroup(this.value)">
+														<option value="Y">자동 등급 사용</option>
+														<option value="N">자동 등급 미사용</option>
+													</select><div class="form-control-line"></div>
+												</div>
+												<div class="input-group-content _type_group_code display-none display-m-row" style="display: none;">
+													<div class="form-control" style="z-index: 3; width: 200px;">
+														<a href="javascript:;" data-toggle="dropdown" class="_group_name text-nowrap" style="line-height: 29px; display: block" aria-expanded="false">
+															<span class="_group_name_text">그룹 선택</span>
+															<span class="text-primary _group_count"></span>
+														</a>
+														<ul class="dropdown-menu animation-dock check" role="menu" aria-labelledby="dLabel">
+															<div class="select_group _check_drop_group_list">
+																															</div>
+														</ul>
+													</div><div class="form-control-line"></div>
+												</div>
+																					</div>
+																					<div class="input-group-content checkbox checkbox-styled _type_group_code display-none" style="display: none;">
+												<label>													<input type="checkbox" name="auto_data_is_only_grade_up" value="Y" checked="">
+													<span class="no-margin-bottom">높은 자동 등급으로 변경되었을 때만 발행</span>
+												</label>
+											</div>
+																			</div>
+									<div class="col-sm-10 _type_create display-none">
+																					<div class="radio radio-styled">
+												<label>
+													<input class="_member" type="radio" name="type_create_target" value="member" checked="" onclick="COUPON.changeCouponTypeTarget('type_create_target', 'member');">
+													<span>회원</span>
+												</label>
+											</div>
+											<div class="radio radio-styled">
+												<label>
+													<input class="_is_member" type="radio" name="type_create_target" value="all" onclick="COUPON.changeCouponTypeTarget('type_create_target', 'isMember');">
+													<span>회원 + 비회원</span>
+												</label>
+											</div>
+																			</div>
+								</div>
+								<div class="form-group _type_down" style="">
+									<label class="col-sm-2 control-label">발행수량										<a href="javascript:;" class="text-gray html-popover" tabindex="0" role="button" data-toggle="popover" data-trigger="focus" data-placement="right" title="" data-content="쿠폰의 발급 가능 총 수량을 제한하여 선착순으로 한정된 인원에게 쿠폰을 지급하고 싶을 때 사용합니다. 발행수량을 10개로 지정하면 선착순으로 10명의 회원만 쿠폰을 다운로드 받을 수 있습니다." data-original-title="발행수량">
+											<i class="btm bt-question-circle"></i>
+										</a>
+									</label>
+									<div class="col-sm-10">
+										<div>
+											<div class="input-group input-group-padding">
+												<div class="input-group-content vertical-bottom width-1">
+													<input type="text" class="limit-count form-control" name="limit_count" placeholder="0" disabled="disabled" value="0"><div class="form-control-line"></div>
+												</div>
+												<div class="padding-left-4 checkbox checkbox-styled _is_limit_toggle">
+													<label>
+														<input type="checkbox" name="is_limit" value="N" checked="">
+														<span class="no-margin-bottom">개수제한 없음</span>
+													</label>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+
+								<div class="form-group _type_down">
+									<label class="col-sm-2 control-label">쿠폰 숨김										<a href="javascript:;" class="text-gray html-popover" tabindex="0" role="button" data-toggle="popover" data-trigger="focus" data-placement="right" title="" data-content="마이페이지의 다운로드 쿠폰 리스트와 상품 상세페이지에서 쿠폰을 숨깁니다." data-original-title="쿠폰 숨김">
+											<i class="btm bt-question-circle"></i>
+										</a>
+									</label>
+									<div class="col-sm-10">
+										<div>
+											<div class="input-group input-group-padding">
+												<div class="padding-left-4 checkbox checkbox-styled">
+													<label>
+														<input type="checkbox" name="is_hide" value="Y" onclick="COUPON.toggleAlarmWrap()">
+														<span class="no-margin-bottom">숨김</span>
+													</label>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+																<div class="form-group _alarm_wrap">
+									<label class="col-sm-2 control-label">발행알림										<a href="javascript:;" class="text-gray html-popover" tabindex="0" role="button" data-toggle="popover" data-trigger="focus" data-placement="right" title="" data-content="발행대상에게 웹과 앱 푸시 알림(앱 사용 시에만)을 발송합니다.&lt;br/&gt;&lt;strong&gt;고객 다운로드:&lt;/strong&gt; 관리자가 지정한 쿠폰 사용 시작일에 알림을 발송합니다.&lt;br/&gt;&lt;strong&gt;자동 발행:&lt;/strong&gt; 자동으로 발행된 발행일에 알림을 발송합니다." data-original-title="발행알림">
+											<i class="btm bt-question-circle"></i>
+										</a>
+									</label>
+									<div class="col-sm-10 _type_down">
+										<div class="input-group input-group-padding">
+											<select class="form-control" tabindex="3" name="is_down_alarm" style="width: 200px;">
+												<option value="Y" selected="">사용 시작일에 알림</option>
+												<option value="N">알림 안함</option>
+											</select><div class="form-control-line"></div>
+										</div>
+									</div>
+									<div class="col-sm-10 _type_targeted display-none">
+										<div class="input-group input-group-padding">
+											<select class="form-control" tabindex="3" name="is_targeted_alarm" style="width: 200px;">
+												<option value="Y" selected="">사용 시작일에 알림</option>
+												<option value="N">알림 안함</option>
+											</select><div class="form-control-line"></div>
+										</div>
+									</div>
+									<div class="col-sm-10 _type_auto display-none">
+										<div class="input-group input-group-padding">
+											<select class="form-control" tabindex="3" name="is_auto_alarm" style="width: 200px;">
+												<option value="Y" selected="">발행 시작일에 알림</option>
+												<option value="N">알림 안함</option>
+											</select><div class="form-control-line"></div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="card">
+							<div class="card-head">
+								<header>사용정보</header>
+							</div>
+							<div class="card-body form-horizontal border-top">
+								<div class="form-group">
+									<label for="" class="col-sm-2 control-label required">사용혜택 <i class="required-icon"></i>
+										<a href="javascript:;" class="text-gray html-popover" tabindex="0" role="button" data-toggle="popover" data-trigger="focus" data-placement="top" title="" data-content="쿠폰 사용 시 어떤 혜택을 줄지 지정합니다.&lt;br&gt;&lt;strong&gt;금액 할인&lt;/strong&gt;: 주문 금액에 적용할 할인 금액 또는 할인율을 지정합니다. 할인율(%)은 결제금액에 비례하여 할인 금액이 책정됩니다.&lt;br&gt;&lt;strong&gt;배송비 무료&lt;/strong&gt;: 주문서의 모든 배송비를 무료로 적용합니다. 주문서당 1개의 배송비 무료 쿠폰만 적용할 수 있습니다. 반품/교환 배송비는 면제되지 않습니다. &lt;br&gt;&lt;strong&gt;지정금액&lt;/strong&gt;: 지정된 금액으로 구매할 수 있습니다. 주문서당 지정금액 쿠폰 1개만 적용할 수 있고 다른 쿠폰과 함께 사용할 수 없습니다. 쿠폰 적용 범위는 ‘지정상품'에 대해서 사용할 수 있습니다. 지정 상품이 여러 개라면 가장 판매가가 높은 상품에 자동 적용됩니다." data-original-title="사용혜택"><i class="btm bt-question-circle"></i></a>
+									</label>
+									<div class="col-sm-10">
+										<div class="input-group input-group-padding">
+											<div class="input-group-content m-block" style="width: 200px;">
+												<select class="form-control" tabindex="3" name="benefit_type" id="">
+													<option value="discount">금액 할인</option>
+													<option value="delivery">배송비 무료</option>
+																											<option value="fix_price">지정금액</option>
+																									</select><div class="form-control-line"></div>
+											</div>
+											<div class="_sale_wrap m-block">
+												<div class="input-group-content vertical-bottom" style="width: 120px;">
+													<input type="text" class="form-control" tabindex="9" name="apply_sale_price" maxlength="10"><div class="form-control-line"></div>
+												</div>
+												<div class="input-group-content vertical-bottom width-2" style="width: 80px;">
+													<select name="sale_amount_type" tabindex="10" class="form-control _sale_amount_type">
+																											<option value="price" id="sale_amount_type_price">KRW</option>
+														<option value="percent" id="sale_amount_type_percent" class="" style="display: block;">%</option>
+													</select><div class="form-control-line"></div>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div>
+										<div class="coupon-edit-selected" style="display: none">
+										</div>
+									</div>
+								</div>
+								<div class="form-group _apply_sale_type_max_price" style="display: none;">
+									<label class="col-sm-2 control-label required">최대 할인 금액 <i class="required-icon"></i><a href="javascript:;" class="text-gray html-popover" tabindex="0" role="button" data-toggle="popover" data-trigger="focus" data-placement="right" title="" data-content="정률(%) 할인의 경우 결제금액에 비례하여 할인 금액이 책정됩니다. 배송비 무료 쿠폰의 경우 배송비 정책(지역별 배송비, 무게별 차등 배송비 등)에 따라 할인 금액이 다르게 책정됩니다. 정률(%) 할인과 배송비 무료 혜택 쿠폰에 최대 할인 금액 한도를 설정하여 너무 많은 할인이 되지 않도록 해주는 장치입니다. " data-original-title="최대 할인 금액 "><i class="btm bt-question-circle"></i></a></label>
+									<div class="col-sm-10">
+										<div class="holder">
+											<input type="text" class="form-control" tabindex="11" style="padding-left: 45px; width: 200px;" value="" name="apply_sale_type_max_price"><div class="form-control-line"></div>
+											<span class="form-control-krw text-gray-bright" style="left:0; top:7px;">KRW</span>
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-sm-2 control-label required">최소 주문금액 <i class="required-icon"></i><a href="javascript:;" class="text-gray html-popover" tabindex="0" role="button" data-toggle="popover" data-trigger="focus" data-placement="right" title="" data-content="쿠폰 사용을 위해 필요한 최소 주문금액을 지정합니다. 주문금액은 주문하려는 상품금액의 합계를 의미하며, 즉시/기간할인이 적용되있는 경우 할인이 적용된 상품금액으로 계산합니다." data-original-title="최소 주문금액 "><i class="btm bt-question-circle"></i></a></label>
+									<div class="col-sm-10">
+										<div class="holder">
+											<input type="text" class="form-control" tabindex="12" style="padding-left: 45px; width: 200px;" name="apply_sale_type_minimum_price" maxlength="10"><div class="form-control-line"></div>
+											<span class="form-control-krw text-gray-bright" style="left:0; top:7px">KRW</span>
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-sm-2 control-label">쿠폰 적용 범위 <a href="javascript:;" class="text-gray html-popover" tabindex="0" role="button" data-toggle="popover" data-trigger="focus" data-placement="right" title="" data-content="쿠폰을 사용할 수 있는 상품의 조건을 지정합니다. &lt;br/&gt;· 모든 상품: 모든 상품과 카테고리에 쿠폰을 적용할 수 있습니다.&lt;br/&gt;· 지정 카테고리: 특정 카테고리에 포함된 상품을 구매할 때만 쿠폰을 적용할 수 있습니다.&lt;br/&gt;· 지정 상품: 특정 상품 구매 시에만 쿠폰을 적용할 수 있습니다." data-original-title="쿠폰 적용 범위 "><i class="btm bt-question-circle"></i></a></label>
+									<div class="col-sm-8">
+										<div class="input-group input-group-padding">
+																							<div class="input-group-content vertical-bottom">
+													<select class="form-control" tabindex="8" name="apply_type" style="width: 200px;">
+														<option value="all">모든 상품</option><option value="category">지정 카테고리</option><option value="product">지정 상품</option>													</select><div class="form-control-line"></div>
+												</div>
+																																	<div class="input-group-content vertical-bottom _apply_type" style="padding-right: 15px; display: none;">
+												<div class="form-control" style="z-index: 3; width: 200px;">
+													<a href="javascript:;" data-toggle="dropdown" class="_group_name" style="line-height: 29px; display: block" aria-expanded="false">
+														<span class="_category_name_text"></span>
+														<span class="text-primary _category_count"></span>
+													</a>
+													<ul class="dropdown-menu animation-dock check" role="menu" aria-labelledby="dLabel" onclick="event.stopPropagation()" style="margin-top:3px;">
+														<div class="select_group coupon_category_select_list _check_drop_category_list checkbox-styled">
+															<ul class="checkbox_group_first"><li class="first_parent_list"><label class="first_wrap"><input class="_coupon_checkbox-0" type="checkbox" data-code="s20220818e0cc55678c51c" value="Photography"><span>Photography</span></label></li></ul><ul class="checkbox_group_first"><li class="first_parent_list"><label class="first_wrap"><input class="_coupon_checkbox-1" type="checkbox" data-code="s20220818172ff6637ac85" value="Music"><span>Music</span></label></li></ul><ul class="checkbox_group_first"><li class="first_parent_list"><label class="first_wrap"><input class="_coupon_checkbox-2" type="checkbox" data-code="s20220831b6744f9e6a174" value="Productivity"><span>Productivity</span></label></li></ul><ul class="checkbox_group_first"><li class="first_parent_list"><label class="first_wrap"><input class="_coupon_checkbox-3" type="checkbox" data-code="s20220831d6fb67666de41" value="Marketing"><span>Marketing</span></label></li></ul><ul class="checkbox_group_first"><li class="first_parent_list"><label class="first_wrap"><input class="_coupon_checkbox-4" type="checkbox" data-code="s202208316f552712ad47b" value="Investment"><span>Investment</span></label></li></ul><ul class="checkbox_group_first"><li class="first_parent_list"><label class="first_wrap"><input class="_coupon_checkbox-5" type="checkbox" data-code="s202208316c77f3e6a385a" value="Programming"><span>Programming</span></label></li></ul><ul class="checkbox_group_first"><li class="first_parent_list"><label class="first_wrap"><input class="_coupon_checkbox-6" type="checkbox" data-code="s202208239603deeac4538" value="3D"><span>3D</span></label></li></ul><ul class="checkbox_group_first"><li class="first_parent_list"><label class="first_wrap"><input class="_coupon_checkbox-7" type="checkbox" data-code="s20220822af86ef1af3ea0" value="Writing"><span>Writing</span></label></li></ul><ul class="checkbox_group_first"><li class="first_parent_list"><label class="first_wrap"><input class="_coupon_checkbox-8" type="checkbox" data-code="s20220818589088395d996" value="IT"><span>IT</span></label></li></ul><ul class="checkbox_group_first"><li class="first_parent_list"><label class="first_wrap"><input class="_coupon_checkbox-9" type="checkbox" data-code="s2022081839a7c483700ea" value="Video contents"><span>Video contents</span></label></li></ul><ul class="checkbox_group_first"><li class="first_parent_list"><label class="first_wrap"><input class="_coupon_checkbox-10" type="checkbox" data-code="s20220818c901efcdd8a6c" value="Drawing"><span>Drawing</span></label></li></ul><ul class="checkbox_group_first"><li class="first_parent_list"><label class="first_wrap"><input class="_coupon_checkbox-11" type="checkbox" data-code="s2022081835c965ccb1d83" value="Handicraft"><span>Handicraft</span></label></li></ul><ul class="checkbox_group_first"><li class="first_parent_list"><label class="first_wrap"><input class="_coupon_checkbox-12" type="checkbox" data-code="s2022081874795cc75a0c3" value="Food"><span>Food</span></label></li></ul><ul class="checkbox_group_first"><li class="first_parent_list"><label class="first_wrap"><input class="_coupon_checkbox-13" type="checkbox" data-code="s20220818f0ec92be5e199" value="Design"><span>Design</span></label></li></ul>														</div>
+													</ul>
+												</div><div class="form-control-line"></div>
+											</div>
+										</div>
+										<div class="_product_list" style="display: none;">
+											<div class="btn btn-file btn-sm ink-reaction btn-raised btn-default-bright _product_search_btn" style="margin:8px 0">
+												쿠폰 적용 상품 선택											</div>
+										</div>
+										<div class="_product_list" style="clear: both; display: none;">
+											<div class="shop-table order _product_apply_list"></div>
+										</div>
+									</div>
+								</div>
+								<div class="form-group _excluded_product_form">
+									<label class="col-sm-2 control-label">사용제외 상품 <a href="javascript:;" class="text-gray html-popover" tabindex="0" role="button" data-toggle="popover" data-trigger="focus" data-placement="right" title="" data-content="쿠폰을 적용할 수 없는 상품을 지정합니다. 사용제외 상품이 주문에 포함되어 있더라도 주문서의 총 주문 금액이 최소 주문금액을 충족하면 쿠폰 사용이 가능합니다. 다만, 쿠폰 사용이 가능한 상품에만 할인이 적용됩니다. 배송비 무료 쿠폰은 주문서의 모든 배송비에 적용하기 때문에 사용가능 상품이 주문에 1개라도 포함되어 있으면 배송비 전체가 할인됩니다." data-original-title="사용제외 상품 "><i class="btm bt-question-circle"></i></a></label>
+									<div class="col-sm-8">
+										<div class="btn btn-file btn-sm ink-reaction btn-raised btn-default-bright _excluded_product_search_btn" style="margin:8px 0;">
+											쿠폰 적용 제외 상품 선택										</div>
+										<div class="shop-table order _excluded_product_list"></div>
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-sm-2 control-label">사용기간										<a href="javascript:;" class="text-gray html-popover" tabindex="0" role="button" data-toggle="popover" data-trigger="focus" data-placement="right" title="" data-content="쿠폰의 사용 가능 기간을 지정합니다. &lt;br&gt;&lt;strong&gt;지정 발행&lt;/strong&gt;: 쿠폰 생성일 기준으로 최대 40일까지 사용기간을 설정할 수 있습니다. 미사용된 쿠폰은 사용기간을 초과시 자동 삭제됩니다.&lt;br&gt;&lt;strong&gt;고객 다운로드&lt;/strong&gt;: 기간설정과 만료일을 설정할 수 있습니다. 기간설정 시 사용 시작일과 종료일을 입력하고 만료일 설정 시 다운로드 후 사용기간을 설정합니다. 사용가능기간을 초과한 경우 마이페이지에서 쿠폰을 확인할 수 없고 결제 페이지에서 사용이 불가합니다.&lt;br&gt;&lt;strong&gt;쿠폰코드 입력&lt;/strong&gt;: 사용 시작일과 종료일을 입력합니다. 사용 종료일 이후에는 마이페이지에서 쿠폰을 확인할 수 없고 결제 페이지에서 사용이 불가합니다.&lt;br&gt;&lt;strong&gt;자동 발행&lt;/strong&gt;: 쿠폰 발행일 기준으로 몇일 후까지 사용 가능하게 할지 입력합니다. 발행상태가 종료됨이라도 이미 발행된 쿠폰은 사용기간까지 마이페이지에서 확인할 수 있고 결제 시 사용할 수 있습니다." data-original-title="사용기간">
+											<i class="btm bt-question-circle"></i>
+										</a>
+									</label>
+
+									<div class="col-sm-10">
+										<div class="_duration_type_wrap">
+											<div class="radio-inline radio-styled">
+												<label>
+													<input type="radio" name="duration_type" value="date_range">
+													<span>기간 설정</span>
+												</label>
+											</div>
+											<div class="radio-inline radio-styled">
+												<label>
+													<input type="radio" name="duration_type" value="validity_period">
+													<span>만료일 설정</span>
+												</label>
+											</div>
+										</div>
+										<div class="_calendar_view">
+											<div class="input-group input-group-padding">
+												<div class="m-block">
+													<div class="input-group-content calendar-wrap">
+														<i class="icon-calendar icons"></i>
+														<input class="_calendar_limit form-control" type="text" name="start_date"><div class="form-control-line"></div>
+													</div>
+													<div class="input-group-content">
+														<div style="margin-top: 5px;">~</div>
+													</div>
+													<div class="input-group-content calendar-wrap">
+														<i class="icon-calendar icons _icon_last"></i>
+														<input class="_calendar_limit form-control" type="text" name="end_date"><div class="form-control-line"></div>
+													</div>
+												</div>
+												<div class="padding-left-4 checkbox checkbox-styled _calendar_limit_toggle m-block">
+													<label>
+														<input type="checkbox" name="is_unlimited_date" value="ok">
+														<span>기간제한 없음															<a href="javascript:;" class="text-gray html-popover" tabindex="0" role="button" data-toggle="popover" data-trigger="focus" data-placement="right" title="" data-content="쿠폰의 종료일을 무기한으로 설정하고 싶은 경우 사용합니다." data-original-title="기간제한 없음"><i class="btm bt-question-circle"></i></a></span>
+													</label>
+												</div>
+											</div>
+										</div>
+
+										<div class="_type_auto _validity_period display-none">
+											<div class="input-group input-group-padding">
+												<div class="m-block">
+													<div class="input-group-content vertical-bottom" style="padding-bottom:5px;">
+														<span class="_auto_data_day_limit_prefix">다운로드 일로부터</span>
+													</div>
+													<div class="input-group-content vertical-bottom width-1">
+														<input type="text" class="form-control limit-count" name="auto_data_day_limit" value="15" placeholder=""><div class="form-control-line"></div>
+													</div>
+													<div class="input-group-content vertical-bottom" style="padding-bottom:5px;">
+														<span>일 후 까지 사용 가능</span>
+													</div>
+												</div>
+												<div class="padding-left-4 checkbox checkbox-styled _day_limit_toggle m-block">
+													<label>
+														<input class="_is_unlimited_date" type="checkbox" name="is_auto_unlimited_date" value="ok">
+														<span class="no-margin-bottom">기간제한 없음															<a href="javascript:;" class="text-gray html-popover" tabindex="0" role="button" data-toggle="popover" data-trigger="focus" data-placement="right" title="" data-content="쿠폰의 종료일을 무기한으로 설정하고 싶은 경우 사용합니다." data-original-title="기간제한 없음"><i class="btm bt-question-circle"></i></a></span>
+													</label>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="form-group _used_count" style="display: block;">
+									<label class="col-sm-2 control-label">사용횟수										<a href="javascript:;" class="text-gray html-popover" tabindex="0" role="button" data-toggle="popover" data-trigger="focus" data-placement="right" title="" data-content="한 고객이 동일한 쿠폰을 사용 기간 내 설정한 횟수만큼 사용할 수 있습니다. 단, 한 주문에 한번만 적용 가능합니다. 0이나 공백 입력 시 1개로 자동 저장됩니다. &lt;br/&gt;&lt;strong&gt;고객 다운로드:&lt;/strong&gt; 사용 후 소멸되지 않고 사용 종료일 전까지 설정한 횟수만큼 사용 가능합니다.&lt;br/&gt; &lt;strong&gt;자동 발행:&lt;/strong&gt; 사용 후 소멸되지 않고 사용 종료일 전까지 설정한 횟수만큼 사용 가능합니다. &lt;br/&gt;&lt;strong&gt;쿠폰코드 입력:&lt;/strong&gt; 단일 쿠폰코드는 동일 회원이 사용 종료일 전까지 사용 횟수만큼 사용 가능합니다. 여러 쿠폰코드는 다른 쿠폰코드로 사용 횟수만큼 사용 가능합니다. 예를 들어, 단일 쿠폰코드로 DISCOUNT 코드를 사용할 경우 해당 코드로 한 회원이 2번 이상 사용 가능합니다. 여러 쿠폰코드로 SALE1, SALE2가 생성된 경우 SALE1을 2번 이상 사용할 수는 없으나 SALE1, SALE2를 2개의 주문에서 사용할 수는 있습니다." data-original-title="사용횟수"><i class="btm bt-question-circle"></i></a>
+									</label>
+																			<div class="col-sm-10">
+											<div class="input-group input-group-padding member_limit_count">
+												<div class="m-block">
+													<div class="input-group-content vertical-bottom" style="padding-bottom:5px;">
+														<span>동일 회원이 최대</span>
+													</div>
+													<div class="input-group-content vertical-bottom width-1">
+														<input type="text" class="form-control _member_limit_count" name="member_limit_count" value="1"><div class="form-control-line"></div>
+													</div>
+													<div class="input-group-content vertical-bottom" style="padding-bottom:5px;">
+														<span>회 까지 사용 가능</span>
+													</div>
+												</div>
+												<div class="padding-left-4 checkbox checkbox-styled m-block">
+													<label class="_member_limit_toggle">
+														<input class="_is_member_limit" type="checkbox" name="is_duplication" value="ok">
+														<span class="no-margin-bottom">횟수제한 없음 </span>
+													</label>
+												</div>
+											</div>
+										</div>
+																	</div>
+								<div class="form-group">
+									<label class="col-sm-2 control-label">사용 옵션</label>
+									<div class="col-sm-10">
+										<div class="">
+											<div class="checkbox checkbox-styled">
+												<label>
+													<input type="checkbox" name="is_overlap" value="ok">
+													<span>추가 할인 가능 <a href="javascript:;" class="text-gray html-popover" tabindex="0" role="button" data-toggle="popover" data-trigger="focus" data-placement="right" title="" data-content="이미 쿠폰이 적용된 주문에 추가로 쿠폰 할인을 받을 수 있습니다. 이 기능에 체크한 쿠폰과 체크하지 않은 쿠폰이 함께 사용될 경우, 2개 쿠폰 할인이 모두 적용됩니다. 하지만 체크하지 않은 쿠폰끼리는 함께 사용할 수 없습니다. 자칫 상품을 무료 또는 원가 이하로 판매할 수 있기 때문에 주의하여 사용해야 합니다.&lt;br&gt;‘지정금액’ 혜택 선택 시 해당 옵션은 비활성화 됩니다." data-original-title="추가 할인 가능 "><i class="btm bt-question-circle"></i></a></span>
+												</label>
+											</div>
+										</div>
+																			</div>
+								</div>
+							</div>
+						</div>
+					</div>
+자동 발행 구조는 아래와 같습니다.
+
+<div class="col-md-12">
+						<div class="card">
+							<div class="card-head">
+								<header>쿠폰정보</header>
+							</div>
+							<div class="card-body form-horizontal border-top">
+																<div class="form-group">
+									<label class="col-sm-2 control-label required">쿠폰명										<i class="required-icon"></i>
+										<a href="javascript:;" class="text-gray html-popover" tabindex="0" role="button" data-toggle="popover" data-trigger="focus" data-placement="right" title="" data-content="고객에게 표시되는 쿠폰 이름입니다. 쿠폰 생성 후에도 수정 가능합니다." data-original-title="쿠폰명"><i class="btm bt-question-circle"></i></a></label>
+									<div class="col-sm-10">
+										<input type="text" tabindex="1" placeholder="예: 사이트 오픈 1주년 할인 쿠폰" autocomplete="off" class="form-control" name="name" maxlength="80"><div class="form-control-line"></div>
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-sm-2 control-label">쿠폰형식										<a href="javascript:;" class="text-gray html-popover" tabindex="0" role="button" data-toggle="popover" data-trigger="focus" data-placement="right" title="" data-content="&lt;p&gt;쿠폰 발행 방식을 선택합니다.&lt;/p&gt;&lt;p&gt;&lt;strong&gt;지정 발행: &lt;/strong&gt;발행대상을 지정하여 일괄 발행하는 쿠폰입니다. 그룹발행시 쿠폰 생성시점의 회원을 대상으로 발행됩니다. 발행 후 설정하신 사용기간에 맞춰 고객이 마이페이지에서 쿠폰을 확인할 수 있고, 결제 페이지에서 쿠폰을 사용할 수 있습니다. 발급대상 회원수에 따라 최대 30분까지 발급시간이 소요될 수 있습니다.&lt;/p&gt; &lt;p&gt;&lt;strong&gt;고객 다운로드:&lt;/strong&gt; 쿠폰을 발행하면 고객이 마이페이지 또는 쿠폰 다운로드 URL을 통해 받을 수 있습니다. 쿠폰 다운로드 URL은 쿠폰 목록에서 확인 및 복사할 수 있습니다.&lt;/p&gt;&lt;p&gt;&lt;strong&gt;자동 발행:&lt;/strong&gt; 회원가입, 첫 주문완료 등 특정 조건을 만족하면 쿠폰이 자동 발행됩니다. 고객이 마이페이지에서 쿠폰을 확인할 수 있고, 결제 페이지에서 쿠폰을 사용할 수 있습니다.&lt;/p&gt;&lt;p&gt;&lt;strong&gt;쿠폰코드 입력:&lt;/strong&gt; 판매자가 쿠폰 코드를 생성하면 고객은 결제 페이지에서 코드를 입력해 사용합니다. 단, 1개 코드만 입력 가능합니다.&lt;/p&gt;" data-original-title="쿠폰형식">
+											<i class="btm bt-question-circle"></i>
+										</a>
+									</label>
+									<div class="col-sm-10" style="">
+										<div class="radio radio-styled">
+											<label>
+												<input type="radio" name="type" value="targeted" checked="">
+												<span>지정 발행</span>
+											</label>
+										</div>
+										<div class="radio radio-styled">
+											<label>
+												<input type="radio" name="type" value="down">
+												<span>고객 다운로드</span>
+											</label>
+										</div>
+										<div class="radio radio-styled">
+											<label>
+												<input type="radio" name="type" value="auto">
+												<span>자동 발행</span>
+											</label>
+										</div>
+										<div class="radio radio-styled">
+											<label>
+												<input type="radio" name="type" value="create">
+												<span>쿠폰코드 생성</span>
+											</label>
+										</div>
+									</div>
+																	</div>
+																<div class="form-group _type_is_mult_coupon display-none" style="display: none;">
+									<label class="col-sm-2 control-label">쿠폰코드</label>
+									<div class="col-sm-10">
+										<div class="input-group input-group-padding">
+																							<div class="input-group-content vertical-bottom">
+													<select class="form-control" tabindex="3" name="type_is_mult_coupon" style="width: 200px;">
+														<option value="N" selected="">단일 쿠폰코드</option>
+														<option value="Y">여러 쿠폰코드</option>
+													</select><div class="form-control-line"></div>
+												</div>
+																																															<div class="input-group-content vertical-bottom width-7 _type_coupon_code" style="display: none;">
+														<input class="form-control" tabindex="7" type="text" placeholder="쿠폰코드 입력 (입력하지 않으면 랜덤 생성)" name="type_coupon_code"><div class="form-control-line"></div>
+													</div>
+																																			<div class="input-group-content vertical-bottom width-4 _type_coupon_create_count display-none" style="display: none;">
+													<input type="text" class="form-control" tabindex="7" placeholder="발급수량(최대 10000개)" name="type_coupon_create_count"><div class="form-control-line"></div>
+												</div>
+																					</div>
+									</div>
+								</div>
+								<div class="form-group _type_target" style="display: block;">
+									<label class="col-sm-2 control-label">발행대상										<a href="javascript:;" class="text-gray html-popover" tabindex="0" role="button" data-toggle="popover" data-trigger="focus" data-placement="right" title="" data-content="&lt;p&gt;쿠폰 발행 대상을 지정합니다.&lt;/p&gt;&lt;p&gt;&lt;strong&gt;고객 다운로드&lt;/strong&gt;&lt;/p&gt;&lt;ul class='description-list'&gt;&lt;li&gt;전체회원: 모든 회원에게 발행합니다.&lt;/li&gt;&lt;li&gt;특정 회원그룹에게 발행합니다. 회원그룹은 &lt;a href='/admin/member/list' target='_blank' class='text-primary'&gt;사용자 목록&lt;/a&gt;에서 관리할 수 있습니다.&lt;/li&gt;&lt;li&gt;고객 행동 관리 그룹: &lt;a href='/admin/crm_marketing' target='_blank' class='text-primary'&gt;고객 행동 관리&lt;/a&gt;에서 생성한 그룹을 지정합니다.&lt;/li&gt;&lt;li&gt;개별회원: 단일 회원을 특정하여 쿠폰을 발행합니다.&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;strong&gt;자동 발행&lt;/strong&gt;&lt;/p&gt;&lt;ul class='description-list'&gt;&lt;li&gt;첫 회원가입: 신규 가입 회원에게 쿠폰 발행합니다. 같은 계정으로 재가입 하거나 동일 본인인증 데이터로 재가입 시 쿠폰이 발행되지 않습니다.&lt;/li&gt;&lt;li&gt;첫 주문완료: 회원의 첫 주문 배송완료일의 23:00 에 지급 됩니다. 부분취소 등으로 인하여 부분 배송완료된 주문이 있는 경우에도 발행됩니다. 단, 동일인(동일 계정, 이메일, 본인인증)이 재주문하거나 구매완료전 전체취소시 쿠폰이 발행되지 않습니다. 첫 주문완료 후 반품/교환 신청 후 다시 쿠폰 발급을 막으려면 쇼핑 &gt; &lt;a href='/admin/shopping/config' target='_blank' class='text-primary'&gt;환경설정&lt;/a&gt;에서 반품/교환 가능 기간을 무제한이 아닌 특정 기간으로 사용을 권장합니다.&lt;/li&gt;&lt;li&gt;생일: 생일을 맞은 회원이 있을 때 쿠폰을 발행합니다. [환경설정 &gt; 회원가입·그룹·등급 &gt; 가입 폼 관리]에서 생년월일을 기준으로 판단합니다. 생일 정보 변경 후 동일한 쿠폰이 재발행 되는 것을 막기 위해 1년에 한번만 발행 됩니다. 생일 쿠폰을 만든 다음날부터 발행이 시작됩니다.&lt;/li&gt;&lt;li&gt;쇼핑등급 변경: 선택한 쇼핑등급으로 변경될 때 쿠폰을 발행합니다. 이미 해당 등급에 속한 회원에게는 발행되지 않습니다. 높은 등급으로 변경되는 경우만 쿠폰을 발행하고 싶으면, ‘높은 자동 등급으로 변경되었을 때만 발행’ 옵션을 사용하세요.&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;strong&gt;쿠폰코드 생성&lt;/strong&gt;&lt;/p&gt;&lt;ul class='description-list'&gt;&lt;li&gt;회원: 모든 회원이 결제 시 사용 가능합니다.&lt;/li&gt;&lt;li&gt;회원+비회원: 회원과 비회원 모두 결제시 사용 가능합니다.&lt;/li&gt;&lt;/ul&gt;" data-original-title="발행대상"><i class="btm bt-question-circle"></i></a></label>
+									<div class="col-sm-10 _type_down display-none">
+										<div class="input-group input-group-padding">
+			<div class="input-group-content">
+			<select class="form-control" tabindex="3" name="type_down_target" style="width: 200px;" onchange="COUPON.changeCouponTypeTarget('type_down_target');">
+				<option value="all">전체회원</option><option value="group">지정그룹</option><option value="specific_member">개별회원</option>			</select><div class="form-control-line"></div>
+		</div>
+
+		<div class="input-group-content _type_group_code _type_input display-none display-m-row" style="display: none;">
+			<div class="form-control" style="z-index: 3; width: 200px;">
+				<a href="javascript:;" data-toggle="dropdown" class="_group_name text-nowrap" style="line-height: 29px; display: block" aria-expanded="false">
+					<span class="_group_name_text">그룹 선택</span>
+					<span class="text-primary _group_count"></span>
+				</a>
+				<ul class="dropdown-menu animation-dock check" role="menu" aria-labelledby="dLabel">
+					<div class="select_group _check_drop_group_list">
+											</div>
+				</ul>
+			</div><div class="form-control-line"></div>
+		</div>
+
+		<div class="input-group-content _type_crm _type_input display-none display-m-row" style="display: none;">
+			<div class="form-control" style="z-index: 3; width: 200px;">
+				<a href="javascript:;" data-toggle="dropdown" class="_group_name text-nowrap" style="line-height: 29px; display: block" aria-expanded="false">
+					<span class="_group_name_text">그룹 선택</span>
+					<span class="text-primary _group_count"></span>
+				</a>
+				<ul class="dropdown-menu animation-dock check" role="menu" aria-labelledby="dLabel">
+					<div class="select_group _check_drop_group_list">
+											</div>
+				</ul>
+			</div><div class="form-control-line"></div>
+		</div>
+
+    <div class="input-group-content display-none _type_input vertical-bottom tw-w-[200px] _type_specific_member_id" style="display: none;">
+      <label>
+        <input class="form-control" type="text" placeholder="회원 ID를 입력해주세요." name="type_specific_member_id"><div class="form-control-line"></div>
+      </label>
+    </div>
+
+		</div>									</div>
+									<div class="col-sm-10 _type_targeted display-none">
+										<div class="input-group input-group-padding">
+			<div class="input-group-content">
+			<select class="form-control" tabindex="3" name="type_targeted_target" style="width: 200px;" onchange="COUPON.changeCouponTypeTarget('type_targeted_target');">
+				<option value="all">전체회원</option><option value="group">지정그룹</option><option value="specific_member">개별회원</option>			</select><div class="form-control-line"></div>
+		</div>
+
+		<div class="input-group-content _type_group_code _type_input display-none display-m-row" style="display: none;">
+			<div class="form-control" style="z-index: 3; width: 200px;">
+				<a href="javascript:;" data-toggle="dropdown" class="_group_name text-nowrap" style="line-height: 29px; display: block" aria-expanded="false">
+					<span class="_group_name_text">그룹 선택</span>
+					<span class="text-primary _group_count"></span>
+				</a>
+				<ul class="dropdown-menu animation-dock check" role="menu" aria-labelledby="dLabel">
+					<div class="select_group _check_drop_group_list">
+											</div>
+				</ul>
+			</div><div class="form-control-line"></div>
+		</div>
+
+		<div class="input-group-content _type_crm _type_input display-none display-m-row" style="display: none;">
+			<div class="form-control" style="z-index: 3; width: 200px;">
+				<a href="javascript:;" data-toggle="dropdown" class="_group_name text-nowrap" style="line-height: 29px; display: block" aria-expanded="false">
+					<span class="_group_name_text">그룹 선택</span>
+					<span class="text-primary _group_count"></span>
+				</a>
+				<ul class="dropdown-menu animation-dock check" role="menu" aria-labelledby="dLabel">
+					<div class="select_group _check_drop_group_list">
+											</div>
+				</ul>
+			</div><div class="form-control-line"></div>
+		</div>
+
+    <div class="input-group-content display-none _type_input vertical-bottom tw-w-[200px] _type_specific_member_id" style="display: none;">
+      <label>
+        <input class="form-control" type="text" placeholder="회원 ID를 입력해주세요." name="type_specific_member_id"><div class="form-control-line"></div>
+      </label>
+    </div>
+
+		</div>									</div>
+									<div class="col-sm-10 _type_auto">
+										<div class="input-group input-group-padding">
+																							<div class="input-group-content">
+													<select name="type_auto_target" class="form-control" style="width: 200px" onchange="COUPON.changeCouponTypeTarget('type_auto_target');">
+														<option value="join" selected="">첫 회원가입</option>
+														<option value="order">첫 주문완료</option>
+														<option value="birthday">생일</option>
+														<option value="grade_change">쇼핑등급 변경</option>
+													</select><div class="form-control-line"></div>
+												</div>
+												<div class="input-group-content _auto_order_list display-none">
+													<select class="form-control" name="auto_data_order_type" style="width: 200px">
+
+																													<option value="1">배송완료 1일 후</option>
+																													<option value="2">배송완료 2일 후</option>
+																													<option value="3">배송완료 3일 후</option>
+																													<option value="4">배송완료 4일 후</option>
+																													<option value="5">배송완료 5일 후</option>
+																													<option value="7">배송완료 7일 후</option>
+																													<option value="10">배송완료 10일 후</option>
+																													<option value="14">배송완료 14일 후</option>
+																													<option value="20">배송완료 20일 후</option>
+																													<option value="30">배송완료 30일 후</option>
+																													<option value="60">배송완료 60일 후</option>
+																													<option value="90">배송완료 90일 후</option>
+																											</select><div class="form-control-line"></div>
+												</div>
+												<div class="input-group-content _type_group_code display-none display-m-row" style="width: 200px; display: none;">
+													<select class="form-control _use_auto_change" name="auto_data_use_auto_change_group" style="height: 29px; padding: 0; margin: 0; width: 100%;" onchange="COUPON.changeUseAutoChangeGroup(this.value)">
+														<option value="Y">자동 등급 사용</option>
+														<option value="N">자동 등급 미사용</option>
+													</select><div class="form-control-line"></div>
+												</div>
+												<div class="input-group-content _type_group_code display-none display-m-row" style="display: none;">
+													<div class="form-control" style="z-index: 3; width: 200px;">
+														<a href="javascript:;" data-toggle="dropdown" class="_group_name text-nowrap" style="line-height: 29px; display: block" aria-expanded="false">
+															<span class="_group_name_text">그룹 선택</span>
+															<span class="text-primary _group_count"></span>
+														</a>
+														<ul class="dropdown-menu animation-dock check" role="menu" aria-labelledby="dLabel">
+															<div class="select_group _check_drop_group_list">
+																															</div>
+														</ul>
+													</div><div class="form-control-line"></div>
+												</div>
+																					</div>
+																					<div class="input-group-content checkbox checkbox-styled _type_group_code display-none" style="display: none;">
+												<label>													<input type="checkbox" name="auto_data_is_only_grade_up" value="Y" checked="">
+													<span class="no-margin-bottom">높은 자동 등급으로 변경되었을 때만 발행</span>
+												</label>
+											</div>
+																			</div>
+									<div class="col-sm-10 _type_create display-none">
+																					<div class="radio radio-styled">
+												<label>
+													<input class="_member" type="radio" name="type_create_target" value="member" checked="" onclick="COUPON.changeCouponTypeTarget('type_create_target', 'member');">
+													<span>회원</span>
+												</label>
+											</div>
+											<div class="radio radio-styled">
+												<label>
+													<input class="_is_member" type="radio" name="type_create_target" value="all" onclick="COUPON.changeCouponTypeTarget('type_create_target', 'isMember');">
+													<span>회원 + 비회원</span>
+												</label>
+											</div>
+																			</div>
+								</div>
+								<div class="form-group _type_down display-none" style="">
+									<label class="col-sm-2 control-label">발행수량										<a href="javascript:;" class="text-gray html-popover" tabindex="0" role="button" data-toggle="popover" data-trigger="focus" data-placement="right" title="" data-content="쿠폰의 발급 가능 총 수량을 제한하여 선착순으로 한정된 인원에게 쿠폰을 지급하고 싶을 때 사용합니다. 발행수량을 10개로 지정하면 선착순으로 10명의 회원만 쿠폰을 다운로드 받을 수 있습니다." data-original-title="발행수량">
+											<i class="btm bt-question-circle"></i>
+										</a>
+									</label>
+									<div class="col-sm-10">
+										<div>
+											<div class="input-group input-group-padding">
+												<div class="input-group-content vertical-bottom width-1">
+													<input type="text" class="limit-count form-control" name="limit_count" placeholder="0" disabled="disabled" value="0"><div class="form-control-line"></div>
+												</div>
+												<div class="padding-left-4 checkbox checkbox-styled _is_limit_toggle">
+													<label>
+														<input type="checkbox" name="is_limit" value="N" checked="">
+														<span class="no-margin-bottom">개수제한 없음</span>
+													</label>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+
+								<div class="form-group _type_down display-none">
+									<label class="col-sm-2 control-label">쿠폰 숨김										<a href="javascript:;" class="text-gray html-popover" tabindex="0" role="button" data-toggle="popover" data-trigger="focus" data-placement="right" title="" data-content="마이페이지의 다운로드 쿠폰 리스트와 상품 상세페이지에서 쿠폰을 숨깁니다." data-original-title="쿠폰 숨김">
+											<i class="btm bt-question-circle"></i>
+										</a>
+									</label>
+									<div class="col-sm-10">
+										<div>
+											<div class="input-group input-group-padding">
+												<div class="padding-left-4 checkbox checkbox-styled">
+													<label>
+														<input type="checkbox" name="is_hide" value="Y" onclick="COUPON.toggleAlarmWrap()">
+														<span class="no-margin-bottom">숨김</span>
+													</label>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+																<div class="form-group _alarm_wrap">
+									<label class="col-sm-2 control-label">발행알림										<a href="javascript:;" class="text-gray html-popover" tabindex="0" role="button" data-toggle="popover" data-trigger="focus" data-placement="right" title="" data-content="발행대상에게 웹과 앱 푸시 알림(앱 사용 시에만)을 발송합니다.&lt;br/&gt;&lt;strong&gt;고객 다운로드:&lt;/strong&gt; 관리자가 지정한 쿠폰 사용 시작일에 알림을 발송합니다.&lt;br/&gt;&lt;strong&gt;자동 발행:&lt;/strong&gt; 자동으로 발행된 발행일에 알림을 발송합니다." data-original-title="발행알림">
+											<i class="btm bt-question-circle"></i>
+										</a>
+									</label>
+									<div class="col-sm-10 _type_down display-none">
+										<div class="input-group input-group-padding">
+											<select class="form-control" tabindex="3" name="is_down_alarm" style="width: 200px;">
+												<option value="Y" selected="">사용 시작일에 알림</option>
+												<option value="N">알림 안함</option>
+											</select><div class="form-control-line"></div>
+										</div>
+									</div>
+									<div class="col-sm-10 _type_targeted display-none">
+										<div class="input-group input-group-padding">
+											<select class="form-control" tabindex="3" name="is_targeted_alarm" style="width: 200px;">
+												<option value="Y" selected="">사용 시작일에 알림</option>
+												<option value="N">알림 안함</option>
+											</select><div class="form-control-line"></div>
+										</div>
+									</div>
+									<div class="col-sm-10 _type_auto">
+										<div class="input-group input-group-padding">
+											<select class="form-control" tabindex="3" name="is_auto_alarm" style="width: 200px;">
+												<option value="Y" selected="">발행 시작일에 알림</option>
+												<option value="N">알림 안함</option>
+											</select><div class="form-control-line"></div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="card">
+							<div class="card-head">
+								<header>사용정보</header>
+							</div>
+							<div class="card-body form-horizontal border-top">
+								<div class="form-group">
+									<label for="" class="col-sm-2 control-label required">사용혜택 <i class="required-icon"></i>
+										<a href="javascript:;" class="text-gray html-popover" tabindex="0" role="button" data-toggle="popover" data-trigger="focus" data-placement="top" title="" data-content="쿠폰 사용 시 어떤 혜택을 줄지 지정합니다.&lt;br&gt;&lt;strong&gt;금액 할인&lt;/strong&gt;: 주문 금액에 적용할 할인 금액 또는 할인율을 지정합니다. 할인율(%)은 결제금액에 비례하여 할인 금액이 책정됩니다.&lt;br&gt;&lt;strong&gt;배송비 무료&lt;/strong&gt;: 주문서의 모든 배송비를 무료로 적용합니다. 주문서당 1개의 배송비 무료 쿠폰만 적용할 수 있습니다. 반품/교환 배송비는 면제되지 않습니다. &lt;br&gt;&lt;strong&gt;지정금액&lt;/strong&gt;: 지정된 금액으로 구매할 수 있습니다. 주문서당 지정금액 쿠폰 1개만 적용할 수 있고 다른 쿠폰과 함께 사용할 수 없습니다. 쿠폰 적용 범위는 ‘지정상품'에 대해서 사용할 수 있습니다. 지정 상품이 여러 개라면 가장 판매가가 높은 상품에 자동 적용됩니다." data-original-title="사용혜택"><i class="btm bt-question-circle"></i></a>
+									</label>
+									<div class="col-sm-10">
+										<div class="input-group input-group-padding">
+											<div class="input-group-content m-block" style="width: 200px;">
+												<select class="form-control" tabindex="3" name="benefit_type" id="">
+													<option value="discount">금액 할인</option>
+													<option value="delivery">배송비 무료</option>
+																											<option value="fix_price">지정금액</option>
+																									</select><div class="form-control-line"></div>
+											</div>
+											<div class="_sale_wrap m-block">
+												<div class="input-group-content vertical-bottom" style="width: 120px;">
+													<input type="text" class="form-control" tabindex="9" name="apply_sale_price" maxlength="10"><div class="form-control-line"></div>
+												</div>
+												<div class="input-group-content vertical-bottom width-2" style="width: 80px;">
+													<select name="sale_amount_type" tabindex="10" class="form-control _sale_amount_type">
+																											<option value="price" id="sale_amount_type_price">KRW</option>
+														<option value="percent" id="sale_amount_type_percent" class="" style="display: block;">%</option>
+													</select><div class="form-control-line"></div>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div>
+										<div class="coupon-edit-selected" style="display: none">
+										</div>
+									</div>
+								</div>
+								<div class="form-group _apply_sale_type_max_price" style="display: none;">
+									<label class="col-sm-2 control-label required">최대 할인 금액 <i class="required-icon"></i><a href="javascript:;" class="text-gray html-popover" tabindex="0" role="button" data-toggle="popover" data-trigger="focus" data-placement="right" title="" data-content="정률(%) 할인의 경우 결제금액에 비례하여 할인 금액이 책정됩니다. 배송비 무료 쿠폰의 경우 배송비 정책(지역별 배송비, 무게별 차등 배송비 등)에 따라 할인 금액이 다르게 책정됩니다. 정률(%) 할인과 배송비 무료 혜택 쿠폰에 최대 할인 금액 한도를 설정하여 너무 많은 할인이 되지 않도록 해주는 장치입니다. " data-original-title="최대 할인 금액 "><i class="btm bt-question-circle"></i></a></label>
+									<div class="col-sm-10">
+										<div class="holder">
+											<input type="text" class="form-control" tabindex="11" style="padding-left: 45px; width: 200px;" value="" name="apply_sale_type_max_price"><div class="form-control-line"></div>
+											<span class="form-control-krw text-gray-bright" style="left:0; top:7px;">KRW</span>
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-sm-2 control-label required">최소 주문금액 <i class="required-icon"></i><a href="javascript:;" class="text-gray html-popover" tabindex="0" role="button" data-toggle="popover" data-trigger="focus" data-placement="right" title="" data-content="쿠폰 사용을 위해 필요한 최소 주문금액을 지정합니다. 주문금액은 주문하려는 상품금액의 합계를 의미하며, 즉시/기간할인이 적용되있는 경우 할인이 적용된 상품금액으로 계산합니다." data-original-title="최소 주문금액 "><i class="btm bt-question-circle"></i></a></label>
+									<div class="col-sm-10">
+										<div class="holder">
+											<input type="text" class="form-control" tabindex="12" style="padding-left: 45px; width: 200px;" name="apply_sale_type_minimum_price" maxlength="10"><div class="form-control-line"></div>
+											<span class="form-control-krw text-gray-bright" style="left:0; top:7px">KRW</span>
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-sm-2 control-label">쿠폰 적용 범위 <a href="javascript:;" class="text-gray html-popover" tabindex="0" role="button" data-toggle="popover" data-trigger="focus" data-placement="right" title="" data-content="쿠폰을 사용할 수 있는 상품의 조건을 지정합니다. &lt;br/&gt;· 모든 상품: 모든 상품과 카테고리에 쿠폰을 적용할 수 있습니다.&lt;br/&gt;· 지정 카테고리: 특정 카테고리에 포함된 상품을 구매할 때만 쿠폰을 적용할 수 있습니다.&lt;br/&gt;· 지정 상품: 특정 상품 구매 시에만 쿠폰을 적용할 수 있습니다." data-original-title="쿠폰 적용 범위 "><i class="btm bt-question-circle"></i></a></label>
+									<div class="col-sm-8">
+										<div class="input-group input-group-padding">
+																							<div class="input-group-content vertical-bottom">
+													<select class="form-control" tabindex="8" name="apply_type" style="width: 200px;">
+														<option value="all">모든 상품</option><option value="category">지정 카테고리</option><option value="product">지정 상품</option>													</select><div class="form-control-line"></div>
+												</div>
+																																	<div class="input-group-content vertical-bottom _apply_type" style="padding-right: 15px; display: none;">
+												<div class="form-control" style="z-index: 3; width: 200px;">
+													<a href="javascript:;" data-toggle="dropdown" class="_group_name" style="line-height: 29px; display: block" aria-expanded="false">
+														<span class="_category_name_text"></span>
+														<span class="text-primary _category_count"></span>
+													</a>
+													<ul class="dropdown-menu animation-dock check" role="menu" aria-labelledby="dLabel" onclick="event.stopPropagation()" style="margin-top:3px;">
+														<div class="select_group coupon_category_select_list _check_drop_category_list checkbox-styled">
+															<ul class="checkbox_group_first"><li class="first_parent_list"><label class="first_wrap"><input class="_coupon_checkbox-0" type="checkbox" data-code="s20220818e0cc55678c51c" value="Photography"><span>Photography</span></label></li></ul><ul class="checkbox_group_first"><li class="first_parent_list"><label class="first_wrap"><input class="_coupon_checkbox-1" type="checkbox" data-code="s20220818172ff6637ac85" value="Music"><span>Music</span></label></li></ul><ul class="checkbox_group_first"><li class="first_parent_list"><label class="first_wrap"><input class="_coupon_checkbox-2" type="checkbox" data-code="s20220831b6744f9e6a174" value="Productivity"><span>Productivity</span></label></li></ul><ul class="checkbox_group_first"><li class="first_parent_list"><label class="first_wrap"><input class="_coupon_checkbox-3" type="checkbox" data-code="s20220831d6fb67666de41" value="Marketing"><span>Marketing</span></label></li></ul><ul class="checkbox_group_first"><li class="first_parent_list"><label class="first_wrap"><input class="_coupon_checkbox-4" type="checkbox" data-code="s202208316f552712ad47b" value="Investment"><span>Investment</span></label></li></ul><ul class="checkbox_group_first"><li class="first_parent_list"><label class="first_wrap"><input class="_coupon_checkbox-5" type="checkbox" data-code="s202208316c77f3e6a385a" value="Programming"><span>Programming</span></label></li></ul><ul class="checkbox_group_first"><li class="first_parent_list"><label class="first_wrap"><input class="_coupon_checkbox-6" type="checkbox" data-code="s202208239603deeac4538" value="3D"><span>3D</span></label></li></ul><ul class="checkbox_group_first"><li class="first_parent_list"><label class="first_wrap"><input class="_coupon_checkbox-7" type="checkbox" data-code="s20220822af86ef1af3ea0" value="Writing"><span>Writing</span></label></li></ul><ul class="checkbox_group_first"><li class="first_parent_list"><label class="first_wrap"><input class="_coupon_checkbox-8" type="checkbox" data-code="s20220818589088395d996" value="IT"><span>IT</span></label></li></ul><ul class="checkbox_group_first"><li class="first_parent_list"><label class="first_wrap"><input class="_coupon_checkbox-9" type="checkbox" data-code="s2022081839a7c483700ea" value="Video contents"><span>Video contents</span></label></li></ul><ul class="checkbox_group_first"><li class="first_parent_list"><label class="first_wrap"><input class="_coupon_checkbox-10" type="checkbox" data-code="s20220818c901efcdd8a6c" value="Drawing"><span>Drawing</span></label></li></ul><ul class="checkbox_group_first"><li class="first_parent_list"><label class="first_wrap"><input class="_coupon_checkbox-11" type="checkbox" data-code="s2022081835c965ccb1d83" value="Handicraft"><span>Handicraft</span></label></li></ul><ul class="checkbox_group_first"><li class="first_parent_list"><label class="first_wrap"><input class="_coupon_checkbox-12" type="checkbox" data-code="s2022081874795cc75a0c3" value="Food"><span>Food</span></label></li></ul><ul class="checkbox_group_first"><li class="first_parent_list"><label class="first_wrap"><input class="_coupon_checkbox-13" type="checkbox" data-code="s20220818f0ec92be5e199" value="Design"><span>Design</span></label></li></ul>														</div>
+													</ul>
+												</div><div class="form-control-line"></div>
+											</div>
+										</div>
+										<div class="_product_list" style="display: none;">
+											<div class="btn btn-file btn-sm ink-reaction btn-raised btn-default-bright _product_search_btn" style="margin:8px 0">
+												쿠폰 적용 상품 선택											</div>
+										</div>
+										<div class="_product_list" style="clear: both; display: none;">
+											<div class="shop-table order _product_apply_list"></div>
+										</div>
+									</div>
+								</div>
+								<div class="form-group _excluded_product_form">
+									<label class="col-sm-2 control-label">사용제외 상품 <a href="javascript:;" class="text-gray html-popover" tabindex="0" role="button" data-toggle="popover" data-trigger="focus" data-placement="right" title="" data-content="쿠폰을 적용할 수 없는 상품을 지정합니다. 사용제외 상품이 주문에 포함되어 있더라도 주문서의 총 주문 금액이 최소 주문금액을 충족하면 쿠폰 사용이 가능합니다. 다만, 쿠폰 사용이 가능한 상품에만 할인이 적용됩니다. 배송비 무료 쿠폰은 주문서의 모든 배송비에 적용하기 때문에 사용가능 상품이 주문에 1개라도 포함되어 있으면 배송비 전체가 할인됩니다." data-original-title="사용제외 상품 "><i class="btm bt-question-circle"></i></a></label>
+									<div class="col-sm-8">
+										<div class="btn btn-file btn-sm ink-reaction btn-raised btn-default-bright _excluded_product_search_btn" style="margin:8px 0;">
+											쿠폰 적용 제외 상품 선택										</div>
+										<div class="shop-table order _excluded_product_list"></div>
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-sm-2 control-label">사용기간										<a href="javascript:;" class="text-gray html-popover" tabindex="0" role="button" data-toggle="popover" data-trigger="focus" data-placement="right" title="" data-content="쿠폰의 사용 가능 기간을 지정합니다. &lt;br&gt;&lt;strong&gt;지정 발행&lt;/strong&gt;: 쿠폰 생성일 기준으로 최대 40일까지 사용기간을 설정할 수 있습니다. 미사용된 쿠폰은 사용기간을 초과시 자동 삭제됩니다.&lt;br&gt;&lt;strong&gt;고객 다운로드&lt;/strong&gt;: 기간설정과 만료일을 설정할 수 있습니다. 기간설정 시 사용 시작일과 종료일을 입력하고 만료일 설정 시 다운로드 후 사용기간을 설정합니다. 사용가능기간을 초과한 경우 마이페이지에서 쿠폰을 확인할 수 없고 결제 페이지에서 사용이 불가합니다.&lt;br&gt;&lt;strong&gt;쿠폰코드 입력&lt;/strong&gt;: 사용 시작일과 종료일을 입력합니다. 사용 종료일 이후에는 마이페이지에서 쿠폰을 확인할 수 없고 결제 페이지에서 사용이 불가합니다.&lt;br&gt;&lt;strong&gt;자동 발행&lt;/strong&gt;: 쿠폰 발행일 기준으로 몇일 후까지 사용 가능하게 할지 입력합니다. 발행상태가 종료됨이라도 이미 발행된 쿠폰은 사용기간까지 마이페이지에서 확인할 수 있고 결제 시 사용할 수 있습니다." data-original-title="사용기간">
+											<i class="btm bt-question-circle"></i>
+										</a>
+									</label>
+
+									<div class="col-sm-10">
+										<div class="_duration_type_wrap display-none">
+											<div class="radio-inline radio-styled">
+												<label>
+													<input type="radio" name="duration_type" value="date_range">
+													<span>기간 설정</span>
+												</label>
+											</div>
+											<div class="radio-inline radio-styled">
+												<label>
+													<input type="radio" name="duration_type" value="validity_period">
+													<span>만료일 설정</span>
+												</label>
+											</div>
+										</div>
+										<div class="_calendar_view display-none">
+											<div class="input-group input-group-padding">
+												<div class="m-block">
+													<div class="input-group-content calendar-wrap">
+														<i class="icon-calendar icons"></i>
+														<input class="_calendar_limit form-control" type="text" name="start_date"><div class="form-control-line"></div>
+													</div>
+													<div class="input-group-content">
+														<div style="margin-top: 5px;">~</div>
+													</div>
+													<div class="input-group-content calendar-wrap">
+														<i class="icon-calendar icons _icon_last"></i>
+														<input class="_calendar_limit form-control" type="text" name="end_date"><div class="form-control-line"></div>
+													</div>
+												</div>
+												<div class="padding-left-4 checkbox checkbox-styled _calendar_limit_toggle m-block">
+													<label>
+														<input type="checkbox" name="is_unlimited_date" value="ok">
+														<span>기간제한 없음															<a href="javascript:;" class="text-gray html-popover" tabindex="0" role="button" data-toggle="popover" data-trigger="focus" data-placement="right" title="" data-content="쿠폰의 종료일을 무기한으로 설정하고 싶은 경우 사용합니다." data-original-title="기간제한 없음"><i class="btm bt-question-circle"></i></a></span>
+													</label>
+												</div>
+											</div>
+										</div>
+
+										<div class="_type_auto _validity_period">
+											<div class="input-group input-group-padding">
+												<div class="m-block">
+													<div class="input-group-content vertical-bottom" style="padding-bottom:5px;">
+														<span class="_auto_data_day_limit_prefix">쿠폰이 발행된 날부터</span>
+													</div>
+													<div class="input-group-content vertical-bottom width-1">
+														<input type="text" class="form-control limit-count" name="auto_data_day_limit" value="15" placeholder=""><div class="form-control-line"></div>
+													</div>
+													<div class="input-group-content vertical-bottom" style="padding-bottom:5px;">
+														<span>일 후 까지 사용 가능</span>
+													</div>
+												</div>
+												<div class="padding-left-4 checkbox checkbox-styled _day_limit_toggle m-block">
+													<label>
+														<input class="_is_unlimited_date" type="checkbox" name="is_auto_unlimited_date" value="ok">
+														<span class="no-margin-bottom">기간제한 없음															<a href="javascript:;" class="text-gray html-popover" tabindex="0" role="button" data-toggle="popover" data-trigger="focus" data-placement="right" title="" data-content="쿠폰의 종료일을 무기한으로 설정하고 싶은 경우 사용합니다." data-original-title="기간제한 없음"><i class="btm bt-question-circle"></i></a></span>
+													</label>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="form-group _used_count" style="display: block;">
+									<label class="col-sm-2 control-label">사용횟수										<a href="javascript:;" class="text-gray html-popover" tabindex="0" role="button" data-toggle="popover" data-trigger="focus" data-placement="right" title="" data-content="한 고객이 동일한 쿠폰을 사용 기간 내 설정한 횟수만큼 사용할 수 있습니다. 단, 한 주문에 한번만 적용 가능합니다. 0이나 공백 입력 시 1개로 자동 저장됩니다. &lt;br/&gt;&lt;strong&gt;고객 다운로드:&lt;/strong&gt; 사용 후 소멸되지 않고 사용 종료일 전까지 설정한 횟수만큼 사용 가능합니다.&lt;br/&gt; &lt;strong&gt;자동 발행:&lt;/strong&gt; 사용 후 소멸되지 않고 사용 종료일 전까지 설정한 횟수만큼 사용 가능합니다. &lt;br/&gt;&lt;strong&gt;쿠폰코드 입력:&lt;/strong&gt; 단일 쿠폰코드는 동일 회원이 사용 종료일 전까지 사용 횟수만큼 사용 가능합니다. 여러 쿠폰코드는 다른 쿠폰코드로 사용 횟수만큼 사용 가능합니다. 예를 들어, 단일 쿠폰코드로 DISCOUNT 코드를 사용할 경우 해당 코드로 한 회원이 2번 이상 사용 가능합니다. 여러 쿠폰코드로 SALE1, SALE2가 생성된 경우 SALE1을 2번 이상 사용할 수는 없으나 SALE1, SALE2를 2개의 주문에서 사용할 수는 있습니다." data-original-title="사용횟수"><i class="btm bt-question-circle"></i></a>
+									</label>
+																			<div class="col-sm-10">
+											<div class="input-group input-group-padding member_limit_count">
+												<div class="m-block">
+													<div class="input-group-content vertical-bottom" style="padding-bottom:5px;">
+														<span>동일 회원이 최대</span>
+													</div>
+													<div class="input-group-content vertical-bottom width-1">
+														<input type="text" class="form-control _member_limit_count" name="member_limit_count" value="1"><div class="form-control-line"></div>
+													</div>
+													<div class="input-group-content vertical-bottom" style="padding-bottom:5px;">
+														<span>회 까지 사용 가능</span>
+													</div>
+												</div>
+												<div class="padding-left-4 checkbox checkbox-styled m-block">
+													<label class="_member_limit_toggle">
+														<input class="_is_member_limit" type="checkbox" name="is_duplication" value="ok">
+														<span class="no-margin-bottom">횟수제한 없음 </span>
+													</label>
+												</div>
+											</div>
+										</div>
+																	</div>
+								<div class="form-group">
+									<label class="col-sm-2 control-label">사용 옵션</label>
+									<div class="col-sm-10">
+										<div class="">
+											<div class="checkbox checkbox-styled">
+												<label>
+													<input type="checkbox" name="is_overlap" value="ok">
+													<span>추가 할인 가능 <a href="javascript:;" class="text-gray html-popover" tabindex="0" role="button" data-toggle="popover" data-trigger="focus" data-placement="right" title="" data-content="이미 쿠폰이 적용된 주문에 추가로 쿠폰 할인을 받을 수 있습니다. 이 기능에 체크한 쿠폰과 체크하지 않은 쿠폰이 함께 사용될 경우, 2개 쿠폰 할인이 모두 적용됩니다. 하지만 체크하지 않은 쿠폰끼리는 함께 사용할 수 없습니다. 자칫 상품을 무료 또는 원가 이하로 판매할 수 있기 때문에 주의하여 사용해야 합니다.&lt;br&gt;‘지정금액’ 혜택 선택 시 해당 옵션은 비활성화 됩니다." data-original-title="추가 할인 가능 "><i class="btm bt-question-circle"></i></a></span>
+												</label>
+											</div>
+										</div>
+																			</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+쿠폰코드 생성의 구조는 아래와 같습니다.
+
+<div class="col-md-12">
+						<div class="card">
+							<div class="card-head">
+								<header>쿠폰정보</header>
+							</div>
+							<div class="card-body form-horizontal border-top">
+																<div class="form-group">
+									<label class="col-sm-2 control-label required">쿠폰명										<i class="required-icon"></i>
+										<a href="javascript:;" class="text-gray html-popover" tabindex="0" role="button" data-toggle="popover" data-trigger="focus" data-placement="right" title="" data-content="고객에게 표시되는 쿠폰 이름입니다. 쿠폰 생성 후에도 수정 가능합니다." data-original-title="쿠폰명"><i class="btm bt-question-circle"></i></a></label>
+									<div class="col-sm-10">
+										<input type="text" tabindex="1" placeholder="예: 사이트 오픈 1주년 할인 쿠폰" autocomplete="off" class="form-control" name="name" maxlength="80"><div class="form-control-line"></div>
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-sm-2 control-label">쿠폰형식										<a href="javascript:;" class="text-gray html-popover" tabindex="0" role="button" data-toggle="popover" data-trigger="focus" data-placement="right" title="" data-content="&lt;p&gt;쿠폰 발행 방식을 선택합니다.&lt;/p&gt;&lt;p&gt;&lt;strong&gt;지정 발행: &lt;/strong&gt;발행대상을 지정하여 일괄 발행하는 쿠폰입니다. 그룹발행시 쿠폰 생성시점의 회원을 대상으로 발행됩니다. 발행 후 설정하신 사용기간에 맞춰 고객이 마이페이지에서 쿠폰을 확인할 수 있고, 결제 페이지에서 쿠폰을 사용할 수 있습니다. 발급대상 회원수에 따라 최대 30분까지 발급시간이 소요될 수 있습니다.&lt;/p&gt; &lt;p&gt;&lt;strong&gt;고객 다운로드:&lt;/strong&gt; 쿠폰을 발행하면 고객이 마이페이지 또는 쿠폰 다운로드 URL을 통해 받을 수 있습니다. 쿠폰 다운로드 URL은 쿠폰 목록에서 확인 및 복사할 수 있습니다.&lt;/p&gt;&lt;p&gt;&lt;strong&gt;자동 발행:&lt;/strong&gt; 회원가입, 첫 주문완료 등 특정 조건을 만족하면 쿠폰이 자동 발행됩니다. 고객이 마이페이지에서 쿠폰을 확인할 수 있고, 결제 페이지에서 쿠폰을 사용할 수 있습니다.&lt;/p&gt;&lt;p&gt;&lt;strong&gt;쿠폰코드 입력:&lt;/strong&gt; 판매자가 쿠폰 코드를 생성하면 고객은 결제 페이지에서 코드를 입력해 사용합니다. 단, 1개 코드만 입력 가능합니다.&lt;/p&gt;" data-original-title="쿠폰형식">
+											<i class="btm bt-question-circle"></i>
+										</a>
+									</label>
+									<div class="col-sm-10" style="">
+										<div class="radio radio-styled">
+											<label>
+												<input type="radio" name="type" value="targeted" checked="">
+												<span>지정 발행</span>
+											</label>
+										</div>
+										<div class="radio radio-styled">
+											<label>
+												<input type="radio" name="type" value="down">
+												<span>고객 다운로드</span>
+											</label>
+										</div>
+										<div class="radio radio-styled">
+											<label>
+												<input type="radio" name="type" value="auto">
+												<span>자동 발행</span>
+											</label>
+										</div>
+										<div class="radio radio-styled">
+											<label>
+												<input type="radio" name="type" value="create">
+												<span>쿠폰코드 생성</span>
+											</label>
+										</div>
+									</div>
+																	</div>
+																<div class="form-group _type_is_mult_coupon display-none" style="display: block;">
+									<label class="col-sm-2 control-label">쿠폰코드</label>
+									<div class="col-sm-10">
+										<div class="input-group input-group-padding">
+																							<div class="input-group-content vertical-bottom">
+													<select class="form-control" tabindex="3" name="type_is_mult_coupon" style="width: 200px;">
+														<option value="N" selected="">단일 쿠폰코드</option>
+														<option value="Y">여러 쿠폰코드</option>
+													</select><div class="form-control-line"></div>
+												</div>
+																																															<div class="input-group-content vertical-bottom width-7 _type_coupon_code" style="display: table-cell;">
+														<input class="form-control" tabindex="7" type="text" placeholder="쿠폰코드 입력 (입력하지 않으면 랜덤 생성)" name="type_coupon_code"><div class="form-control-line"></div>
+													</div>
+																																			<div class="input-group-content vertical-bottom width-4 _type_coupon_create_count display-none" style="display: none;">
+													<input type="text" class="form-control" tabindex="7" placeholder="발급수량(최대 10000개)" name="type_coupon_create_count"><div class="form-control-line"></div>
+												</div>
+																					</div>
+									</div>
+								</div>
+								<div class="form-group _type_target" style="display: block;">
+									<label class="col-sm-2 control-label">발행대상										<a href="javascript:;" class="text-gray html-popover" tabindex="0" role="button" data-toggle="popover" data-trigger="focus" data-placement="right" title="" data-content="&lt;p&gt;쿠폰 발행 대상을 지정합니다.&lt;/p&gt;&lt;p&gt;&lt;strong&gt;고객 다운로드&lt;/strong&gt;&lt;/p&gt;&lt;ul class='description-list'&gt;&lt;li&gt;전체회원: 모든 회원에게 발행합니다.&lt;/li&gt;&lt;li&gt;특정 회원그룹에게 발행합니다. 회원그룹은 &lt;a href='/admin/member/list' target='_blank' class='text-primary'&gt;사용자 목록&lt;/a&gt;에서 관리할 수 있습니다.&lt;/li&gt;&lt;li&gt;고객 행동 관리 그룹: &lt;a href='/admin/crm_marketing' target='_blank' class='text-primary'&gt;고객 행동 관리&lt;/a&gt;에서 생성한 그룹을 지정합니다.&lt;/li&gt;&lt;li&gt;개별회원: 단일 회원을 특정하여 쿠폰을 발행합니다.&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;strong&gt;자동 발행&lt;/strong&gt;&lt;/p&gt;&lt;ul class='description-list'&gt;&lt;li&gt;첫 회원가입: 신규 가입 회원에게 쿠폰 발행합니다. 같은 계정으로 재가입 하거나 동일 본인인증 데이터로 재가입 시 쿠폰이 발행되지 않습니다.&lt;/li&gt;&lt;li&gt;첫 주문완료: 회원의 첫 주문 배송완료일의 23:00 에 지급 됩니다. 부분취소 등으로 인하여 부분 배송완료된 주문이 있는 경우에도 발행됩니다. 단, 동일인(동일 계정, 이메일, 본인인증)이 재주문하거나 구매완료전 전체취소시 쿠폰이 발행되지 않습니다. 첫 주문완료 후 반품/교환 신청 후 다시 쿠폰 발급을 막으려면 쇼핑 &gt; &lt;a href='/admin/shopping/config' target='_blank' class='text-primary'&gt;환경설정&lt;/a&gt;에서 반품/교환 가능 기간을 무제한이 아닌 특정 기간으로 사용을 권장합니다.&lt;/li&gt;&lt;li&gt;생일: 생일을 맞은 회원이 있을 때 쿠폰을 발행합니다. [환경설정 &gt; 회원가입·그룹·등급 &gt; 가입 폼 관리]에서 생년월일을 기준으로 판단합니다. 생일 정보 변경 후 동일한 쿠폰이 재발행 되는 것을 막기 위해 1년에 한번만 발행 됩니다. 생일 쿠폰을 만든 다음날부터 발행이 시작됩니다.&lt;/li&gt;&lt;li&gt;쇼핑등급 변경: 선택한 쇼핑등급으로 변경될 때 쿠폰을 발행합니다. 이미 해당 등급에 속한 회원에게는 발행되지 않습니다. 높은 등급으로 변경되는 경우만 쿠폰을 발행하고 싶으면, ‘높은 자동 등급으로 변경되었을 때만 발행’ 옵션을 사용하세요.&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;strong&gt;쿠폰코드 생성&lt;/strong&gt;&lt;/p&gt;&lt;ul class='description-list'&gt;&lt;li&gt;회원: 모든 회원이 결제 시 사용 가능합니다.&lt;/li&gt;&lt;li&gt;회원+비회원: 회원과 비회원 모두 결제시 사용 가능합니다.&lt;/li&gt;&lt;/ul&gt;" data-original-title="발행대상"><i class="btm bt-question-circle"></i></a></label>
+									<div class="col-sm-10 _type_down display-none">
+										<div class="input-group input-group-padding">
+			<div class="input-group-content">
+			<select class="form-control" tabindex="3" name="type_down_target" style="width: 200px;" onchange="COUPON.changeCouponTypeTarget('type_down_target');">
+				<option value="all">전체회원</option><option value="group">지정그룹</option><option value="specific_member">개별회원</option>			</select><div class="form-control-line"></div>
+		</div>
+
+		<div class="input-group-content _type_group_code _type_input display-none display-m-row" style="display: none;">
+			<div class="form-control" style="z-index: 3; width: 200px;">
+				<a href="javascript:;" data-toggle="dropdown" class="_group_name text-nowrap" style="line-height: 29px; display: block" aria-expanded="false">
+					<span class="_group_name_text">그룹 선택</span>
+					<span class="text-primary _group_count"></span>
+				</a>
+				<ul class="dropdown-menu animation-dock check" role="menu" aria-labelledby="dLabel">
+					<div class="select_group _check_drop_group_list">
+											</div>
+				</ul>
+			</div><div class="form-control-line"></div>
+		</div>
+
+		<div class="input-group-content _type_crm _type_input display-none display-m-row" style="display: none;">
+			<div class="form-control" style="z-index: 3; width: 200px;">
+				<a href="javascript:;" data-toggle="dropdown" class="_group_name text-nowrap" style="line-height: 29px; display: block" aria-expanded="false">
+					<span class="_group_name_text">그룹 선택</span>
+					<span class="text-primary _group_count"></span>
+				</a>
+				<ul class="dropdown-menu animation-dock check" role="menu" aria-labelledby="dLabel">
+					<div class="select_group _check_drop_group_list">
+											</div>
+				</ul>
+			</div><div class="form-control-line"></div>
+		</div>
+
+    <div class="input-group-content display-none _type_input vertical-bottom tw-w-[200px] _type_specific_member_id" style="display: none;">
+      <label>
+        <input class="form-control" type="text" placeholder="회원 ID를 입력해주세요." name="type_specific_member_id"><div class="form-control-line"></div>
+      </label>
+    </div>
+
+		</div>									</div>
+									<div class="col-sm-10 _type_targeted display-none">
+										<div class="input-group input-group-padding">
+			<div class="input-group-content">
+			<select class="form-control" tabindex="3" name="type_targeted_target" style="width: 200px;" onchange="COUPON.changeCouponTypeTarget('type_targeted_target');">
+				<option value="all">전체회원</option><option value="group">지정그룹</option><option value="specific_member">개별회원</option>			</select><div class="form-control-line"></div>
+		</div>
+
+		<div class="input-group-content _type_group_code _type_input display-none display-m-row" style="display: none;">
+			<div class="form-control" style="z-index: 3; width: 200px;">
+				<a href="javascript:;" data-toggle="dropdown" class="_group_name text-nowrap" style="line-height: 29px; display: block" aria-expanded="false">
+					<span class="_group_name_text">그룹 선택</span>
+					<span class="text-primary _group_count"></span>
+				</a>
+				<ul class="dropdown-menu animation-dock check" role="menu" aria-labelledby="dLabel">
+					<div class="select_group _check_drop_group_list">
+											</div>
+				</ul>
+			</div><div class="form-control-line"></div>
+		</div>
+
+		<div class="input-group-content _type_crm _type_input display-none display-m-row" style="display: none;">
+			<div class="form-control" style="z-index: 3; width: 200px;">
+				<a href="javascript:;" data-toggle="dropdown" class="_group_name text-nowrap" style="line-height: 29px; display: block" aria-expanded="false">
+					<span class="_group_name_text">그룹 선택</span>
+					<span class="text-primary _group_count"></span>
+				</a>
+				<ul class="dropdown-menu animation-dock check" role="menu" aria-labelledby="dLabel">
+					<div class="select_group _check_drop_group_list">
+											</div>
+				</ul>
+			</div><div class="form-control-line"></div>
+		</div>
+
+    <div class="input-group-content display-none _type_input vertical-bottom tw-w-[200px] _type_specific_member_id" style="display: none;">
+      <label>
+        <input class="form-control" type="text" placeholder="회원 ID를 입력해주세요." name="type_specific_member_id"><div class="form-control-line"></div>
+      </label>
+    </div>
+
+		</div>									</div>
+									<div class="col-sm-10 _type_auto display-none">
+										<div class="input-group input-group-padding">
+																							<div class="input-group-content">
+													<select name="type_auto_target" class="form-control" style="width: 200px" onchange="COUPON.changeCouponTypeTarget('type_auto_target');">
+														<option value="join" selected="">첫 회원가입</option>
+														<option value="order">첫 주문완료</option>
+														<option value="birthday">생일</option>
+														<option value="grade_change">쇼핑등급 변경</option>
+													</select><div class="form-control-line"></div>
+												</div>
+												<div class="input-group-content _auto_order_list display-none">
+													<select class="form-control" name="auto_data_order_type" style="width: 200px">
+
+																													<option value="1">배송완료 1일 후</option>
+																													<option value="2">배송완료 2일 후</option>
+																													<option value="3">배송완료 3일 후</option>
+																													<option value="4">배송완료 4일 후</option>
+																													<option value="5">배송완료 5일 후</option>
+																													<option value="7">배송완료 7일 후</option>
+																													<option value="10">배송완료 10일 후</option>
+																													<option value="14">배송완료 14일 후</option>
+																													<option value="20">배송완료 20일 후</option>
+																													<option value="30">배송완료 30일 후</option>
+																													<option value="60">배송완료 60일 후</option>
+																													<option value="90">배송완료 90일 후</option>
+																											</select><div class="form-control-line"></div>
+												</div>
+												<div class="input-group-content _type_group_code display-none display-m-row" style="width: 200px; display: none;">
+													<select class="form-control _use_auto_change" name="auto_data_use_auto_change_group" style="height: 29px; padding: 0; margin: 0; width: 100%;" onchange="COUPON.changeUseAutoChangeGroup(this.value)">
+														<option value="Y">자동 등급 사용</option>
+														<option value="N">자동 등급 미사용</option>
+													</select><div class="form-control-line"></div>
+												</div>
+												<div class="input-group-content _type_group_code display-none display-m-row" style="display: none;">
+													<div class="form-control" style="z-index: 3; width: 200px;">
+														<a href="javascript:;" data-toggle="dropdown" class="_group_name text-nowrap" style="line-height: 29px; display: block" aria-expanded="false">
+															<span class="_group_name_text">그룹 선택</span>
+															<span class="text-primary _group_count"></span>
+														</a>
+														<ul class="dropdown-menu animation-dock check" role="menu" aria-labelledby="dLabel">
+															<div class="select_group _check_drop_group_list">
+																															</div>
+														</ul>
+													</div><div class="form-control-line"></div>
+												</div>
+																					</div>
+																					<div class="input-group-content checkbox checkbox-styled _type_group_code display-none" style="display: none;">
+												<label>													<input type="checkbox" name="auto_data_is_only_grade_up" value="Y" checked="">
+													<span class="no-margin-bottom">높은 자동 등급으로 변경되었을 때만 발행</span>
+												</label>
+											</div>
+																			</div>
+									<div class="col-sm-10 _type_create">
+																					<div class="radio radio-styled">
+												<label>
+													<input class="_member" type="radio" name="type_create_target" value="member" checked="" onclick="COUPON.changeCouponTypeTarget('type_create_target', 'member');">
+													<span>회원</span>
+												</label>
+											</div>
+											<div class="radio radio-styled">
+												<label>
+													<input class="_is_member" type="radio" name="type_create_target" value="all" onclick="COUPON.changeCouponTypeTarget('type_create_target', 'isMember');">
+													<span>회원 + 비회원</span>
+												</label>
+											</div>
+																			</div>
+								</div>
+								<div class="form-group _type_down display-none" style="">
+									<label class="col-sm-2 control-label">발행수량										<a href="javascript:;" class="text-gray html-popover" tabindex="0" role="button" data-toggle="popover" data-trigger="focus" data-placement="right" title="" data-content="쿠폰의 발급 가능 총 수량을 제한하여 선착순으로 한정된 인원에게 쿠폰을 지급하고 싶을 때 사용합니다. 발행수량을 10개로 지정하면 선착순으로 10명의 회원만 쿠폰을 다운로드 받을 수 있습니다." data-original-title="발행수량">
+											<i class="btm bt-question-circle"></i>
+										</a>
+									</label>
+									<div class="col-sm-10">
+										<div>
+											<div class="input-group input-group-padding">
+												<div class="input-group-content vertical-bottom width-1">
+													<input type="text" class="limit-count form-control" name="limit_count" placeholder="0" disabled="disabled" value="0"><div class="form-control-line"></div>
+												</div>
+												<div class="padding-left-4 checkbox checkbox-styled _is_limit_toggle">
+													<label>
+														<input type="checkbox" name="is_limit" value="N" checked="">
+														<span class="no-margin-bottom">개수제한 없음</span>
+													</label>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+
+								<div class="form-group _type_down display-none">
+									<label class="col-sm-2 control-label">쿠폰 숨김										<a href="javascript:;" class="text-gray html-popover" tabindex="0" role="button" data-toggle="popover" data-trigger="focus" data-placement="right" title="" data-content="마이페이지의 다운로드 쿠폰 리스트와 상품 상세페이지에서 쿠폰을 숨깁니다." data-original-title="쿠폰 숨김">
+											<i class="btm bt-question-circle"></i>
+										</a>
+									</label>
+									<div class="col-sm-10">
+										<div>
+											<div class="input-group input-group-padding">
+												<div class="padding-left-4 checkbox checkbox-styled">
+													<label>
+														<input type="checkbox" name="is_hide" value="Y" onclick="COUPON.toggleAlarmWrap()">
+														<span class="no-margin-bottom">숨김</span>
+													</label>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+																<div class="form-group _alarm_wrap display-none">
+									<label class="col-sm-2 control-label">발행알림										<a href="javascript:;" class="text-gray html-popover" tabindex="0" role="button" data-toggle="popover" data-trigger="focus" data-placement="right" title="" data-content="발행대상에게 웹과 앱 푸시 알림(앱 사용 시에만)을 발송합니다.&lt;br/&gt;&lt;strong&gt;고객 다운로드:&lt;/strong&gt; 관리자가 지정한 쿠폰 사용 시작일에 알림을 발송합니다.&lt;br/&gt;&lt;strong&gt;자동 발행:&lt;/strong&gt; 자동으로 발행된 발행일에 알림을 발송합니다." data-original-title="발행알림">
+											<i class="btm bt-question-circle"></i>
+										</a>
+									</label>
+									<div class="col-sm-10 _type_down display-none">
+										<div class="input-group input-group-padding">
+											<select class="form-control" tabindex="3" name="is_down_alarm" style="width: 200px;">
+												<option value="Y" selected="">사용 시작일에 알림</option>
+												<option value="N">알림 안함</option>
+											</select><div class="form-control-line"></div>
+										</div>
+									</div>
+									<div class="col-sm-10 _type_targeted display-none">
+										<div class="input-group input-group-padding">
+											<select class="form-control" tabindex="3" name="is_targeted_alarm" style="width: 200px;">
+												<option value="Y" selected="">사용 시작일에 알림</option>
+												<option value="N">알림 안함</option>
+											</select><div class="form-control-line"></div>
+										</div>
+									</div>
+									<div class="col-sm-10 _type_auto display-none">
+										<div class="input-group input-group-padding">
+											<select class="form-control" tabindex="3" name="is_auto_alarm" style="width: 200px;">
+												<option value="Y" selected="">발행 시작일에 알림</option>
+												<option value="N">알림 안함</option>
+											</select><div class="form-control-line"></div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="card">
+							<div class="card-head">
+								<header>사용정보</header>
+							</div>
+							<div class="card-body form-horizontal border-top">
+								<div class="form-group">
+									<label for="" class="col-sm-2 control-label required">사용혜택 <i class="required-icon"></i>
+										<a href="javascript:;" class="text-gray html-popover" tabindex="0" role="button" data-toggle="popover" data-trigger="focus" data-placement="top" title="" data-content="쿠폰 사용 시 어떤 혜택을 줄지 지정합니다.&lt;br&gt;&lt;strong&gt;금액 할인&lt;/strong&gt;: 주문 금액에 적용할 할인 금액 또는 할인율을 지정합니다. 할인율(%)은 결제금액에 비례하여 할인 금액이 책정됩니다.&lt;br&gt;&lt;strong&gt;배송비 무료&lt;/strong&gt;: 주문서의 모든 배송비를 무료로 적용합니다. 주문서당 1개의 배송비 무료 쿠폰만 적용할 수 있습니다. 반품/교환 배송비는 면제되지 않습니다. &lt;br&gt;&lt;strong&gt;지정금액&lt;/strong&gt;: 지정된 금액으로 구매할 수 있습니다. 주문서당 지정금액 쿠폰 1개만 적용할 수 있고 다른 쿠폰과 함께 사용할 수 없습니다. 쿠폰 적용 범위는 ‘지정상품'에 대해서 사용할 수 있습니다. 지정 상품이 여러 개라면 가장 판매가가 높은 상품에 자동 적용됩니다." data-original-title="사용혜택"><i class="btm bt-question-circle"></i></a>
+									</label>
+									<div class="col-sm-10">
+										<div class="input-group input-group-padding">
+											<div class="input-group-content m-block" style="width: 200px;">
+												<select class="form-control" tabindex="3" name="benefit_type" id="">
+													<option value="discount">금액 할인</option>
+													<option value="delivery">배송비 무료</option>
+																											<option value="fix_price">지정금액</option>
+																									</select><div class="form-control-line"></div>
+											</div>
+											<div class="_sale_wrap m-block">
+												<div class="input-group-content vertical-bottom" style="width: 120px;">
+													<input type="text" class="form-control" tabindex="9" name="apply_sale_price" maxlength="10"><div class="form-control-line"></div>
+												</div>
+												<div class="input-group-content vertical-bottom width-2" style="width: 80px;">
+													<select name="sale_amount_type" tabindex="10" class="form-control _sale_amount_type">
+																											<option value="price" id="sale_amount_type_price">KRW</option>
+														<option value="percent" id="sale_amount_type_percent" class="" style="display: block;">%</option>
+													</select><div class="form-control-line"></div>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div>
+										<div class="coupon-edit-selected" style="display: none">
+										</div>
+									</div>
+								</div>
+								<div class="form-group _apply_sale_type_max_price" style="display: none;">
+									<label class="col-sm-2 control-label required">최대 할인 금액 <i class="required-icon"></i><a href="javascript:;" class="text-gray html-popover" tabindex="0" role="button" data-toggle="popover" data-trigger="focus" data-placement="right" title="" data-content="정률(%) 할인의 경우 결제금액에 비례하여 할인 금액이 책정됩니다. 배송비 무료 쿠폰의 경우 배송비 정책(지역별 배송비, 무게별 차등 배송비 등)에 따라 할인 금액이 다르게 책정됩니다. 정률(%) 할인과 배송비 무료 혜택 쿠폰에 최대 할인 금액 한도를 설정하여 너무 많은 할인이 되지 않도록 해주는 장치입니다. " data-original-title="최대 할인 금액 "><i class="btm bt-question-circle"></i></a></label>
+									<div class="col-sm-10">
+										<div class="holder">
+											<input type="text" class="form-control" tabindex="11" style="padding-left: 45px; width: 200px;" value="" name="apply_sale_type_max_price"><div class="form-control-line"></div>
+											<span class="form-control-krw text-gray-bright" style="left:0; top:7px;">KRW</span>
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-sm-2 control-label required">최소 주문금액 <i class="required-icon"></i><a href="javascript:;" class="text-gray html-popover" tabindex="0" role="button" data-toggle="popover" data-trigger="focus" data-placement="right" title="" data-content="쿠폰 사용을 위해 필요한 최소 주문금액을 지정합니다. 주문금액은 주문하려는 상품금액의 합계를 의미하며, 즉시/기간할인이 적용되있는 경우 할인이 적용된 상품금액으로 계산합니다." data-original-title="최소 주문금액 "><i class="btm bt-question-circle"></i></a></label>
+									<div class="col-sm-10">
+										<div class="holder">
+											<input type="text" class="form-control" tabindex="12" style="padding-left: 45px; width: 200px;" name="apply_sale_type_minimum_price" maxlength="10"><div class="form-control-line"></div>
+											<span class="form-control-krw text-gray-bright" style="left:0; top:7px">KRW</span>
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-sm-2 control-label">쿠폰 적용 범위 <a href="javascript:;" class="text-gray html-popover" tabindex="0" role="button" data-toggle="popover" data-trigger="focus" data-placement="right" title="" data-content="쿠폰을 사용할 수 있는 상품의 조건을 지정합니다. &lt;br/&gt;· 모든 상품: 모든 상품과 카테고리에 쿠폰을 적용할 수 있습니다.&lt;br/&gt;· 지정 카테고리: 특정 카테고리에 포함된 상품을 구매할 때만 쿠폰을 적용할 수 있습니다.&lt;br/&gt;· 지정 상품: 특정 상품 구매 시에만 쿠폰을 적용할 수 있습니다." data-original-title="쿠폰 적용 범위 "><i class="btm bt-question-circle"></i></a></label>
+									<div class="col-sm-8">
+										<div class="input-group input-group-padding">
+																							<div class="input-group-content vertical-bottom">
+													<select class="form-control" tabindex="8" name="apply_type" style="width: 200px;">
+														<option value="all">모든 상품</option><option value="category">지정 카테고리</option><option value="product">지정 상품</option>													</select><div class="form-control-line"></div>
+												</div>
+																																	<div class="input-group-content vertical-bottom _apply_type" style="padding-right: 15px; display: none;">
+												<div class="form-control" style="z-index: 3; width: 200px;">
+													<a href="javascript:;" data-toggle="dropdown" class="_group_name" style="line-height: 29px; display: block" aria-expanded="false">
+														<span class="_category_name_text"></span>
+														<span class="text-primary _category_count"></span>
+													</a>
+													<ul class="dropdown-menu animation-dock check" role="menu" aria-labelledby="dLabel" onclick="event.stopPropagation()" style="margin-top:3px;">
+														<div class="select_group coupon_category_select_list _check_drop_category_list checkbox-styled">
+															<ul class="checkbox_group_first"><li class="first_parent_list"><label class="first_wrap"><input class="_coupon_checkbox-0" type="checkbox" data-code="s20220818e0cc55678c51c" value="Photography"><span>Photography</span></label></li></ul><ul class="checkbox_group_first"><li class="first_parent_list"><label class="first_wrap"><input class="_coupon_checkbox-1" type="checkbox" data-code="s20220818172ff6637ac85" value="Music"><span>Music</span></label></li></ul><ul class="checkbox_group_first"><li class="first_parent_list"><label class="first_wrap"><input class="_coupon_checkbox-2" type="checkbox" data-code="s20220831b6744f9e6a174" value="Productivity"><span>Productivity</span></label></li></ul><ul class="checkbox_group_first"><li class="first_parent_list"><label class="first_wrap"><input class="_coupon_checkbox-3" type="checkbox" data-code="s20220831d6fb67666de41" value="Marketing"><span>Marketing</span></label></li></ul><ul class="checkbox_group_first"><li class="first_parent_list"><label class="first_wrap"><input class="_coupon_checkbox-4" type="checkbox" data-code="s202208316f552712ad47b" value="Investment"><span>Investment</span></label></li></ul><ul class="checkbox_group_first"><li class="first_parent_list"><label class="first_wrap"><input class="_coupon_checkbox-5" type="checkbox" data-code="s202208316c77f3e6a385a" value="Programming"><span>Programming</span></label></li></ul><ul class="checkbox_group_first"><li class="first_parent_list"><label class="first_wrap"><input class="_coupon_checkbox-6" type="checkbox" data-code="s202208239603deeac4538" value="3D"><span>3D</span></label></li></ul><ul class="checkbox_group_first"><li class="first_parent_list"><label class="first_wrap"><input class="_coupon_checkbox-7" type="checkbox" data-code="s20220822af86ef1af3ea0" value="Writing"><span>Writing</span></label></li></ul><ul class="checkbox_group_first"><li class="first_parent_list"><label class="first_wrap"><input class="_coupon_checkbox-8" type="checkbox" data-code="s20220818589088395d996" value="IT"><span>IT</span></label></li></ul><ul class="checkbox_group_first"><li class="first_parent_list"><label class="first_wrap"><input class="_coupon_checkbox-9" type="checkbox" data-code="s2022081839a7c483700ea" value="Video contents"><span>Video contents</span></label></li></ul><ul class="checkbox_group_first"><li class="first_parent_list"><label class="first_wrap"><input class="_coupon_checkbox-10" type="checkbox" data-code="s20220818c901efcdd8a6c" value="Drawing"><span>Drawing</span></label></li></ul><ul class="checkbox_group_first"><li class="first_parent_list"><label class="first_wrap"><input class="_coupon_checkbox-11" type="checkbox" data-code="s2022081835c965ccb1d83" value="Handicraft"><span>Handicraft</span></label></li></ul><ul class="checkbox_group_first"><li class="first_parent_list"><label class="first_wrap"><input class="_coupon_checkbox-12" type="checkbox" data-code="s2022081874795cc75a0c3" value="Food"><span>Food</span></label></li></ul><ul class="checkbox_group_first"><li class="first_parent_list"><label class="first_wrap"><input class="_coupon_checkbox-13" type="checkbox" data-code="s20220818f0ec92be5e199" value="Design"><span>Design</span></label></li></ul>														</div>
+													</ul>
+												</div><div class="form-control-line"></div>
+											</div>
+										</div>
+										<div class="_product_list" style="display: none;">
+											<div class="btn btn-file btn-sm ink-reaction btn-raised btn-default-bright _product_search_btn" style="margin:8px 0">
+												쿠폰 적용 상품 선택											</div>
+										</div>
+										<div class="_product_list" style="clear: both; display: none;">
+											<div class="shop-table order _product_apply_list"></div>
+										</div>
+									</div>
+								</div>
+								<div class="form-group _excluded_product_form">
+									<label class="col-sm-2 control-label">사용제외 상품 <a href="javascript:;" class="text-gray html-popover" tabindex="0" role="button" data-toggle="popover" data-trigger="focus" data-placement="right" title="" data-content="쿠폰을 적용할 수 없는 상품을 지정합니다. 사용제외 상품이 주문에 포함되어 있더라도 주문서의 총 주문 금액이 최소 주문금액을 충족하면 쿠폰 사용이 가능합니다. 다만, 쿠폰 사용이 가능한 상품에만 할인이 적용됩니다. 배송비 무료 쿠폰은 주문서의 모든 배송비에 적용하기 때문에 사용가능 상품이 주문에 1개라도 포함되어 있으면 배송비 전체가 할인됩니다." data-original-title="사용제외 상품 "><i class="btm bt-question-circle"></i></a></label>
+									<div class="col-sm-8">
+										<div class="btn btn-file btn-sm ink-reaction btn-raised btn-default-bright _excluded_product_search_btn" style="margin:8px 0;">
+											쿠폰 적용 제외 상품 선택										</div>
+										<div class="shop-table order _excluded_product_list"></div>
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-sm-2 control-label">사용기간										<a href="javascript:;" class="text-gray html-popover" tabindex="0" role="button" data-toggle="popover" data-trigger="focus" data-placement="right" title="" data-content="쿠폰의 사용 가능 기간을 지정합니다. &lt;br&gt;&lt;strong&gt;지정 발행&lt;/strong&gt;: 쿠폰 생성일 기준으로 최대 40일까지 사용기간을 설정할 수 있습니다. 미사용된 쿠폰은 사용기간을 초과시 자동 삭제됩니다.&lt;br&gt;&lt;strong&gt;고객 다운로드&lt;/strong&gt;: 기간설정과 만료일을 설정할 수 있습니다. 기간설정 시 사용 시작일과 종료일을 입력하고 만료일 설정 시 다운로드 후 사용기간을 설정합니다. 사용가능기간을 초과한 경우 마이페이지에서 쿠폰을 확인할 수 없고 결제 페이지에서 사용이 불가합니다.&lt;br&gt;&lt;strong&gt;쿠폰코드 입력&lt;/strong&gt;: 사용 시작일과 종료일을 입력합니다. 사용 종료일 이후에는 마이페이지에서 쿠폰을 확인할 수 없고 결제 페이지에서 사용이 불가합니다.&lt;br&gt;&lt;strong&gt;자동 발행&lt;/strong&gt;: 쿠폰 발행일 기준으로 몇일 후까지 사용 가능하게 할지 입력합니다. 발행상태가 종료됨이라도 이미 발행된 쿠폰은 사용기간까지 마이페이지에서 확인할 수 있고 결제 시 사용할 수 있습니다." data-original-title="사용기간">
+											<i class="btm bt-question-circle"></i>
+										</a>
+									</label>
+
+									<div class="col-sm-10">
+										<div class="_duration_type_wrap display-none">
+											<div class="radio-inline radio-styled">
+												<label>
+													<input type="radio" name="duration_type" value="date_range">
+													<span>기간 설정</span>
+												</label>
+											</div>
+											<div class="radio-inline radio-styled">
+												<label>
+													<input type="radio" name="duration_type" value="validity_period">
+													<span>만료일 설정</span>
+												</label>
+											</div>
+										</div>
+										<div class="_calendar_view">
+											<div class="input-group input-group-padding">
+												<div class="m-block">
+													<div class="input-group-content calendar-wrap">
+														<i class="icon-calendar icons"></i>
+														<input class="_calendar_limit form-control" type="text" name="start_date"><div class="form-control-line"></div>
+													</div>
+													<div class="input-group-content">
+														<div style="margin-top: 5px;">~</div>
+													</div>
+													<div class="input-group-content calendar-wrap">
+														<i class="icon-calendar icons _icon_last"></i>
+														<input class="_calendar_limit form-control" type="text" name="end_date"><div class="form-control-line"></div>
+													</div>
+												</div>
+												<div class="padding-left-4 checkbox checkbox-styled _calendar_limit_toggle m-block">
+													<label>
+														<input type="checkbox" name="is_unlimited_date" value="ok">
+														<span>기간제한 없음															<a href="javascript:;" class="text-gray html-popover" tabindex="0" role="button" data-toggle="popover" data-trigger="focus" data-placement="right" title="" data-content="쿠폰의 종료일을 무기한으로 설정하고 싶은 경우 사용합니다." data-original-title="기간제한 없음"><i class="btm bt-question-circle"></i></a></span>
+													</label>
+												</div>
+											</div>
+										</div>
+
+										<div class="_type_auto _validity_period display-none">
+											<div class="input-group input-group-padding">
+												<div class="m-block">
+													<div class="input-group-content vertical-bottom" style="padding-bottom:5px;">
+														<span class="_auto_data_day_limit_prefix">쿠폰이 발행된 날부터</span>
+													</div>
+													<div class="input-group-content vertical-bottom width-1">
+														<input type="text" class="form-control limit-count" name="auto_data_day_limit" value="15" placeholder=""><div class="form-control-line"></div>
+													</div>
+													<div class="input-group-content vertical-bottom" style="padding-bottom:5px;">
+														<span>일 후 까지 사용 가능</span>
+													</div>
+												</div>
+												<div class="padding-left-4 checkbox checkbox-styled _day_limit_toggle m-block">
+													<label>
+														<input class="_is_unlimited_date" type="checkbox" name="is_auto_unlimited_date" value="ok">
+														<span class="no-margin-bottom">기간제한 없음															<a href="javascript:;" class="text-gray html-popover" tabindex="0" role="button" data-toggle="popover" data-trigger="focus" data-placement="right" title="" data-content="쿠폰의 종료일을 무기한으로 설정하고 싶은 경우 사용합니다." data-original-title="기간제한 없음"><i class="btm bt-question-circle"></i></a></span>
+													</label>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="form-group _used_count" style="display: block;">
+									<label class="col-sm-2 control-label">사용횟수										<a href="javascript:;" class="text-gray html-popover" tabindex="0" role="button" data-toggle="popover" data-trigger="focus" data-placement="right" title="" data-content="한 고객이 동일한 쿠폰을 사용 기간 내 설정한 횟수만큼 사용할 수 있습니다. 단, 한 주문에 한번만 적용 가능합니다. 0이나 공백 입력 시 1개로 자동 저장됩니다. &lt;br/&gt;&lt;strong&gt;고객 다운로드:&lt;/strong&gt; 사용 후 소멸되지 않고 사용 종료일 전까지 설정한 횟수만큼 사용 가능합니다.&lt;br/&gt; &lt;strong&gt;자동 발행:&lt;/strong&gt; 사용 후 소멸되지 않고 사용 종료일 전까지 설정한 횟수만큼 사용 가능합니다. &lt;br/&gt;&lt;strong&gt;쿠폰코드 입력:&lt;/strong&gt; 단일 쿠폰코드는 동일 회원이 사용 종료일 전까지 사용 횟수만큼 사용 가능합니다. 여러 쿠폰코드는 다른 쿠폰코드로 사용 횟수만큼 사용 가능합니다. 예를 들어, 단일 쿠폰코드로 DISCOUNT 코드를 사용할 경우 해당 코드로 한 회원이 2번 이상 사용 가능합니다. 여러 쿠폰코드로 SALE1, SALE2가 생성된 경우 SALE1을 2번 이상 사용할 수는 없으나 SALE1, SALE2를 2개의 주문에서 사용할 수는 있습니다." data-original-title="사용횟수"><i class="btm bt-question-circle"></i></a>
+									</label>
+																			<div class="col-sm-10">
+											<div class="input-group input-group-padding member_limit_count">
+												<div class="m-block">
+													<div class="input-group-content vertical-bottom" style="padding-bottom:5px;">
+														<span>동일 회원이 최대</span>
+													</div>
+													<div class="input-group-content vertical-bottom width-1">
+														<input type="text" class="form-control _member_limit_count" name="member_limit_count" value="1"><div class="form-control-line"></div>
+													</div>
+													<div class="input-group-content vertical-bottom" style="padding-bottom:5px;">
+														<span>회 까지 사용 가능</span>
+													</div>
+												</div>
+												<div class="padding-left-4 checkbox checkbox-styled m-block">
+													<label class="_member_limit_toggle">
+														<input class="_is_member_limit" type="checkbox" name="is_duplication" value="ok">
+														<span class="no-margin-bottom">횟수제한 없음 </span>
+													</label>
+												</div>
+											</div>
+										</div>
+																	</div>
+								<div class="form-group">
+									<label class="col-sm-2 control-label">사용 옵션</label>
+									<div class="col-sm-10">
+										<div class="">
+											<div class="checkbox checkbox-styled">
+												<label>
+													<input type="checkbox" name="is_overlap" value="ok">
+													<span>추가 할인 가능 <a href="javascript:;" class="text-gray html-popover" tabindex="0" role="button" data-toggle="popover" data-trigger="focus" data-placement="right" title="" data-content="이미 쿠폰이 적용된 주문에 추가로 쿠폰 할인을 받을 수 있습니다. 이 기능에 체크한 쿠폰과 체크하지 않은 쿠폰이 함께 사용될 경우, 2개 쿠폰 할인이 모두 적용됩니다. 하지만 체크하지 않은 쿠폰끼리는 함께 사용할 수 없습니다. 자칫 상품을 무료 또는 원가 이하로 판매할 수 있기 때문에 주의하여 사용해야 합니다.&lt;br&gt;‘지정금액’ 혜택 선택 시 해당 옵션은 비활성화 됩니다." data-original-title="추가 할인 가능 "><i class="btm bt-question-circle"></i></a></span>
+												</label>
+											</div>
+										</div>
+																			</div>
+								</div>
+							</div>
+						</div>
+					</div>
