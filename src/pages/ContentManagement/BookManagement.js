@@ -131,6 +131,7 @@ export const initialBooks = [
     BOOK_EBOOK_RENT_YN: "Y",
     EBOOK_PUBLISH_DATE: "2024-05-17",
     REGISTRATION_DATE: "2024-05-10",
+    SERVICE_OPEN_DATE: "2024-05-20",
     TAKE_COUNT: "73",
     BOOK_ADULT_YN: "N",
     IS_EXCLUSIVE: "N",
@@ -178,6 +179,7 @@ export const initialBooks = [
     BOOK_EBOOK_RENT_YN: "N",
     EBOOK_PUBLISH_DATE: "2023-01-15",
     REGISTRATION_DATE: "2023-01-10",
+    SERVICE_OPEN_DATE: null,
     TAKE_COUNT: "150",
     BOOK_ADULT_YN: "N",
     IS_EXCLUSIVE: "Y",
@@ -221,6 +223,7 @@ export const initialBooks = [
     BOOK_EBOOK_RENT_YN: "N",
     EBOOK_PUBLISH_DATE: "2023-05-20",
     REGISTRATION_DATE: "2023-05-15",
+    SERVICE_OPEN_DATE: "2023-06-01",
     TAKE_COUNT: "88",
     BOOK_ADULT_YN: "Y",
     IS_EXCLUSIVE: "N",
@@ -266,6 +269,7 @@ export const initialBooks = [
     BOOK_EBOOK_RENT_YN: "Y",
     EBOOK_PUBLISH_DATE: "2022-08-10",
     REGISTRATION_DATE: "2022-08-01",
+    SERVICE_OPEN_DATE: "2022-08-15",
     TAKE_COUNT: "250",
     BOOK_ADULT_YN: "N",
     IS_EXCLUSIVE: "N",
@@ -312,6 +316,7 @@ export const initialBooks = [
     BOOK_EBOOK_RENT_YN: "Y",
     EBOOK_PUBLISH_DATE: "2024-01-20",
     REGISTRATION_DATE: "2024-01-15",
+    SERVICE_OPEN_DATE: null,
     TAKE_COUNT: "120",
     BOOK_ADULT_YN: "N",
     IS_EXCLUSIVE: "N",
@@ -1012,6 +1017,7 @@ export const initialBooks = [
   RECOMMENDATION_TITLE: book.RECOMMENDATION_TITLE || "",
   RECOMMENDATION_MESSAGE: book.RECOMMENDATION_MESSAGE || "",
   RECOMMENDATION_TEXTS: book.RECOMMENDATION_TEXTS || [],
+  SERVICE_OPEN_DATE: book.SERVICE_OPEN_DATE || null,
   DOWNLOAD_COUNT: Math.floor(Math.random() * 2000),
   LIKE_COUNT: Math.floor(Math.random() * 1000),
   REVIEW_COUNT: Math.floor(Math.random() * 500),
@@ -1075,6 +1081,10 @@ const BookManagement = () => {
 
   const [searchText, setSearchText] = useState("");
   const [searchContentType, setSearchContentType] = useState("all");
+  const [
+    showOnlyMissingServiceOpenDate,
+    setShowOnlyMissingServiceOpenDate,
+  ] = useState(false);
 
   const availableKeywords = useMemo(() => {
     const activeKeywords = new Set();
@@ -1093,6 +1103,13 @@ const BookManagement = () => {
 
   const filteredData = useMemo(() => {
     const filtered = books
+      .filter((book) => {
+        // New filter logic
+        if (showOnlyMissingServiceOpenDate) {
+          return !book.SERVICE_OPEN_DATE;
+        }
+        return true;
+      })
       .filter((book) => {
         // Content Type Filter
         if (searchContentType === "all") return true;
@@ -1119,7 +1136,7 @@ const BookManagement = () => {
     );
 
     return filtered;
-  }, [books, searchText, searchContentType]);
+  }, [books, searchText, searchContentType, showOnlyMissingServiceOpenDate]);
 
   // 기존 시리즈명 목록 및 권수 추출 (중복 제거 및 권수 계산)
   const seriesData = useMemo(() => {
@@ -1179,6 +1196,9 @@ const BookManagement = () => {
         : null,
       REGISTRATION_DATE: book.REGISTRATION_DATE
         ? moment(book.REGISTRATION_DATE)
+        : null,
+      SERVICE_OPEN_DATE: book.SERVICE_OPEN_DATE
+        ? moment(book.SERVICE_OPEN_DATE)
         : null,
       TAGS: book.TAGS || [],
       LANGUAGE: book.LANGUAGE
@@ -1256,6 +1276,9 @@ const BookManagement = () => {
             : null,
           REGISTRATION_DATE: values.REGISTRATION_DATE
             ? values.REGISTRATION_DATE.format("YYYY-MM-DD")
+            : null,
+          SERVICE_OPEN_DATE: values.SERVICE_OPEN_DATE
+            ? values.SERVICE_OPEN_DATE.format("YYYY-MM-DD")
             : null,
           PLAY_TIME:
             contentType === "20" ? values.PLAY_TIME || "00:00:00" : undefined,
@@ -1605,6 +1628,9 @@ const BookManagement = () => {
       EBOOK_PUBLISH_DATE: bookData.EBOOK_PUBLISH_DATE
         ? moment(bookData.EBOOK_PUBLISH_DATE).format("YYYY-MM-DD")
         : null, // Format date
+      SERVICE_OPEN_DATE: bookData.SERVICE_OPEN_DATE
+        ? moment(bookData.SERVICE_OPEN_DATE).format("YYYY-MM-DD")
+        : null,
       // Ensure other fields are strings or null/undefined
       BOOK_PUBLISHER: bookData.BOOK_PUBLISHER || "",
       SUB_CATEGORY_NAME: bookData.SUB_CATEGORY_NAME || "",
@@ -1792,8 +1818,32 @@ const BookManagement = () => {
       key: "registrationDate",
       align: "center",
       width: 110,
-      sorter: (a, b) =>
-        moment(a.REGISTRATION_DATE).unix() - moment(b.REGISTRATION_DATE).unix(),
+      sorter: (a, b) => {
+        if (!a.REGISTRATION_DATE && !b.REGISTRATION_DATE) return 0;
+        if (!a.REGISTRATION_DATE) return 1;
+        if (!b.REGISTRATION_DATE) return -1;
+        return (
+          moment(a.REGISTRATION_DATE).unix() -
+          moment(b.REGISTRATION_DATE).unix()
+        );
+      },
+      render: (date) => (date ? moment(date).format("YYYY-MM-DD") : "-"),
+    },
+    {
+      title: "서비스 오픈일",
+      dataIndex: "SERVICE_OPEN_DATE",
+      key: "serviceOpenDate",
+      align: "center",
+      width: 120,
+      sorter: (a, b) => {
+        if (!a.SERVICE_OPEN_DATE && !b.SERVICE_OPEN_DATE) return 0;
+        if (!a.SERVICE_OPEN_DATE) return 1;
+        if (!b.SERVICE_OPEN_DATE) return -1;
+        return (
+          moment(a.SERVICE_OPEN_DATE).unix() -
+          moment(b.SERVICE_OPEN_DATE).unix()
+        );
+      },
       render: (date) => (date ? moment(date).format("YYYY-MM-DD") : "-"),
     },
     {
@@ -1906,7 +1956,7 @@ const BookManagement = () => {
         style={{
           display: "flex",
           justifyContent: "space-between",
-          alignItems: "flex-start",
+          alignItems: "center",
           flexWrap: "wrap",
           gap: "10px",
         }}
@@ -1929,6 +1979,13 @@ const BookManagement = () => {
           style={{ minWidth: "300px", flex: 1, maxWidth: "600px" }}
         />
         <Space>
+          <Space>
+            <Text>오픈일 미지정</Text>
+            <Switch
+              checked={showOnlyMissingServiceOpenDate}
+              onChange={setShowOnlyMissingServiceOpenDate}
+            />
+          </Space>
           {/* Import Button */}
           <Button icon={<UploadOutlined />} onClick={showImportModal}>
             대량 등록
@@ -2513,6 +2570,11 @@ const BookManagement = () => {
                 </Select>
               </Form.Item>
             </Col>
+            <Col span={12}>
+              <Form.Item name="SERVICE_OPEN_DATE" label="서비스 오픈일">
+                <DatePicker format="YYYY-MM-DD" style={{ width: "100%" }} />
+              </Form.Item>
+            </Col>
           </Row>
           <Divider />
           <Form.Item
@@ -2574,8 +2636,8 @@ const BookManagement = () => {
                 </p>
                 <p>
                   선택 컬럼 예시: BOOK_PUBLISHER, SUB_CATEGORY_NAME, PRICE,
-                  EBOOK_PUBLISH_DATE (YYYY-MM-DD), TAGS (쉼표로 구분),
-                  DESCRIPTION 등
+                  EBOOK_PUBLISH_DATE (YYYY-MM-DD), SERVICE_OPEN_DATE
+                  (YYYY-MM-DD), TAGS (쉼표로 구분), DESCRIPTION 등
                 </p>
               </div>
             }

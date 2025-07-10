@@ -11,6 +11,7 @@ import {
     BookOutlined,
     CalendarOutlined,
     CheckSquareOutlined,
+    CustomerServiceOutlined,
     DatabaseOutlined,
     DollarCircleOutlined,
     EditOutlined,
@@ -48,7 +49,6 @@ const menuItems = [
     icon: <BookOutlined />,
     subMenu: [
       { key: '/content/books', path: '/content/books', name: '도서 관리', icon: <BookOutlined /> },
-      { key: '/content/book-ranking', path: '/content/book-ranking', name: '도서 랭킹 관리', icon: <OrderedListOutlined /> },
       { key: '/content/categories', path: '/content/categories', name: '카테고리 관리', icon: <TagOutlined /> },
       { key: '/content/keywords', path: '/content/keywords', name: '키워드 관리', icon: <TagsOutlined /> },
       { key: '/content/series-management', path: '/content/series-management', name: '시리즈 관리', icon: <ApartmentOutlined /> },
@@ -56,6 +56,16 @@ const menuItems = [
       { key: '/content/analysis', path: '/content/analysis', name: '콘텐츠 통계', icon: <BookOutlined /> },
       { key: '/content/curation', path: '/content/curation', name: '큐레이션 관리', icon: <TagsOutlined /> },
     ],
+  },
+  {
+    key: '/fixed-content',
+    name: '고정 콘텐츠 관리',
+    icon: <FileTextOutlined />,
+    subMenu: [
+        { key: '/fixed-content/book-ranking', path: '/fixed-content/book-ranking', name: '도서 랭킹 관리', icon: <OrderedListOutlined /> },
+        { key: '/fixed-content/new-books', path: '/fixed-content/new-books', name: '신규 도서 관리', icon: <BookOutlined /> },
+        { key: '/fixed-content/new-audiobooks', path: '/fixed-content/new-audiobooks', name: '신규 오디오북 관리', icon: <CustomerServiceOutlined /> },
+    ]
   },
   {
     key: '/self-publishing',

@@ -50,7 +50,10 @@ import MemberInfo from './pages/UserManagement/MemberInfo';
 import SubscriptionHistory from './pages/UserManagement/SubscriptionHistory';
 
 // 새로 추가된 신고 관리 페이지 컴포넌트 임포트
-import BookRankingManagement from "./pages/ContentManagement/BookRankingManagement";
+import BookRankingManagement from "./pages/FixedContentManagement/BookRankingManagement";
+import FixedContentManagement from './pages/FixedContentManagement/FixedContentManagement';
+import NewAudiobookManagement from "./pages/FixedContentManagement/NewAudiobookManagement";
+import NewBookManagement from "./pages/FixedContentManagement/NewBookManagement";
 import ReportList from './pages/ReportManagement/ReportList';
 import ReportSettings from './pages/ReportManagement/ReportSettings';
 import WorksList from './pages/SelfPublishing/WorksList';
@@ -164,7 +167,12 @@ function App() {
               <Route path="content/analysis" element={<ContentStatistics />} />
               <Route path="content/curation" element={<CurationManagement />} />
               <Route path="content/unsubscribe" element={<UnsubscribeManagement />} />
-              <Route path="content/book-ranking" element={<BookRankingManagement />} />
+
+              {/* 고정 콘텐츠 관리 */}
+              <Route path="fixed-content" element={<FixedContentManagement />} />
+              <Route path="fixed-content/book-ranking" element={<BookRankingManagement />} />
+              <Route path="fixed-content/new-books" element={<NewBookManagement />} />
+              <Route path="fixed-content/new-audiobooks" element={<NewAudiobookManagement />} />
 
               {/* 자가출판 */}
               <Route path="self-publishing/approval" element={<ContentApproval />} />
