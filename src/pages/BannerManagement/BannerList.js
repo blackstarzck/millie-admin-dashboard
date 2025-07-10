@@ -1,4 +1,4 @@
-import { MenuOutlined } from '@ant-design/icons';
+import { LinkOutlined, MenuOutlined } from '@ant-design/icons';
 import {
   DndContext,
   PointerSensor,
@@ -12,11 +12,11 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { Button, Card, Carousel, Col, Form, Input, Modal, Popconfirm, Row, Select, Space, Table, Tag, Typography } from 'antd';
+import { Button, Card, Col, Form, Image, Input, Popconfirm, Row, Select, Space, Table, Tooltip, Typography } from 'antd';
 import React, { createContext, useContext, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const { Title, Text } = Typography;
+const { Title } = Typography;
 const { Search } = Input;
 const { Option } = Select;
 
@@ -95,8 +95,13 @@ const BannerList = () => {
         },
     ]);
 
+    const positionToPath = {
+        Home_Top: '/dashboard',
+        Home_Middle: '/dashboard',
+        Category_Top: '/content/categories',
+    };
+
     const [filteredBanners, setFilteredBanners] = useState(banners);
-    const [previewBanner, setPreviewBanner] = useState(null);
     const [editingKey, setEditingKey] = useState('');
     const [editingItemKey, setEditingItemKey] = useState('');
 
@@ -188,8 +193,6 @@ const BannerList = () => {
         else setFilteredBanners(banners.filter(banner => banner.position === value));
     };
 
-    const showPreviewModal = (banner) => setPreviewBanner(banner);
-
     const handleDelete = (key) => {
         const newBanners = banners.filter(item => item.key !== key);
         setBanners(newBanners);
@@ -208,7 +211,7 @@ const BannerList = () => {
           { key: 'sort', width: 60, align: 'center', render: () => <DragHandle /> },
           { title: '아이템 제목', dataIndex: 'title', key: 'title', editable: true },
           { title: '아이템 설명', dataIndex: 'description', key: 'description', editable: true },
-          { title: '이미지 URL', dataIndex: 'imageUrl', key: 'imageUrl', editable: true, render: (url) => <a href={url} target="_blank" rel="noopener noreferrer">{url}</a> },
+          { title: '이미지', dataIndex: 'imageUrl', key: 'imageUrl', editable: true, render: (url) => <Image src={url} width={100} alt="배너 아이템 이미지" /> },
           { title: '네비게이션 URL', dataIndex: 'navigationUrl', key: 'navigationUrl', editable: true, render: (url) => <a href={url} target="_blank" rel="noopener noreferrer">{url}</a> },
           {
             title: '관리',
@@ -267,7 +270,7 @@ const BannerList = () => {
             key: 'position',
             editable: true,
             inputType: 'select',
-            render: (pos) => <Tag>{ {Home_Top: '홈 상단', Home_Middle: '홈 중단', Category_Top: '카테고리 상단'}[pos] || '위치 정보 없음' }</Tag>
+            render: (pos) => ({Home_Top: '홈 상단', Home_Middle: '홈 중단', Category_Top: '카테고리 상단'}[pos] || '위치 정보 없음')
         },
         { title: '생성일', dataIndex: 'createdAt', key: 'createdAt' },
         { title: '아이템 수', dataIndex: 'items', key: 'itemCount', render: (items) => items ? items.length : 0 },
@@ -288,7 +291,14 @@ const BannerList = () => {
                         <Popconfirm title="정말 삭제하시겠습니까?" onConfirm={() => handleDelete(record.key)} disabled={isAnythingEditing} okText="예" cancelText="아니오">
                           <Button type="link" danger disabled={isAnythingEditing}>삭제</Button>
                         </Popconfirm>
-                        <Button type="link" disabled={isAnythingEditing} onClick={() => showPreviewModal(record)}>미리보기</Button>
+                        <Tooltip title="배너가 위치한 페이지로 이동합니다">
+                            <Button
+                                type="link"
+                                icon={<LinkOutlined />}
+                                disabled={isAnythingEditing || !positionToPath[record.position]}
+                                onClick={() => navigate(positionToPath[record.position])}
+                            />
+                        </Tooltip>
                     </Space>
                 );
             },
@@ -332,27 +342,6 @@ const BannerList = () => {
                     rowClassName="editable-row"
                 />
             </Card>
-            {previewBanner && (
-                <Modal
-                    title={`${previewBanner.name} 미리보기`}
-                    open={!!previewBanner}
-                    onCancel={() => setPreviewBanner(null)}
-                    footer={[<Button key="close" onClick={() => setPreviewBanner(null)}>닫기</Button>]}
-                    width={850}
-                >
-                    <Carousel dots infinite speed={500} slidesToShow={1} slidesToScroll={1} autoplay>
-                        {previewBanner.items.map((item, index) => (
-                            <div key={index}>
-                                <img src={item.imageUrl} alt={item.title} style={{ width: '100%', height: 'auto' }} />
-                                <div style={{ padding: '20px', textAlign: 'center' }}>
-                                    <Title level={4}>{item.title}</Title>
-                                    <Text>{item.description}</Text>
-                                </div>
-                            </div>
-                        ))}
-                    </Carousel>
-                </Modal>
-            )}
         </Space>
       </Form>
     );
