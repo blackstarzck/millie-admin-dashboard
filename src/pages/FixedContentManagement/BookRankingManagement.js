@@ -190,11 +190,12 @@ const BookRankingManagement = () => {
   const isSaveable = targetKeys.length === 12;
 
   const baseColumns = [
-    { dataIndex: 'title', title: '제목' },
+    { dataIndex: 'title', title: '제목', width: 250 },
     {
       dataIndex: 'previewCount',
       title: '조회수',
       sorter: (a, b) => a.previewCount - b.previewCount,
+      width: 120,
       render: (text, record) => {
         const diff = record.previewCount - record.previousPreviewCount;
         let diffElement = diff > 0
@@ -209,6 +210,7 @@ const BookRankingManagement = () => {
       dataIndex: 'downloadCount',
       title: '다운로드수',
       sorter: (a, b) => a.downloadCount - b.downloadCount,
+      width: 120,
       render: (text, record) => {
         const diff = record.downloadCount - record.previousDownloadCount;
         let diffElement = diff > 0
@@ -219,7 +221,7 @@ const BookRankingManagement = () => {
         return <Flex align="center"><span>{text}</span>{diffElement}</Flex>;
       },
     },
-    { dataIndex: 'totalScore', title: '총점', sorter: (a, b) => a.totalScore - b.totalScore },
+    { dataIndex: 'totalScore', title: '총점', sorter: (a, b) => a.totalScore - b.totalScore, width: 100 },
   ];
 
   const rightColumns = [
