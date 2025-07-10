@@ -22,6 +22,7 @@ import {
     MessageOutlined,
     NotificationOutlined,
     OrderedListOutlined,
+    PictureOutlined,
     PieChartOutlined,
     ProfileOutlined,
     QuestionCircleOutlined,
@@ -132,6 +133,15 @@ const menuItems = [
     subMenu: [
       { key: '/coupons/list', path: '/coupons/list', name: '쿠폰 목록', icon: <OrderedListOutlined /> },
       { key: '/coupons/register', path: '/coupons/register', name: '쿠폰 등록', icon: <FormOutlined /> },
+    ]
+  },
+  {
+    key: '/banner',
+    name: '배너 관리',
+    icon: <PictureOutlined />,
+    subMenu: [
+      { key: '/banner/list', path: '/banner/list', name: '배너 목록', icon: <OrderedListOutlined /> },
+      { key: '/banner/register', path: '/banner/register', name: '배너 등록', icon: <FormOutlined /> },
     ]
   },
   {

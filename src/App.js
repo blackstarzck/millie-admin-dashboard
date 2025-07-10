@@ -59,6 +59,10 @@ import WorksList from './pages/SelfPublishing/WorksList';
 import Coupon from './pages/CouponManagement/Coupon';
 import CouponForm from './pages/CouponManagement/CouponForm';
 
+// 배너 관리 페이지
+import BannerCreation from './pages/BannerManagement/BannerCreation';
+import BannerList from './pages/BannerManagement/BannerList';
+
 function App() {
   const [coupons, setCoupons] = useState([
       {
@@ -196,6 +200,11 @@ function App() {
               {/* 이벤트 관리 */}
               <Route path="events/register" element={<EventRegistration />} />
               <Route path="events/status" element={<EventStatus />} />
+
+              {/* 배너 관리 */}
+              <Route path="banner/list" element={<BannerList />} />
+              <Route path="banner/register" element={<BannerCreation />} />
+              <Route path="banner/edit/:bannerId" element={<BannerCreation />} />
 
               {/* 쿠폰 관리 */}
               <Route path="coupons/list" element={<Coupon coupons={coupons} setCoupons={setCoupons} />} />
