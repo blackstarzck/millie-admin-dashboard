@@ -1,20 +1,23 @@
-import React, { useState } from 'react';
+import { CopyOutlined, DeleteOutlined, ExportOutlined, PlusOutlined } from '@ant-design/icons';
 import {
-    Typography,
-    Table,
-    Button,
-    Space,
-    Tag,
-    Card,
-    Popconfirm,
-    Form,
-    Input,
-    Switch,
-    Modal,
-    message
+  Button,
+  Card,
+  Col,
+  Collapse,
+  Form,
+  Input,
+  Modal,
+  Popconfirm,
+  Row,
+  Space,
+  Switch,
+  Table,
+  Tag,
+  Typography,
+  message
 } from 'antd';
-import { PlusOutlined, DeleteOutlined, CopyOutlined } from '@ant-design/icons';
 import copy from 'copy-to-clipboard';
+import React, { useState } from 'react';
 
 const { Title, Paragraph, Text } = Typography;
 
@@ -28,6 +31,30 @@ const ApiManagement = () => {
   ]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [newGeneratedKey, setNewGeneratedKey] = useState(null);
+
+  const [socialLogins, setSocialLogins] = useState([
+    { key: 'google', name: 'Google', clientId: '1234567890-abcdefg.apps.googleusercontent.com', clientSecret: 'GOCSPX-ABCDEFG12345', isEnabled: true, developerUrl: 'https://console.cloud.google.com/' },
+    { key: 'facebook', name: 'Facebook', clientId: '', clientSecret: '', isEnabled: false, developerUrl: 'https://developers.facebook.com/' },
+    { key: 'naver', name: '네이버', clientId: '', clientSecret: '', isEnabled: false, developerUrl: 'https://developers.naver.com/' },
+    { key: 'kakao', name: '카카오', clientId: 'a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6', clientSecret: 'SECRETKEYABC123', isEnabled: true, developerUrl: 'https://developers.kakao.com/' },
+    { key: 'apple', name: 'Apple', clientId: '', clientSecret: '', isEnabled: false, developerUrl: 'https://developer.apple.com/' },
+  ]);
+
+  const handleSocialLoginChange = (key, field, value) => {
+    setSocialLogins(
+      socialLogins.map(login =>
+        login.key === key ? { ...login, [field]: value } : login
+      )
+    );
+  };
+
+  const handleSaveSocialSettings = (key) => {
+    const setting = socialLogins.find(login => login.key === key);
+    // In a real application, you would make an API call here to save the settings.
+    console.log("Saving social login settings:", setting);
+    message.success(`${setting.name} 로그인 설정이 저장되었습니다.`);
+  };
+
 
   const handleGenerateKey = (values) => {
     const { newKeyName } = values;
@@ -104,7 +131,7 @@ const ApiManagement = () => {
       width: 120,
       align: 'center',
       render: (_, record) => (
-         <Popconfirm 
+         <Popconfirm
              title="정말로 이 API 키를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다."
              onConfirm={() => handleDeleteKey(record.id)}
              okText="삭제"
@@ -147,6 +174,83 @@ const ApiManagement = () => {
          />
       </Card>
 
+      <Card title="소셜 로그인 연동 관리">
+        <Paragraph>
+          각 소셜 미디어 플랫폼에서 발급받은 API 키 정보를 입력하여 소셜 로그인을 활성화합니다.
+          <br />
+          '활성화' 스위치는 플랫폼의 설정을 직접 변경하는 것이 아니며, 우리 서비스에서 해당 소셜 로그인 기능을 사용자에게 노출할지 여부를 제어하는 역할을 합니다.
+        </Paragraph>
+        <Collapse accordion>
+          {socialLogins.map((login) => (
+            <Collapse.Panel
+              header={
+                <Space>
+                  {`${login.name} 연동 설정`}
+                  {login.isEnabled ? <Tag color="blue">활성</Tag> : <Tag>비활성</Tag>}
+                </Space>
+              }
+              key={login.key}
+              extra={
+                <Button
+                  type="link"
+                  icon={<ExportOutlined />}
+                  href={login.developerUrl}
+                  target="_blank"
+                  onClick={(e) => e.stopPropagation()} // 패널이 열리는 것을 방지
+                >
+                  개발자 콘솔
+                </Button>
+              }
+            >
+              <Form layout="vertical" onFinish={() => handleSaveSocialSettings(login.key)}>
+                <Row gutter={16}>
+                    <Col xs={24} sm={12}>
+                        <Form.Item
+                            label="Client ID"
+                            required
+                            tooltip="플랫폼에서 발급받은 Client ID를 입력하세요."
+                        >
+                            <Input
+                                value={login.clientId}
+                                onChange={(e) => handleSocialLoginChange(login.key, 'clientId', e.target.value)}
+                                placeholder={`${login.name} Client ID`}
+                            />
+                        </Form.Item>
+                    </Col>
+                    <Col xs={24} sm={12}>
+                        <Form.Item
+                            label="Client Secret"
+                            required
+                            tooltip="플랫폼에서 발급받은 Client Secret을 입력하세요. (없는 경우 비워두세요)"
+                        >
+                            <Input.Password
+                                value={login.clientSecret}
+                                onChange={(e) => handleSocialLoginChange(login.key, 'clientSecret', e.target.value)}
+                                placeholder={`${login.name} Client Secret`}
+                            />
+                        </Form.Item>
+                    </Col>
+                </Row>
+                <Form.Item>
+                    <Space>
+                        <Text>로그인 활성화:</Text>
+                        <Switch
+                            checked={login.isEnabled}
+                            onChange={(checked) => handleSocialLoginChange(login.key, 'isEnabled', checked)}
+                        />
+                    </Space>
+                </Form.Item>
+                <Form.Item>
+                    <Button type="primary" htmlType="submit">
+                        {login.name} 설정 저장
+                    </Button>
+                </Form.Item>
+              </Form>
+            </Collapse.Panel>
+          ))}
+        </Collapse>
+      </Card>
+
       <Modal
         title="API 키 생성 완료"
         visible={isModalVisible}
@@ -162,14 +266,14 @@ const ApiManagement = () => {
         ]}
       >
         <Paragraph>새로운 API 키가 성공적으로 생성되었습니다. <Text strong>이 키는 다시 표시되지 않으니 반드시 안전한 곳에 보관하세요.</Text></Paragraph>
-        <Input.TextArea 
-            readOnly 
-            value={newGeneratedKey?.fullKey || ''} 
+        <Input.TextArea
+            readOnly
+            value={newGeneratedKey?.fullKey || ''}
             autoSize={{ minRows: 2, maxRows: 4 }}
-            style={{ marginTop: 16, backgroundColor: '#f5f5f5', cursor: 'text' }} 
+            style={{ marginTop: 16, backgroundColor: '#f5f5f5', cursor: 'text' }}
         />
       </Modal>
-      
+
       <style>{`
         .disabled-row td {
           color: rgba(0, 0, 0, 0.25);
@@ -185,4 +289,4 @@ const ApiManagement = () => {
   );
 };
 
-export default ApiManagement; 
+export default ApiManagement;

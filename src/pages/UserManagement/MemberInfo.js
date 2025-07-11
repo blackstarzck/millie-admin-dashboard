@@ -1,44 +1,34 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
-    Table,
-    Input,
-    Button,
-    Space,
-    Typography,
-    Card,
-    Tag,
-    Select,
-    DatePicker,
-    Modal,
-    Descriptions,
-    message,
-    Avatar,
-    Tooltip,
-    Dropdown,
-    Menu,
-    Switch,
-} from 'antd';
-import {
-    UserOutlined,
-    SearchOutlined,
-    ReloadOutlined,
-    MailOutlined,
-    PhoneOutlined,
-    CalendarOutlined,
-    CheckCircleOutlined,
-    StopOutlined,
-    EyeOutlined,
-    EditOutlined,
-    LockOutlined,
-    UnlockOutlined,
-    MoreOutlined,
-    ClockCircleOutlined,
-    MobileOutlined,
-    MessageOutlined,
+  CheckCircleOutlined,
+  ClockCircleOutlined,
+  MailOutlined,
+  MessageOutlined,
+  MobileOutlined,
+  ReloadOutlined,
+  SearchOutlined,
+  StopOutlined,
+  UserOutlined
 } from '@ant-design/icons';
-import Highlighter from 'react-highlight-words';
+import {
+  Avatar,
+  Button,
+  Card,
+  DatePicker,
+  Descriptions,
+  Input,
+  message,
+  Modal,
+  Select,
+  Space,
+  Table,
+  Tag,
+  Tooltip,
+  Typography
+} from 'antd';
 import moment from 'moment';
+import React, { useEffect, useState } from 'react';
+import Highlighter from 'react-highlight-words';
+import { useNavigate } from 'react-router-dom';
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -46,17 +36,37 @@ const { RangePicker } = DatePicker;
 
 // Sample Data
 const initialUsers = [
-    { key: '1', userId: 'user001', name: '홍길동', email: 'gildong@example.com', phone: '010-1234-5678', signupDate: '2024-07-01 10:30:00', lastLogin: '2024-07-25 15:00:00', status: 'active', userGroup: ' 일반', purchaseAmount: 50000, suspensionReason: null, birthdate: '1990-05-15', gender: 'male', notifications: { appPush: true, sms: true, email: false } },
-    { key: '2', userId: 'user002', name: '김철수', email: 'chulsoo@example.com', phone: '010-9876-5432', signupDate: '2024-06-15 09:00:00', lastLogin: '2024-07-20 11:20:00', status: 'active', userGroup: 'VIP', purchaseAmount: 250000, suspensionReason: null, birthdate: '1985-11-20', gender: 'male', notifications: { appPush: true, sms: false, email: true } },
-    { key: '3', userId: 'user003', name: '박영희', email: 'younghee@example.com', phone: '010-1111-2222', signupDate: '2024-05-20 14:00:00', lastLogin: '2024-06-10 08:00:00', status: 'dormant', userGroup: '일반', purchaseAmount: 10000, suspensionReason: null, birthdate: null, gender: 'female', notifications: { appPush: false, sms: false, email: false } },
-    { key: '5', userId: 'user005', name: '강민준', email: 'minjun@example.co.kr', phone: '010-3333-7777', signupDate: '2024-07-22 16:00:00', lastLogin: '2024-07-26 09:10:00', status: 'active', userGroup: '일반', purchaseAmount: 30000, suspensionReason: null, birthdate: '2001-08-25', gender: null, notifications: { appPush: true, sms: false, email: false } },
-    { key: '6', userId: 'user006', name: '오서아', email: 'seoa@email.com', phone: '010-6666-9999', signupDate: '2024-04-01 12:00:00', lastLogin: '2024-05-15 18:30:00', status: 'dormant', userGroup: '일반', purchaseAmount: 0, suspensionReason: null, birthdate: null, gender: null, notifications: { appPush: false, sms: true, email: true } },
+    { key: '1', userId: 'user001', name: '홍길동', email: 'gildong@example.com', phone: '010-1234-5678', signupDate: '2024-07-01 10:30:00', lastLogin: '2024-07-25 15:00:00', status: 'active', userGroup: ' 일반', purchaseAmount: 50000, suspensionReason: null, birthdate: '1990-05-15', gender: 'male', notifications: { appPush: true, sms: true, email: false }, signupType: 'email', socialProvider: null },
+    { key: '2', userId: 'user002', name: '김철수', email: 'chulsoo@example.com', phone: '010-9876-5432', signupDate: '2024-06-15 09:00:00', lastLogin: '2024-07-20 11:20:00', status: 'active', userGroup: 'VIP', purchaseAmount: 250000, suspensionReason: null, birthdate: '1985-11-20', gender: 'male', notifications: { appPush: true, sms: false, email: true }, signupType: 'social', socialProvider: 'kakao' },
+    { key: '3', userId: 'user003', name: '박영희', email: 'younghee@example.com', phone: '010-1111-2222', signupDate: '2024-05-20 14:00:00', lastLogin: '2024-06-10 08:00:00', status: 'dormant', userGroup: '일반', purchaseAmount: 10000, suspensionReason: null, birthdate: null, gender: 'female', notifications: { appPush: false, sms: false, email: false }, signupType: 'email', socialProvider: null },
+    { key: '4', userId: 'user004', name: '최미영', email: 'miyoung@example.net', phone: '010-5555-4444', signupDate: '2023-11-30 18:45:00', lastLogin: '2024-07-24 10:00:00', status: 'suspended', userGroup: '일반', purchaseAmount: 120000, suspensionReason: '어뷰징 활동', birthdate: '1992-02-28', gender: 'female', notifications: { appPush: true, sms: true, email: true }, signupType: 'social', socialProvider: 'naver' },
+    { key: '5', userId: 'user005', name: '강민준', email: 'minjun@example.co.kr', phone: '010-3333-7777', signupDate: '2024-07-22 16:00:00', lastLogin: '2024-07-26 09:10:00', status: 'active', userGroup: '일반', purchaseAmount: 30000, suspensionReason: null, birthdate: '2001-08-25', gender: null, notifications: { appPush: true, sms: false, email: false }, signupType: 'social', socialProvider: 'google' },
+    { key: '6', userId: 'user006', name: '오서아', email: 'seoa@email.com', phone: '010-6666-9999', signupDate: '2024-04-01 12:00:00', lastLogin: '2024-05-15 18:30:00', status: 'dormant', userGroup: '일반', purchaseAmount: 0, suspensionReason: null, birthdate: null, gender: null, notifications: { appPush: false, sms: true, email: true }, signupType: 'email', socialProvider: null },
+    { key: '7', userId: 'user007', name: '이하준', email: 'hajun@example.com', phone: '010-1212-3434', signupDate: '2024-07-10 11:00:00', lastLogin: '2024-07-25 10:00:00', status: 'active', userGroup: '일반', purchaseAmount: 80000, suspensionReason: null, birthdate: '1995-03-10', gender: 'male', notifications: { appPush: true, sms: true, email: false }, signupType: 'social', socialProvider: 'kakao' },
+    { key: '8', userId: 'user008', name: '정서윤', email: 'seoyun@example.com', phone: '010-3434-5656', signupDate: '2024-07-05 16:20:00', lastLogin: '2024-07-22 13:00:00', status: 'active', userGroup: 'VIP', purchaseAmount: 320000, suspensionReason: null, birthdate: '1998-07-22', gender: 'female', notifications: { appPush: true, sms: false, email: true }, signupType: 'email', socialProvider: null },
+    { key: '9', userId: 'user009', name: '박도윤', email: 'doyun@example.com', phone: '010-5656-7878', signupDate: '2024-06-20 09:30:00', lastLogin: '2024-07-15 11:45:00', status: 'dormant', userGroup: '일반', purchaseAmount: 5000, suspensionReason: null, birthdate: '2000-01-01', gender: 'male', notifications: { appPush: false, sms: true, email: false }, signupType: 'social', socialProvider: 'naver' },
+    { key: '10', userId: 'user010', name: '김하윤', email: 'hayun@example.co.kr', phone: '010-7878-9090', signupDate: '2024-05-15 14:00:00', lastLogin: '2024-06-28 22:00:00', status: 'suspended', userGroup: '일반', purchaseAmount: 0, suspensionReason: '불법 프로그램 사용', birthdate: '1993-11-30', gender: 'female', notifications: { appPush: false, sms: false, email: false }, signupType: 'email', socialProvider: null },
+    { key: '11', userId: 'user011', name: '최시우', email: 'siwoo@example.net', phone: '010-9090-1212', signupDate: '2024-07-25 08:00:00', lastLogin: '2024-07-26 11:00:00', status: 'active', userGroup: '일반', purchaseAmount: 15000, suspensionReason: null, birthdate: '1999-09-09', gender: 'male', notifications: { appPush: true, sms: true, email: true }, signupType: 'social', socialProvider: 'google' },
+    { key: '12', userId: 'user012', name: '강지아', email: 'jia@email.com', phone: '010-2323-4545', signupDate: '2024-03-10 18:00:00', lastLogin: '2024-07-20 19:30:00', status: 'active', userGroup: 'VIP', purchaseAmount: 550000, suspensionReason: null, birthdate: '1988-12-25', gender: 'female', notifications: { appPush: true, sms: true, email: true }, signupType: 'email', socialProvider: null },
+    { key: '13', userId: 'user013', name: '한이준', email: 'ijun@example.com', phone: '010-4545-6767', signupDate: '2024-02-01 10:10:00', lastLogin: '2024-04-01 10:00:00', status: 'dormant', userGroup: '일반', purchaseAmount: 20000, suspensionReason: null, birthdate: '1996-06-07', gender: 'male', notifications: { appPush: false, sms: false, email: false }, signupType: 'social', socialProvider: 'facebook' },
+    { key: '14', userId: 'user014', name: '윤아린', email: 'arin@example.com', phone: '010-6767-8989', signupDate: '2024-07-18 13:00:00', lastLogin: '2024-07-26 14:00:00', status: 'active', userGroup: '일반', purchaseAmount: 65000, suspensionReason: null, birthdate: '1994-04-15', gender: 'female', notifications: { appPush: true, sms: false, email: false }, signupType: 'email', socialProvider: null },
+    { key: '15', userId: 'user015', name: '임로건', email: 'logan@example.co.kr', phone: '010-8989-1010', signupDate: '2024-01-05 20:00:00', lastLogin: '2024-07-25 21:00:00', status: 'active', userGroup: '일반', purchaseAmount: 95000, suspensionReason: null, birthdate: '1997-10-05', gender: 'male', notifications: { appPush: true, sms: false, email: true }, signupType: 'social', socialProvider: 'apple' },
+    { key: '16', userId: 'user016', name: '송채원', email: 'chaewon@email.com', phone: '010-1010-2323', signupDate: '2024-06-30 23:50:00', lastLogin: '2024-07-01 08:00:00', status: 'pending', userGroup: '일반', purchaseAmount: 0, suspensionReason: null, birthdate: '2002-08-18', gender: 'female', notifications: { appPush: true, sms: true, email: true }, signupType: 'email', socialProvider: null },
 ];
 
 const statusMap = {
     active: { color: 'success', text: '활성', icon: <CheckCircleOutlined /> },
     dormant: { color: 'default', text: '휴면', icon: <StopOutlined /> },
     pending: { color: 'warning', text: '대기', icon: <ClockCircleOutlined /> },
+};
+
+const signupTypeMap = {
+    email: { text: '이메일' },
+    kakao: { text: 'Kakao' },
+    google: { text: 'Google' },
+    naver: { text: 'Naver' },
+    facebook: { text: 'Facebook' },
+    apple: { text: 'Apple' },
 };
 
 const MemberInfo = () => {
@@ -85,6 +95,13 @@ const MemberInfo = () => {
             // Apply filters (example)
             if (filters.status) {
                 filteredData = filteredData.filter(user => user.status === filters.status);
+            }
+            if (filters.signupType) {
+                if (filters.signupType === 'email') {
+                    filteredData = filteredData.filter(user => user.signupType === 'email');
+                } else {
+                    filteredData = filteredData.filter(user => user.socialProvider === filters.signupType);
+                }
             }
             if (filters.search) {
                 const term = filters.search.toLowerCase();
@@ -369,6 +386,28 @@ const MemberInfo = () => {
              }
          },
         {
+            title: '가입 유형',
+            dataIndex: 'signupType',
+            key: 'signupType',
+            width: 120,
+            align: 'center',
+            filters: Object.entries(signupTypeMap)
+                .map(([key, { text }]) => ({ text, value: key })),
+            onFilter: (value, record) => {
+                if (value === 'email') {
+                    return record.signupType === 'email';
+                }
+                return record.socialProvider === value;
+            },
+            render: (signupType, record) => {
+                if (signupType === 'social' && record.socialProvider) {
+                    return record.socialProvider.charAt(0).toUpperCase() + record.socialProvider.slice(1);
+                }
+                const typeInfo = signupTypeMap[signupType] || { text: signupType };
+                return typeInfo.text;
+            }
+        },
+        {
             title: '생년월일',
             dataIndex: 'birthdate',
             key: 'birthdate',
@@ -495,6 +534,18 @@ const MemberInfo = () => {
                                 <Option key={key} value={key}>{text}</Option>
                             ))}
                     </Select>
+                    <Select
+                        placeholder="가입 유형 필터"
+                        allowClear
+                        style={{ width: 140 }}
+                        onChange={(value) => handleFilterChange('signupType', value)}
+                        value={filters.signupType || undefined}
+                    >
+                        {Object.entries(signupTypeMap)
+                            .map(([key, { text }]) => (
+                                <Option key={key} value={key}>{text}</Option>
+                            ))}
+                    </Select>
                     <Text>가입일:</Text>
                     <RangePicker
                         onChange={(dates) => handleFilterChange('signupDateRange', dates)}
@@ -517,7 +568,7 @@ const MemberInfo = () => {
                             onClick: (event) => {
                                 openEditModalForRow(record); // 수정 모달 바로 열기
                             },
-                            style: { cursor: 'pointer' } 
+                            style: { cursor: 'pointer' }
                         };
                     }}
                 />
@@ -568,7 +619,7 @@ const MemberInfo = () => {
                             <Descriptions.Item label="연락처">
                                  {isEditMode ? (
                                     <Input name="phone" value={editedUser?.phone || ''} onChange={handleInputChange} />
-                                ) : (
+                                 ) : (
                                     selectedUser.phone ? (
                                         selectedUser.phone.split('-').length === 3 && selectedUser.phone.split('-')[1].length === 4
                                         ? `${selectedUser.phone.split('-')[0]}-****-${selectedUser.phone.split('-')[2]}`
@@ -600,9 +651,9 @@ const MemberInfo = () => {
                                          <Option value="male">남</Option>
                                          <Option value="female">여</Option>
                                      </Select>
-                                ) : (
-                                    selectedUser.gender === 'male' ? '남' : selectedUser.gender === 'female' ? '여' : '-'
-                                )}
+                                 ) : (
+                                     selectedUser.gender === 'male' ? '남' : selectedUser.gender === 'female' ? '여' : '-'
+                                 )}
                             </Descriptions.Item>
                             <Descriptions.Item label="가입일시">{selectedUser.signupDate}</Descriptions.Item>
                             <Descriptions.Item label="마지막 접속">{selectedUser.lastLogin}</Descriptions.Item>
@@ -611,6 +662,15 @@ const MemberInfo = () => {
                                      {statusMap[selectedUser.status]?.text || selectedUser.status}
                                  </Tag>
                              </Descriptions.Item>
+                             <Descriptions.Item label="가입 유형" span={1}>
+                                {(() => {
+                                    if (selectedUser.signupType === 'social' && selectedUser.socialProvider) {
+                                        return selectedUser.socialProvider.charAt(0).toUpperCase() + selectedUser.socialProvider.slice(1);
+                                    }
+                                    const typeInfo = signupTypeMap[selectedUser.signupType] || { text: selectedUser.signupType };
+                                    return typeInfo.text;
+                                })()}
+                            </Descriptions.Item>
                              {selectedUser.status === 'suspended' && !isEditMode && (
                                  <Descriptions.Item label="정지 사유">
                                      {selectedUser.suspensionReason || '사유 없음'}
@@ -639,4 +699,4 @@ const MemberInfo = () => {
     );
 };
 
-export default MemberInfo; 
+export default MemberInfo;
