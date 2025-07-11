@@ -1,47 +1,46 @@
-import React, { useEffect, useRef, useState } from 'react';
-import Chart from 'chart.js/auto';
 import {
-    Row,
-    Col,
-    Card,
-    Statistic,
-    Button,
-    Typography,
-    Table,
-    Space,
-    Tag,
-    List,
-    Descriptions,
-    Divider,
-    Radio,
-} from 'antd';
-import {
-    ArrowUpOutlined,
-    ArrowDownOutlined,
-    BookOutlined,
-    UserOutlined,
-    HighlightOutlined,
-    ClockCircleOutlined,
-    CheckCircleOutlined,
-    QuestionCircleOutlined,
-    PlusOutlined,
-    MessageOutlined,
-    SoundOutlined,
-    GiftOutlined,
-    PictureOutlined,
-    DatabaseOutlined,
-    TagsOutlined,
-    SettingOutlined,
-    FileTextOutlined,
-    ShoppingOutlined,
-    TeamOutlined,
-    CreditCardOutlined,
-    SafetyCertificateOutlined,
-    LockOutlined,
-    SecurityScanOutlined,
-    AreaChartOutlined,
-    DownloadOutlined,
+  AreaChartOutlined,
+  ArrowDownOutlined,
+  ArrowUpOutlined,
+  BookOutlined,
+  CheckCircleOutlined,
+  ClockCircleOutlined,
+  CreditCardOutlined,
+  DatabaseOutlined,
+  DownloadOutlined,
+  FileTextOutlined,
+  GiftOutlined,
+  HighlightOutlined,
+  LockOutlined,
+  MessageOutlined,
+  PictureOutlined,
+  QuestionCircleOutlined,
+  SafetyCertificateOutlined,
+  SecurityScanOutlined,
+  SettingOutlined,
+  ShoppingOutlined,
+  SoundOutlined,
+  TagsOutlined,
+  TeamOutlined,
+  UserOutlined
 } from '@ant-design/icons';
+import {
+  Button,
+  Card,
+  Col,
+  Descriptions,
+  Divider,
+  List,
+  Radio,
+  Row,
+  Space,
+  Statistic,
+  Table,
+  Tag,
+  Typography,
+} from 'antd';
+import Chart from 'chart.js/auto';
+import React, { useEffect, useRef, useState } from 'react';
 
 // --- Chart Component (Keep as is) ---
 const ChartComponent = ({ chartId, type, data, options }) => {
@@ -210,6 +209,7 @@ const Dashboard = () => {
 
       {/* Header */}
       <Title level={2} style={{ margin: 0 }}>밀리의 서재 대시보드</Title>
+      <input type="file" />
       <Text type="secondary">관리자님, 사용자들의 독서 여정을 함께 만들어가요.</Text>
 
       {/* 1. 핵심 지표 */}
@@ -579,4 +579,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard; 
+export default Dashboard;
