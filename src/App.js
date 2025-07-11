@@ -39,6 +39,7 @@ import PopupExposureSettings from './pages/PopupManagement/ExposureSettings';
 import PopupCreation from './pages/PopupManagement/PopupCreation';
 import PopupTemplateManagement from './pages/PopupManagement/TemplateManagement';
 import AuthorInfoManagement from './pages/SelfPublishing/AuthorInfoManagement';
+import VersionHistory from './pages/SystemManagement/VersionHistory';
 import AdminActivityLog from './pages/SystemSettings/AdminActivityLog'; // 새로 추가
 import ApiManagement from './pages/SystemSettings/ApiManagement';
 import PermissionManagement from './pages/SystemSettings/PermissionManagement';
@@ -237,6 +238,7 @@ function App() {
               <Route path="settings/api" element={<ApiManagement />} />
               <Route path="settings/security" element={<SecuritySettings />} />
               <Route path="settings/policy" element={<ServicePolicy />} />
+              <Route path="settings/version-history" element={<VersionHistory />} />
 
               {/* 파트너 관리 */}
               <Route path="partners/accounts" element={<PartnerAccount />} />

@@ -1,23 +1,24 @@
-import React, { useState } from 'react';
 import {
-    Table,
-    Button,
-    Modal,
-    Form,
-    Input,
-    Space,
-    Typography,
-    message,
-    Tooltip, // For icon buttons
-} from 'antd';
-import {
-    PlusOutlined,
-    EditOutlined,
-    DeleteOutlined,
-    EyeOutlined, // For Preview
-    MinusCircleOutlined, // For Form.List remove button
+  DeleteOutlined,
+  EditOutlined,
+  EyeOutlined, // For Preview
+  MinusCircleOutlined,
+  PlusOutlined,
 } from '@ant-design/icons';
+import {
+  Alert,
+  Button,
+  Form,
+  Input,
+  message,
+  Modal,
+  Space,
+  Table,
+  Tooltip,
+  Typography,
+} from 'antd';
 import moment from 'moment';
+import React, { useState } from 'react';
 import { usePopupTemplates } from '../../context/PopupTemplateContext'; // Import the hook
 
 const { Title } = Typography;
@@ -125,7 +126,13 @@ const TemplateManagement = () => {
                          <Button icon={<EditOutlined />} onClick={() => showEditModal(record)} size="small" />
                     </Tooltip>
                     <Tooltip title="삭제">
-                        <Button icon={<DeleteOutlined />} onClick={() => handleDelete(record.key)} danger size="small" />
+                        <Button
+                            icon={<DeleteOutlined />}
+                            onClick={() => handleDelete(record.key)}
+                            danger
+                            size="small"
+                            disabled={record.id === 'popupTpl001'} // 긴급 공지 템플릿은 삭제 불가
+                        />
                     </Tooltip>
                 </Space>
             ),
@@ -168,12 +175,20 @@ const TemplateManagement = () => {
                     layout="vertical"
                     name="template_form"
                 >
+                    {editingTemplate?.id === 'popupTpl001' && (
+                        <Alert
+                            message="해당 템플릿은 수정/삭제할 수 없습니다."
+                            type="info"
+                            showIcon
+                            style={{ marginBottom: 16 }}
+                        />
+                    )}
                     <Form.Item
                         name="name"
                         label="템플릿명"
                         rules={[{ required: true, message: '템플릿명을 입력해주세요!' }]}
                     >
-                        <Input />
+                        <Input disabled={editingTemplate?.id === 'popupTpl001'} />
                     </Form.Item>
                     <Form.Item
                         name="description"
@@ -245,4 +260,4 @@ const TemplateManagement = () => {
     );
 };
 
-export default TemplateManagement; 
+export default TemplateManagement;

@@ -191,6 +191,7 @@ const menuItems = [
       { key: '/settings/api', path: '/settings/api', name: 'API 관리', icon: <ApiOutlined /> },
       { key: '/settings/security', path: '/settings/security', name: '보안 설정', icon: <SecurityScanOutlined /> },
       { key: '/settings/policy', path: '/settings/policy', name: '서비스 정책', icon: <FileProtectOutlined /> },
+      { key: '/settings/version-history', path: '/settings/version-history', name: '플랫폼 버전 히스토리', icon: <HistoryOutlined /> },
     ],
   },
   {
