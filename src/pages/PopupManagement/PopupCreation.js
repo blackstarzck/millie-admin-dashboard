@@ -12,6 +12,7 @@ import {
 import {
   Button,
   Card,
+  Checkbox,
   Col,
   DatePicker,
   Form,
@@ -243,6 +244,7 @@ const PopupCreation = () => {
                         contentType: 'image',
                         frequencyType: 'once_per_session',
                         status: 'active',
+                        hideOptions: [],
                     }}
                 >
                     <Form.Item
@@ -366,6 +368,17 @@ const PopupCreation = () => {
                         rules={[{ required: true, type: 'number', min: 1, message: '1 이상의 숫자를 입력해주세요.' }]}
                     >
                         <InputNumber min={1} style={{ width: 120 }} placeholder="예: 1"/>
+                    </Form.Item>
+
+                    <Form.Item
+                        name="hideOptions"
+                        label="다시 보지 않기 옵션"
+                        tooltip="사용자에게 '하루 동안 보지 않기', '일주일 동안 보지 않기'와 같은 선택지를 제공합니다."
+                    >
+                        <Checkbox.Group>
+                            <Checkbox value="day">하루 동안 보지 않기</Checkbox>
+                            <Checkbox value="week">일주일 동안 보지 않기</Checkbox>
+                        </Checkbox.Group>
                     </Form.Item>
 
                     {/* Add fields for priority, device type targeting, page targeting if needed */}
