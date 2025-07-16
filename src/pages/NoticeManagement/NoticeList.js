@@ -1,13 +1,24 @@
-import React, { useState, useEffect } from 'react';
 import {
-    Table, Button, Input, Space, Typography, Popconfirm, Modal, Form,
-    Select, DatePicker, Switch, message, Row, Col, Tooltip
-} from 'antd';
-import {
-    PlusOutlined, SearchOutlined, EditOutlined, DeleteOutlined,
-    FileTextOutlined, SendOutlined
+  DeleteOutlined,
+  EditOutlined,
+  InfoCircleOutlined,
+  PlusOutlined, SearchOutlined
 } from '@ant-design/icons';
+import {
+  Button,
+  Form,
+  Input,
+  message,
+  Modal,
+  Popconfirm,
+  Select,
+  Space,
+  Table,
+  Tooltip,
+  Typography
+} from 'antd';
 import dayjs from 'dayjs';
+import React, { useState } from 'react';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 
@@ -302,7 +313,14 @@ const NoticeList = () => {
 
             <Form.Item
                 name="content"
-                label="내용"
+                label={
+                    <Space>
+                        <span>내용</span>
+                        <Tooltip title="작성 후 반드시 모바일 환경에서 확인해주세요">
+                            <InfoCircleOutlined style={{ color: 'rgba(0,0,0,.45)' }} />
+                        </Tooltip>
+                    </Space>
+                }
                 rules={[{ required: true, message: '내용을 입력해주세요.' }]}
                 getValueFromEvent={(value) => { return value === '<p><br></p>' ? '' : value; }}
             >
@@ -362,7 +380,14 @@ const NoticeList = () => {
 
             <Form.Item
                 name="content"
-                label="내용"
+                label={
+                    <Space>
+                        <span>내용</span>
+                        <Tooltip title="작성 후 반드시 모바일 환경에서 확인해주세요">
+                            <InfoCircleOutlined style={{ color: 'rgba(0,0,0,.45)' }} />
+                        </Tooltip>
+                    </Space>
+                }
                 rules={[{ required: true, message: '내용을 입력해주세요.' }]}
                 getValueFromEvent={(value) => { return value === '<p><br></p>' ? '' : value; }}
             >
@@ -372,7 +397,7 @@ const NoticeList = () => {
                     style={{ height: '250px', marginBottom: '50px' }}
                 />
           </Form.Item>
-          
+
             <Form.Item style={{ textAlign: 'right' }}>
                     <Button
                         type="primary"
@@ -388,4 +413,4 @@ const NoticeList = () => {
   );
 };
 
-export default NoticeList; 
+export default NoticeList;

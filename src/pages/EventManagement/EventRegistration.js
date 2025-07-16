@@ -1458,14 +1458,16 @@ const EventRegistration = () => {
               >
                 이벤트 미리보기
               </Button>
-              <Button
-                type="primary"
-                htmlType="submit"
-                icon={<SendOutlined />}
-                loading={loading}
-              >
-                이벤트 등록
-              </Button>
+              <Tooltip title="이벤트 등록 후 반드시 모바일에서 확인해주세요.">
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  icon={<SendOutlined />}
+                  loading={loading}
+                >
+                  이벤트 등록
+                </Button>
+              </Tooltip>
             </Space>
           </Form.Item>
         </Form>

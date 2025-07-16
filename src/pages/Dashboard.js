@@ -209,7 +209,6 @@ const Dashboard = () => {
 
       {/* Header */}
       <Title level={2} style={{ margin: 0 }}>밀리의 서재 대시보드</Title>
-      <input type="file" />
       <Text type="secondary">관리자님, 사용자들의 독서 여정을 함께 만들어가요.</Text>
 
       {/* 1. 핵심 지표 */}
