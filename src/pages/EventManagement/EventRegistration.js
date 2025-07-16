@@ -29,7 +29,6 @@ import {
   Row,
   Select,
   Space,
-  Switch,
   Table,
   Tooltip,
   Typography,
@@ -457,11 +456,6 @@ const TemplateInputArea = ({
     },
   });
 
-  const isClickable = Form.useWatch(
-    ["templates", index, "isClickable"],
-    formInstance
-  );
-
   // template 객체는 selectedTemplates 배열의 요소이므로 displayId를 가지고 있어야 함
   const headerTitle = `[${template.displayId || template.id}] ${template.name}`;
 
@@ -521,35 +515,20 @@ const TemplateInputArea = ({
             </Form.Item>
 
             <Form.Item
-              name={["templates", index, "isClickable"]}
-              label={
-                <Space>
-                  <span>클릭 연결 사용</span>
-                  <Tooltip title="이 설정을 활성화하면 템플릿에 버튼이 생성되고 URL을 입력하면 해당 URL로 이동합니다.">
-                    <InfoCircleOutlined style={{ color: "rgba(0,0,0,.45)" }} />
-                  </Tooltip>
-                </Space>
-              }
-              valuePropName="checked"
-              initialValue={false}
+              name={["templates", index, "buttonText"]}
+              label="버튼 텍스트"
+              tooltip="버튼에 표시될 텍스트입니다. (선택 사항)"
             >
-              <Switch />
+              <Input placeholder="예: 자세히 보기" />
             </Form.Item>
-
-            {isClickable && (
-              <Form.Item
-                name={["templates", index, "clickThroughUrl"]}
-                label="연결 URL"
-                rules={[
-                  {
-                    type: "url",
-                    message: "유효한 URL 형식이 아닙니다.",
-                  },
-                ]}
-              >
-                <Input placeholder="https://example.com/target-page" />
-              </Form.Item>
-            )}
+            <Form.Item
+              name={["templates", index, "buttonUrl"]}
+              label="버튼 링크 URL"
+              tooltip="버튼 클릭 시 이동할 URL입니다. (선택 사항)"
+              rules={[{ type: "url", message: "유효한 URL 형식이 아닙니다." }]}
+            >
+              <Input placeholder="https://example.com/details" />
+            </Form.Item>
 
             {template.fields.map((field) => {
               if (field.type === "book") {
@@ -731,10 +710,8 @@ const EventRegistration = () => {
             displayId: originalTemplate.displayId,
             name: originalTemplate.name,
             backgroundColor: tplData.backgroundColor,
-            isClickable: tplData.isClickable || false,
-            clickThroughUrl: tplData.isClickable
-              ? tplData.clickThroughUrl
-              : undefined,
+            buttonText: tplData.buttonText,
+            buttonUrl: tplData.buttonUrl,
             data: tplData.data,
           };
         }) || [];
@@ -797,9 +774,9 @@ const EventRegistration = () => {
         displayId: template.displayId,
         name: template.name,
         fields: template.fields,
-        isClickable: false,
-        clickThroughUrl: "",
         backgroundColor: "#ffffff",
+        buttonText: "",
+        buttonUrl: "",
         data: template.fields.reduce((acc, field) => {
           let defaultValue = "";
           if (field.type === "book") {
@@ -819,9 +796,9 @@ const EventRegistration = () => {
         templates: [
           ...templates,
           {
-            isClickable: newTemplate.isClickable,
-            clickThroughUrl: newTemplate.clickThroughUrl,
             backgroundColor: newTemplate.backgroundColor,
+            buttonText: newTemplate.buttonText,
+            buttonUrl: newTemplate.buttonUrl,
             data: newTemplate.data,
           },
         ],
@@ -911,62 +888,31 @@ const EventRegistration = () => {
         ></div>
 
         {eventType === EVENT_TYPE_INTERNAL &&
-          formValues.buttonText &&
-          formValues.buttonUrl && (
-            <div style={{ textAlign: "center", margin: "20px 0" }}>
-              <Button
-                type="primary"
-                href={formValues.buttonUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={(e) => e.preventDefault()}
-              >
-                {formValues.buttonText}
-              </Button>
-            </div>
-          )}
-
-        {eventType === EVENT_TYPE_INTERNAL &&
           selectedTemplates.map((template, index) => {
             const templateType = Object.values(TEMPLATE_TYPES).find(
               (t) => t.id === template.id
             );
             if (!templateType) return null;
             const templateData = formValues.templates?.[index]?.data || {};
-            const isClickable =
-              formValues.templates?.[index]?.isClickable || false;
-            const clickThroughUrl =
-              formValues.templates?.[index]?.clickThroughUrl;
+            const buttonText = formValues.templates?.[index]?.buttonText;
+            const buttonUrl = formValues.templates?.[index]?.buttonUrl;
             let previewContent = templateType.preview(templateData);
-            if (isClickable && clickThroughUrl) {
-              previewContent = (
-                <a
-                  href={clickThroughUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={(e) => e.preventDefault()}
-                  style={{
-                    display: "block",
-                    border: "2px dashed blue",
-                    padding: "5px",
-                    textDecoration: "none",
-                  }}
-                  title={`클릭 시 ${clickThroughUrl}로 이동 (미리보기에서는 이동 안 함)`}
-                >
-                  {previewContent}
-                  <div
-                    style={{
-                      textAlign: "center",
-                      color: "blue",
-                      fontSize: "0.9em",
-                      marginTop: "5px",
-                    }}
+
+            const buttonPreview =
+              buttonText && buttonUrl ? (
+                <div style={{ textAlign: "center", padding: "10px" }}>
+                  <Button
+                    type="default"
+                    href={buttonUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(e) => e.preventDefault()}
                   >
-                    (클릭 가능 영역: {clickThroughUrl})
-                  </div>
-                </a>
-              );
-            }
+                    {buttonText}
+                  </Button>
+                </div>
+              ) : null;
+
             return (
               <div
                 key={index}
@@ -977,6 +923,7 @@ const EventRegistration = () => {
                 }}
               >
                 {previewContent}
+                {buttonPreview}
               </div>
             );
           })}
@@ -1179,7 +1126,7 @@ const EventRegistration = () => {
                     <Form.Item
                       name="buttonUrl"
                       label="버튼 링크 URL"
-                      tooltip="버튼 클릭 시 이동할 URL입니다. (선택 사항)"ㅊㅊ
+                      tooltip="버튼 클릭 시 이동할 URL입니다. (선택 사항)"
                       rules={[
                         {
                           type: "url",
