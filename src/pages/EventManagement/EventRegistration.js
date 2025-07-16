@@ -38,6 +38,8 @@ import {
 import React, { useEffect, useRef, useState } from "react";
 import { DndProvider, useDrag, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -569,7 +571,7 @@ const TemplateInputArea = ({
                   label={field.label}
                 >
                   {field.type === "textarea" ? (
-                    <TextArea rows={4} />
+                    <ReactQuill theme="snow" />
                   ) : field.type === "image" ? (
                     <Upload
                       listType="picture-card"
@@ -740,8 +742,6 @@ const EventRegistration = () => {
       eventSpecificData = {
         type: EVENT_TYPE_INTERNAL,
         title1: values.title1,
-        title2: values.title2,
-        title3: values.title3,
         slug: values.slug,
         templates: processedTemplates,
         seoTitle: values.seoTitle,
@@ -1062,8 +1062,6 @@ const EventRegistration = () => {
       "slug",
       "externalUrl",
       "title1",
-      "title2",
-      "title3",
       "eventTitleExternal",
       "eventDescription",
       "seoTitle",
@@ -1143,9 +1141,10 @@ const EventRegistration = () => {
                       ]}
                       label="이벤트 설명"
                     >
-                      <TextArea
-                        rows={3}
+                      <ReactQuill
+                        theme="snow"
                         placeholder="이벤트에 대한 간단한 설명을 입력하세요."
+                        style={{ height: "200px", marginBottom: "40px" }}
                       />
                     </Form.Item>
                     <Form.Item
@@ -1167,24 +1166,6 @@ const EventRegistration = () => {
                         format="YYYY-MM-DD HH:mm"
                         style={{ width: "100%" }}
                       />
-                    </Form.Item>
-                    <Form.Item
-                      name="title2"
-                      label="제목1 (내부용)"
-                      rules={[
-                        { required: true, message: "제목2를 입력해주세요." },
-                      ]}
-                    >
-                      <Input placeholder="예: 특별 할인" />
-                    </Form.Item>
-                    <Form.Item
-                      name="title3"
-                      label="제목2 (내부용)"
-                      rules={[
-                        { required: true, message: "제목3을 입력해주세요." },
-                      ]}
-                    >
-                      <Input placeholder="예: 이벤트" />
                     </Form.Item>
                   </>
                 ) : (
@@ -1208,9 +1189,10 @@ const EventRegistration = () => {
                       ]}
                       label="이벤트 설명"
                     >
-                      <TextArea
-                        rows={3}
+                      <ReactQuill
+                        theme="snow"
                         placeholder="이벤트에 대한 간단한 설명을 입력하세요."
+                        style={{ height: "200px", marginBottom: "40px" }}
                       />
                     </Form.Item>
                     <Form.Item
