@@ -749,6 +749,8 @@ const EventRegistration = () => {
         ogDescription: values.ogDescription,
         ogImageUrl: values.ogImageUrl,
         ogUrl: values.ogUrl,
+        buttonText: values.buttonText,
+        buttonUrl: values.buttonUrl,
       };
     } else if (eventType === EVENT_TYPE_EXTERNAL) {
       eventSpecificData = {
@@ -903,9 +905,27 @@ const EventRegistration = () => {
     return (
       <div style={{ padding: "20px" }}>
         <h1>{previewTitle}</h1>
-        <p style={{ color: "#555", marginBottom: "20px" }}>
-          {previewDescription}
-        </p>
+        <div
+          style={{ color: "#555", marginBottom: "20px" }}
+          dangerouslySetInnerHTML={{ __html: previewDescription }}
+        ></div>
+
+        {eventType === EVENT_TYPE_INTERNAL &&
+          formValues.buttonText &&
+          formValues.buttonUrl && (
+            <div style={{ textAlign: "center", margin: "20px 0" }}>
+              <Button
+                type="primary"
+                href={formValues.buttonUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => e.preventDefault()}
+              >
+                {formValues.buttonText}
+              </Button>
+            </div>
+          )}
+
         {eventType === EVENT_TYPE_INTERNAL &&
           selectedTemplates.map((template, index) => {
             const templateType = Object.values(TEMPLATE_TYPES).find(
@@ -1072,6 +1092,8 @@ const EventRegistration = () => {
       "metaKeywords",
       "ogType",
       "templates",
+      "buttonText",
+      "buttonUrl",
     ];
     form.resetFields(fieldsToReset);
     setSelectedTemplates([]);
@@ -1146,6 +1168,26 @@ const EventRegistration = () => {
                         placeholder="이벤트에 대한 간단한 설명을 입력하세요."
                         style={{ height: "200px", marginBottom: "40px" }}
                       />
+                    </Form.Item>
+                    <Form.Item
+                      name="buttonText"
+                      label="버튼 텍스트"
+                      tooltip="이벤트 페이지에 표시될 버튼의 텍스트입니다. (선택 사항)"
+                    >
+                      <Input placeholder="예: 이벤트 참여하기" />
+                    </Form.Item>
+                    <Form.Item
+                      name="buttonUrl"
+                      label="버튼 링크 URL"
+                      tooltip="버튼 클릭 시 이동할 URL입니다. (선택 사항)"ㅊㅊ
+                      rules={[
+                        {
+                          type: "url",
+                          message: "유효한 URL 형식이 아닙니다.",
+                        },
+                      ]}
+                    >
+                      <Input placeholder="https://millie.co.kr/event/1" />
                     </Form.Item>
                     <Form.Item
                       name="eventPeriod"
