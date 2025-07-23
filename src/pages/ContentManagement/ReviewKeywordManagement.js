@@ -1,36 +1,15 @@
-import React, { useState, useEffect } from "react";
 import {
-  Card,
-  Button,
-  Modal,
-  Form,
-  Input,
-  Select,
-  InputNumber,
-  Space,
-  message,
-  Popconfirm,
-  Tag,
-  Row,
-  Col,
-  Typography,
-  Divider,
-  Tooltip,
-  Badge,
-  Tabs,
-  Switch,
-} from "antd";
-import {
-  PlusOutlined,
-  EditOutlined,
   DeleteOutlined,
-  StarOutlined,
-  StarFilled,
   DragOutlined,
+  EditOutlined,
+  PlusOutlined,
+  SmileOutlined,
+  StarFilled,
+  StarOutlined,
 } from "@ant-design/icons";
 import {
-  DndContext,
   closestCenter,
+  DndContext,
   KeyboardSensor,
   PointerSensor,
   useSensor,
@@ -40,10 +19,30 @@ import {
   arrayMove,
   SortableContext,
   sortableKeyboardCoordinates,
+  useSortable,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import {
+  Badge,
+  Button,
+  Card,
+  Col,
+  Form,
+  Input,
+  message,
+  Modal,
+  Popconfirm,
+  Popover,
+  Row,
+  Select,
+  Space,
+  Switch,
+  Tabs,
+  Typography
+} from "antd";
+import EmojiPicker from "emoji-picker-react";
+import React, { useEffect, useState } from "react";
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -109,7 +108,12 @@ const SortableKeywordCard = ({
                     display: "block",
                   }}
                 >
-                  {keyword.keyword}
+                  <Space>
+                    {keyword.emoji && (
+                      <span style={{ fontSize: "20px" }}>{keyword.emoji}</span>
+                    )}
+                    <span>{keyword.keyword}</span>
+                  </Space>
                 </Text>
                 <Text type="secondary" style={{ fontSize: "12px" }}>
                   {keyword.description}
@@ -174,6 +178,7 @@ const ReviewKeywordManagement = () => {
   const [keywords, setKeywords] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingKeyword, setEditingKeyword] = useState(null);
+  const [selectedEmoji, setSelectedEmoji] = useState(null);
   const [form] = Form.useForm();
 
   // 드래그 앤 드롭 센서 설정
@@ -220,7 +225,8 @@ const ReviewKeywordManagement = () => {
         rating: 5,
         order: 1,
         keyword: "스토리가 흥미로워요",
-        description: "",
+        emoji: "🤩",
+        description: "이야기의 전개가 매우 흥미롭고 흡입력이 있습니다.",
         isActive: true,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -230,7 +236,8 @@ const ReviewKeywordManagement = () => {
         rating: 5,
         order: 2,
         keyword: "몰입감이 엄청나요",
-        description: "",
+        emoji: "😮",
+        description: "책을 읽는 내내 다른 생각을 할 수 없을 정도로 몰입했습니다.",
         isActive: true,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -240,7 +247,8 @@ const ReviewKeywordManagement = () => {
         rating: 5,
         order: 3,
         keyword: "다시 읽고 싶어요",
-        description: "",
+        emoji: "🥰",
+        description: "한 번으로는 부족해서 여러 번 다시 읽고 싶은 책입니다.",
         isActive: true,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -250,7 +258,8 @@ const ReviewKeywordManagement = () => {
         rating: 5,
         order: 4,
         keyword: "인사이트가 깊어요",
-        description: "",
+        emoji: "🧐",
+        description: "새로운 관점과 깊이 있는 통찰을 얻을 수 있었습니다.",
         isActive: true,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -260,7 +269,8 @@ const ReviewKeywordManagement = () => {
         rating: 5,
         order: 5,
         keyword: "감동적이에요",
-        description: "",
+        emoji: "😭",
+        description: "마음이 따뜻해지는 감동적인 이야기가 담겨 있습니다.",
         isActive: true,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -270,7 +280,8 @@ const ReviewKeywordManagement = () => {
         rating: 5,
         order: 6,
         keyword: "선물용으로도 좋을 듯해요",
-        description: "",
+        emoji: "🎁",
+        description: "소중한 사람에게 선물하기 좋은 책입니다.",
         isActive: true,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -280,7 +291,8 @@ const ReviewKeywordManagement = () => {
         rating: 5,
         order: 7,
         keyword: "구성이 탄탄해요",
-        description: "",
+        emoji: "👍",
+        description: "논리적이고 체계적인 구성이 돋보입니다.",
         isActive: true,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -290,7 +302,8 @@ const ReviewKeywordManagement = () => {
         rating: 5,
         order: 8,
         keyword: "토론용으로 좋아요",
-        description: "",
+        emoji: "🤔",
+        description: "다양한 생각거리를 던져주어 토론하기 좋은 책입니다.",
         isActive: true,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -300,7 +313,8 @@ const ReviewKeywordManagement = () => {
         rating: 5,
         order: 9,
         keyword: "실무에 도움돼요",
-        description: "",
+        emoji: "💼",
+        description: "업무에 바로 적용할 수 있는 유용한 지식을 얻었습니다.",
         isActive: true,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -310,7 +324,8 @@ const ReviewKeywordManagement = () => {
         rating: 5,
         order: 10,
         keyword: "학생에게 추천해요",
-        description: "",
+        emoji: "🎓",
+        description: "학생들의 시야를 넓혀줄 수 있는 좋은 책입니다.",
         isActive: true,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -321,7 +336,8 @@ const ReviewKeywordManagement = () => {
         rating: 4,
         order: 1,
         keyword: "유쾌하고 재밌어요",
-        description: "",
+        emoji: "😄",
+        description: "가볍게 읽기 좋고, 유머가 넘치는 책입니다.",
         isActive: true,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -331,7 +347,8 @@ const ReviewKeywordManagement = () => {
         rating: 4,
         order: 2,
         keyword: "전개가 반전이에요",
-        description: "",
+        emoji: "😲",
+        description: "예상치 못한 반전이 있어서 흥미진진했습니다.",
         isActive: true,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -341,7 +358,8 @@ const ReviewKeywordManagement = () => {
         rating: 4,
         order: 3,
         keyword: "문장이 매끄러워요",
-        description: "",
+        emoji: "✍️",
+        description: "술술 읽히는 유려한 문체가 인상적입니다.",
         isActive: true,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -351,7 +369,8 @@ const ReviewKeywordManagement = () => {
         rating: 4,
         order: 4,
         keyword: "내용이 잘 정리되어 있어요",
-        description: "",
+        emoji: "📚",
+        description: "복잡한 내용이 보기 쉽게 잘 정리되어 있습니다.",
         isActive: true,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -361,7 +380,8 @@ const ReviewKeywordManagement = () => {
         rating: 4,
         order: 5,
         keyword: "길이가 적당해요",
-        description: "",
+        emoji: "👌",
+        description: "부담 없이 읽을 수 있는 적절한 분량입니다.",
         isActive: true,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -371,7 +391,8 @@ const ReviewKeywordManagement = () => {
         rating: 4,
         order: 6,
         keyword: "정보가 유익해요",
-        description: "",
+        emoji: "💡",
+        description: "일상이나 업무에 도움이 되는 유익한 정보가 많습니다.",
         isActive: true,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -381,7 +402,8 @@ const ReviewKeywordManagement = () => {
         rating: 4,
         order: 7,
         keyword: "생각하게 만들어요",
-        description: "",
+        emoji: "🧠",
+        description: "읽고 나서도 계속 생각하게 만드는 여운이 있습니다.",
         isActive: true,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -391,7 +413,8 @@ const ReviewKeywordManagement = () => {
         rating: 4,
         order: 8,
         keyword: "공감이 많이 돼요",
-        description: "",
+        emoji: "💖",
+        description: "나의 이야기처럼 공감되는 부분이 많았습니다.",
         isActive: true,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -401,7 +424,8 @@ const ReviewKeywordManagement = () => {
         rating: 4,
         order: 9,
         keyword: "짧은 시간에 읽기 좋아요",
-        description: "",
+        emoji: "⏳",
+        description: "자투리 시간에 가볍게 읽기 좋은 책입니다.",
         isActive: true,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -411,7 +435,8 @@ const ReviewKeywordManagement = () => {
         rating: 4,
         order: 10,
         keyword: "삽화/디자인이 예뻐요",
-        description: "",
+        emoji: "🎨",
+        description: "책의 내용과 잘 어울리는 아름다운 삽화와 디자인이 돋보입니다.",
         isActive: true,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -422,7 +447,8 @@ const ReviewKeywordManagement = () => {
         rating: 3,
         order: 1,
         keyword: "입문자에게 좋아요",
-        description: "",
+        emoji: "🔰",
+        description: "해당 분야를 처음 접하는 사람들에게 추천할 만합니다.",
         isActive: true,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -432,7 +458,8 @@ const ReviewKeywordManagement = () => {
         rating: 3,
         order: 2,
         keyword: "실무에 도움돼요",
-        description: "",
+        emoji: "💼",
+        description: "업무 관련 지식을 쌓는 데 도움이 됩니다.",
         isActive: true,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -442,7 +469,8 @@ const ReviewKeywordManagement = () => {
         rating: 3,
         order: 3,
         keyword: "학생에게 추천해요",
-        description: "",
+        emoji: "🎓",
+        description: "관련 분야를 공부하는 학생들에게 유용합니다.",
         isActive: true,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -452,7 +480,8 @@ const ReviewKeywordManagement = () => {
         rating: 3,
         order: 4,
         keyword: "구성이 탄탄해요",
-        description: "",
+        emoji: "👍",
+        description: "전체적인 짜임새가 좋은 편입니다.",
         isActive: true,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -462,7 +491,8 @@ const ReviewKeywordManagement = () => {
         rating: 3,
         order: 5,
         keyword: "내용이 잘 정리되어 있어요",
-        description: "",
+        emoji: "📚",
+        description: "정보가 체계적으로 정리되어 있어 이해하기 쉽습니다.",
         isActive: true,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -472,7 +502,8 @@ const ReviewKeywordManagement = () => {
         rating: 3,
         order: 6,
         keyword: "길이가 적당해요",
-        description: "",
+        emoji: "👌",
+        description: "지루하지 않게 읽을 수 있는 분량입니다.",
         isActive: true,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -482,7 +513,8 @@ const ReviewKeywordManagement = () => {
         rating: 3,
         order: 7,
         keyword: "토론용으로 좋아요",
-        description: "",
+        emoji: "🤔",
+        description: "이야기할 거리가 많아 토론용으로 적합합니다.",
         isActive: true,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -492,7 +524,8 @@ const ReviewKeywordManagement = () => {
         rating: 3,
         order: 8,
         keyword: "정보가 유익해요",
-        description: "",
+        emoji: "💡",
+        description: "알아두면 좋은 유용한 정보들을 얻을 수 있습니다.",
         isActive: true,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -502,7 +535,8 @@ const ReviewKeywordManagement = () => {
         rating: 3,
         order: 9,
         keyword: "공감이 많이 돼요",
-        description: "",
+        emoji: "💖",
+        description: "감정적으로 공감되는 부분이 있습니다.",
         isActive: true,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -512,7 +546,8 @@ const ReviewKeywordManagement = () => {
         rating: 3,
         order: 10,
         keyword: "짧은 시간에 읽기 좋아요",
-        description: "",
+        emoji: "⏳",
+        description: "짧고 간결하여 금방 읽을 수 있습니다.",
         isActive: true,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -523,7 +558,8 @@ const ReviewKeywordManagement = () => {
         rating: 2,
         order: 1,
         keyword: "집중해서 읽어야 해요",
-        description: "",
+        emoji: "🙇",
+        description: "내용이 다소 어려워 집중이 필요합니다.",
         isActive: true,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -533,7 +569,8 @@ const ReviewKeywordManagement = () => {
         rating: 2,
         order: 2,
         keyword: "조금 지루했어요",
-        description: "",
+        emoji: "😑",
+        description: "개인적으로는 다소 흥미가 떨어지는 부분이 있었습니다.",
         isActive: true,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -543,7 +580,8 @@ const ReviewKeywordManagement = () => {
         rating: 2,
         order: 3,
         keyword: "다시 읽고 싶어요",
-        description: "",
+        emoji: "🥰",
+        description: "이해를 위해 다시 한번 읽어보고 싶은 책입니다.",
         isActive: true,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -553,7 +591,8 @@ const ReviewKeywordManagement = () => {
         rating: 2,
         order: 4,
         keyword: "생각하게 만들어요",
-        description: "",
+        emoji: "🧠",
+        description: "복잡한 생각을 하게 만드는 내용이 포함되어 있습니다.",
         isActive: true,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -563,7 +602,8 @@ const ReviewKeywordManagement = () => {
         rating: 2,
         order: 5,
         keyword: "구성이 탄탄해요",
-        description: "",
+        emoji: "👍",
+        description: "구성 자체는 나쁘지 않았습니다.",
         isActive: true,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -573,7 +613,8 @@ const ReviewKeywordManagement = () => {
         rating: 2,
         order: 6,
         keyword: "문장이 매끄러워요",
-        description: "",
+        emoji: "✍️",
+        description: "문장 자체는 잘 쓰여졌습니다.",
         isActive: true,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -583,7 +624,8 @@ const ReviewKeywordManagement = () => {
         rating: 2,
         order: 7,
         keyword: "유쾌하고 재밌어요",
-        description: "",
+        emoji: "😄",
+        description: "일부 재미있는 부분이 있었습니다.",
         isActive: true,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -593,7 +635,8 @@ const ReviewKeywordManagement = () => {
         rating: 2,
         order: 8,
         keyword: "공감이 많이 돼요",
-        description: "",
+        emoji: "💖",
+        description: "어느 정도 공감되는 내용이 있었습니다.",
         isActive: true,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -603,7 +646,8 @@ const ReviewKeywordManagement = () => {
         rating: 2,
         order: 9,
         keyword: "인사이트가 깊어요",
-        description: "",
+        emoji: "🧐",
+        description: "생각해볼 만한 통찰을 제공합니다.",
         isActive: true,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -613,7 +657,8 @@ const ReviewKeywordManagement = () => {
         rating: 2,
         order: 10,
         keyword: "삽화/디자인이 예뻐요",
-        description: "",
+        emoji: "🎨",
+        description: "디자인은 만족스러웠습니다.",
         isActive: true,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -624,7 +669,8 @@ const ReviewKeywordManagement = () => {
         rating: 1,
         order: 1,
         keyword: "조금 지루했어요",
-        description: "",
+        emoji: "😑",
+        description: "제 취향과는 맞지 않아 지루하게 느껴졌습니다.",
         isActive: true,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -634,7 +680,8 @@ const ReviewKeywordManagement = () => {
         rating: 1,
         order: 2,
         keyword: "집중해서 읽어야 해요",
-        description: "",
+        emoji: "🙇",
+        description: "너무 어려워서 따라가기 힘들었습니다.",
         isActive: true,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -644,7 +691,8 @@ const ReviewKeywordManagement = () => {
         rating: 1,
         order: 3,
         keyword: "삽화/디자인이 예뻐요",
-        description: "",
+        emoji: "🎨",
+        description: "내용보다는 디자인이 더 인상에 남습니다.",
         isActive: true,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -654,7 +702,8 @@ const ReviewKeywordManagement = () => {
         rating: 1,
         order: 4,
         keyword: "길이가 적당해요",
-        description: "",
+        emoji: "👌",
+        description: "길이는 적당했지만 내용은 아쉬웠습니다.",
         isActive: true,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -664,7 +713,8 @@ const ReviewKeywordManagement = () => {
         rating: 1,
         order: 5,
         keyword: "입문자에게 좋아요",
-        description: "",
+        emoji: "🔰",
+        description: "입문자가 보기에도 내용이 부실합니다.",
         isActive: true,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -674,7 +724,8 @@ const ReviewKeywordManagement = () => {
         rating: 1,
         order: 6,
         keyword: "전개가 반전이에요",
-        description: "",
+        emoji: "😲",
+        description: "반전이 너무 뜬금없게 느껴졌습니다.",
         isActive: true,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -684,7 +735,8 @@ const ReviewKeywordManagement = () => {
         rating: 1,
         order: 7,
         keyword: "인사이트가 깊어요",
-        description: "",
+        emoji: "🧐",
+        description: "특별한 인사이트를 얻지 못했습니다.",
         isActive: true,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -694,7 +746,8 @@ const ReviewKeywordManagement = () => {
         rating: 1,
         order: 8,
         keyword: "토론용으로 좋아요",
-        description: "",
+        emoji: "🤔",
+        description: "토론하기에는 내용이 부족합니다.",
         isActive: true,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -704,7 +757,8 @@ const ReviewKeywordManagement = () => {
         rating: 1,
         order: 9,
         keyword: "선물용으로도 좋을 듯해요",
-        description: "",
+        emoji: "🎁",
+        description: "선물하기에는 적절하지 않은 것 같습니다.",
         isActive: true,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -714,7 +768,8 @@ const ReviewKeywordManagement = () => {
         rating: 1,
         order: 10,
         keyword: "유쾌하고 재밌어요",
-        description: "",
+        emoji: "😄",
+        description: "재미를 느끼기 어려웠습니다.",
         isActive: true,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -756,6 +811,7 @@ const ReviewKeywordManagement = () => {
   const handleSubmit = async () => {
     try {
       const values = await form.validateFields();
+      values.emoji = selectedEmoji;
 
       if (editingKeyword) {
         // 수정
@@ -782,6 +838,7 @@ const ReviewKeywordManagement = () => {
 
       setIsModalVisible(false);
       setEditingKeyword(null);
+      setSelectedEmoji(null);
       form.resetFields();
     } catch (error) {
       console.error("Validation failed:", error);
@@ -811,8 +868,10 @@ const ReviewKeywordManagement = () => {
     setEditingKeyword(keyword);
     if (keyword) {
       form.setFieldsValue(keyword);
+      setSelectedEmoji(keyword.emoji);
     } else {
       form.resetFields();
+      setSelectedEmoji(null);
     }
     setIsModalVisible(true);
   };
@@ -821,20 +880,9 @@ const ReviewKeywordManagement = () => {
   const handleCancel = () => {
     setIsModalVisible(false);
     setEditingKeyword(null);
+    setSelectedEmoji(null);
     form.resetFields();
   };
-
-  // 점수별 통계
-  const getRatingStats = () => {
-    const stats = {};
-    for (let i = 1; i <= 5; i++) {
-      const count = keywords.filter((k) => k.rating === i).length;
-      stats[i] = count;
-    }
-    return stats;
-  };
-
-  const ratingStats = getRatingStats();
 
   return (
     <div style={{ padding: "24px" }}>
@@ -863,7 +911,6 @@ const ReviewKeywordManagement = () => {
           </Col>
         </Row>
 
-        {/* 점수별 키워드 미리보기 */}
         <Tabs
           defaultActiveKey="all"
           items={[
@@ -916,7 +963,14 @@ const ReviewKeywordManagement = () => {
                                         {keyword.order}.
                                       </Text>
                                       <Text style={{ fontSize: "14px" }}>
-                                        {keyword.keyword}
+                                        <Space>
+                                          {keyword.emoji && (
+                                            <span style={{ fontSize: "16px" }}>
+                                              {keyword.emoji}
+                                            </span>
+                                          )}
+                                          <span>{keyword.keyword}</span>
+                                        </Space>
                                       </Text>
                                       <Switch
                                         size="small"
@@ -1009,12 +1063,8 @@ const ReviewKeywordManagement = () => {
             }),
           ]}
         />
-
-        {/* 키워드 테이블 */}
-        {/* The table component and its related code have been removed. */}
       </Card>
 
-      {/* 키워드 추가/수정 모달 */}
       <Modal
         title={editingKeyword ? "키워드 수정" : "키워드 추가"}
         open={isModalVisible}
@@ -1027,7 +1077,7 @@ const ReviewKeywordManagement = () => {
         <Form
           form={form}
           layout="vertical"
-          initialValues={{ rating: 5, isActive: true }}
+          initialValues={{ rating: 5, isActive: true, emoji: null }}
         >
           <Row gutter={16}>
             <Col span={12}>
@@ -1059,16 +1109,43 @@ const ReviewKeywordManagement = () => {
             </Col>
           </Row>
 
-          <Form.Item
-            name="keyword"
-            label="키워드"
-            rules={[
-              { required: true, message: "키워드를 입력해주세요" },
-              { max: 50, message: "키워드는 50자 이내로 입력해주세요" },
-            ]}
-          >
-            <Input placeholder="예: 재미있어요, 감동적이에요, 추천해요" />
-          </Form.Item>
+          <Row gutter={16} align="bottom">
+            <Col span={18}>
+              <Form.Item
+                name="keyword"
+                label="키워드"
+                rules={[
+                  { required: true, message: "키워드를 입력해주세요" },
+                  { max: 16, message: "키워드는 16자 이내로 입력해주세요" },
+                ]}
+              >
+                <Input
+                  showCount
+                  maxLength={16}
+                  placeholder="예: 재미있어요, 감동적이에요"
+                />
+              </Form.Item>
+            </Col>
+            <Col span={6}>
+              <Form.Item label="이모지">
+                <Popover
+                  content={
+                    <EmojiPicker
+                      onEmojiClick={(emojiData) => {
+                        setSelectedEmoji(emojiData.emoji);
+                        form.setFieldsValue({ emoji: emojiData.emoji });
+                      }}
+                    />
+                  }
+                  trigger="click"
+                >
+                  <Button icon={<SmileOutlined />} style={{ width: "100%" }}>
+                    {selectedEmoji || "선택"}
+                  </Button>
+                </Popover>
+              </Form.Item>
+            </Col>
+          </Row>
 
           <Form.Item
             name="description"
@@ -1079,9 +1156,14 @@ const ReviewKeywordManagement = () => {
             ]}
           >
             <Input.TextArea
+              showCount
+              maxLength={200}
               placeholder="키워드에 대한 설명을 입력해주세요"
               rows={3}
             />
+          </Form.Item>
+          <Form.Item name="emoji" noStyle>
+            <Input type="hidden" />
           </Form.Item>
         </Form>
       </Modal>

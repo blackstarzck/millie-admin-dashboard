@@ -23,6 +23,7 @@ import ContentStatistics from "./pages/DataAnalysis/ContentStatistics";
 import ReportGeneration from "./pages/DataAnalysis/ReportGeneration";
 import UserStatistics from "./pages/DataAnalysis/UserStatistics";
 import VisitStatistics from "./pages/DataAnalysis/VisitStatistics";
+import EmailTemplateManagement from "./pages/EmailManagement/EmailTemplateManagement";
 import EventRegistration from "./pages/EventManagement/EventRegistration";
 import EventStatus from "./pages/EventManagement/EventStatus";
 import FaqManagement from "./pages/InquiryManagement/FaqManagement";
@@ -240,6 +241,8 @@ function App() {
                 path="notifications/groups"
                 element={<TargetGroupManagement />}
               />
+              {/* 이메일 관리 */}
+              <Route path="/email/templates" element={<EmailTemplateManagement />} />
               {/* 팝업 관리 */}
               <Route path="popups/create" element={<PopupCreation />} />
               <Route
