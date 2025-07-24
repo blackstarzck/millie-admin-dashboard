@@ -24,6 +24,7 @@ import ReportGeneration from "./pages/DataAnalysis/ReportGeneration";
 import UserStatistics from "./pages/DataAnalysis/UserStatistics";
 import VisitStatistics from "./pages/DataAnalysis/VisitStatistics";
 import EmailTemplateManagement from "./pages/EmailManagement/EmailTemplateManagement";
+import EmailTemplateOperations from "./pages/EmailManagement/EmailTemplateOperations";
 import EventRegistration from "./pages/EventManagement/EventRegistration";
 import EventStatus from "./pages/EventManagement/EventStatus";
 import FaqManagement from "./pages/InquiryManagement/FaqManagement";
@@ -243,6 +244,7 @@ function App() {
               />
               {/* 이메일 관리 */}
               <Route path="/email/templates" element={<EmailTemplateManagement />} />
+              <Route path="/email/operations" element={<EmailTemplateOperations />} />
               {/* 팝업 관리 */}
               <Route path="popups/create" element={<PopupCreation />} />
               <Route

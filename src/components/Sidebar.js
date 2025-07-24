@@ -15,6 +15,7 @@ import {
     DatabaseOutlined,
     DollarCircleOutlined,
     EditOutlined,
+    EyeOutlined,
     FileProtectOutlined,
     FileTextOutlined,
     FormOutlined,
@@ -226,8 +227,14 @@ const menuItems = [
       {
         key: "/email/templates",
         path: "/email/templates",
-        name: "이메일 템플릿",
-        icon: <FileTextOutlined />,
+        name: "이메일 템플릿 등록",
+        icon: <FormOutlined />,
+      },
+      {
+        key: "/email/operations",
+        path: "/email/operations",
+        name: "이메일 템플릿 운영",
+        icon: <EyeOutlined />,
       }
     ]
   },
