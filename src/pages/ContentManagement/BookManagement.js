@@ -9,6 +9,7 @@ import {
   EllipsisOutlined,
   FileExcelOutlined,
   FileTextOutlined,
+  InfoCircleOutlined,
   PlusOutlined,
   ReadOutlined,
   SafetyOutlined,
@@ -16,7 +17,6 @@ import {
 } from "@ant-design/icons";
 import {
   Alert,
-  AutoComplete,
   Button,
   Col,
   DatePicker,
@@ -36,6 +36,7 @@ import {
   Switch,
   Table,
   Tag,
+  Tooltip,
   Typography,
   Upload
 } from "antd";
@@ -2032,7 +2033,6 @@ const BookManagement = () => {
   const [form] = Form.useForm();
   const [bookFileList, setBookFileList] = useState([]); // 개별 도서 파일 첨부용 상태
   const [coverFileList, setCoverFileList] = useState([]); // 표지 썸네일 파일 첨부용 상태
-  const [filteredSeriesOptions, setFilteredSeriesOptions] = useState([]); // 자동 완성 옵션 상태 추가
   const [recommendationTextInput, setRecommendationTextInput] = useState("");
 
   const [searchText, setSearchText] = useState("");
@@ -3124,7 +3124,14 @@ const BookManagement = () => {
             <Col span={24}>
               <Form.Item
                 name="SERIES_NAME"
-                label="시리즈명"
+                label={
+                  <span>
+                    시리즈명&nbsp;
+                    <Tooltip title='시리즈를 추가하고 저장할 경우 신규시리즈 알림이 자동으로 발송됩니다. 발송될 알림내용은 관리자 페이지 "알림 관리 > 알림 템플릿 관리"에서 확인해주세요.'>
+                      <InfoCircleOutlined />
+                    </Tooltip>
+                  </span>
+                }
                 rules={[
                   {
                     validator: (_, value) => {
@@ -3140,33 +3147,22 @@ const BookManagement = () => {
                   },
                 ]}
               >
-                <AutoComplete
-                  options={filteredSeriesOptions}
-                  onSearch={(value) => {
-                    const searchValue = value.toLowerCase();
-                    const topOptions = seriesData
-                      .filter((series) =>
-                        series.name.toLowerCase().includes(searchValue)
-                      )
-                      .slice(0, 5)
-                      .map((series) => ({
-                        value: series.name,
-                        label: (
-                          <div>
-                            {series.name}
-                            <Text type="secondary" style={{ marginLeft: 8 }}>
-                              ({series.count}권)
-                            </Text>
-                          </div>
-                        ),
-                        // Pass along category info for onSelect
-                        categoryName: series.categoryName,
-                        subCategoryName: series.subCategoryName,
-                      }));
-                    setFilteredSeriesOptions(topOptions);
-                  }}
+                <Select
+                  showSearch
+                  placeholder="시리즈 선택"
+                  allowClear
+                  filterOption={(input, option) =>
+                    (option?.label ?? "")
+                      .toLowerCase()
+                      .includes(input.toLowerCase())
+                  }
+                  options={seriesData.map((series) => ({
+                    value: series.name,
+                    label: `${series.name} (${series.count}권)`,
+                    categoryName: series.categoryName,
+                    subCategoryName: series.subCategoryName,
+                  }))}
                   onSelect={(value, option) => {
-                    // option contains { value, label, categoryName, subCategoryName, introduction }
                     if (option) {
                       const fieldsToUpdate = {};
                       if (option.categoryName !== undefined) {
@@ -3176,17 +3172,26 @@ const BookManagement = () => {
                         fieldsToUpdate.SUB_CATEGORY_NAME =
                           option.subCategoryName;
                       } else if (option.categoryName !== undefined) {
-                        // If main category is set but sub is not in option, clear it
                         fieldsToUpdate.SUB_CATEGORY_NAME = undefined;
                       }
-                      // 시리즈 선택 시 책 소개 필드에 더미 데이터 삽입
                       fieldsToUpdate.DESCRIPTION = `[${option.value}] 시리즈의 간략한 소개입니다. 내용을 직접 수정해주세요.`;
                       form.setFieldsValue(fieldsToUpdate);
                     }
                   }}
-                  placeholder="시리즈명 검색 또는 새 시리즈 입력"
-                  allowClear
-                  filterOption={false}
+                  onChange={(value) => {
+                    if (!value) {
+                      const fieldsToClear = {
+                        CATEGORY_NAME: undefined,
+                        SUB_CATEGORY_NAME: undefined,
+                      };
+                      if (editingBook) {
+                        fieldsToClear.DESCRIPTION = editingBook.DESCRIPTION || "";
+                      } else {
+                        fieldsToClear.DESCRIPTION = "";
+                      }
+                      form.setFieldsValue(fieldsToClear);
+                    }
+                  }}
                 />
               </Form.Item>
             </Col>

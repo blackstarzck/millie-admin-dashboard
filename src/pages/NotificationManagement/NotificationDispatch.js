@@ -1,35 +1,36 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
-    Form,
-    Input,
-    Select,
-    Radio,
-    DatePicker,
-    Button,
-    Space,
-    Typography,
-    message,
-    Card,
-    Divider,
-    AutoComplete, // For user search
-    Row,
-    Col,
-    Modal,
-    Descriptions,
-    Spin, // Import Spin for loading indicator
-    List, // Import List
-    Tag, // Import Tag
-} from 'antd';
-import {
-    SendOutlined, // 발송 아이콘
-    EyeOutlined, // 미리보기 아이콘
-    MailOutlined,
-    MessageOutlined,
-    BellOutlined,
-    MobileOutlined, // 테스트 발송 아이콘 추가
+  BellOutlined, // 그룹 추가 아이콘
+  ExclamationCircleOutlined, // 발송 아이콘
+  EyeOutlined, // 미리보기 아이콘
+  MailOutlined,
+  MessageOutlined,
+  MobileOutlined,
+  SendOutlined, // 발송 아이콘
+  UsergroupAddOutlined, // 그룹 추가 아이콘
 } from '@ant-design/icons';
+import {
+  Button,
+  Card,
+  Col,
+  DatePicker,
+  Descriptions,
+  Divider,
+  Form,
+  Input,
+  message,
+  Modal,
+  Popconfirm,
+  Radio, // For user search
+  Row,
+  Select,
+  Space,
+  Spin, // Import List
+  Tag,
+  Typography,
+} from 'antd';
 import moment from 'moment';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useGroups } from '../../context/GroupContext'; // Import useGroups hook
 
 const { Title, Text, Paragraph } = Typography;
@@ -54,11 +55,8 @@ const NotificationDispatch = () => {
     const [form] = Form.useForm();
     const navigate = useNavigate();
     const { groups } = useGroups(); // Get groups from context
-    const [targetType, setTargetType] = useState('all'); // all, group, individual
+    const [targetType, setTargetType] = useState('all'); // all, group
     const [dispatchTime, setDispatchTime] = useState('immediate'); // immediate, scheduled
-    const [userSearchOptions, setUserSearchOptions] = useState([]);
-    const [selectedUsers, setSelectedUsers] = useState([]); // State for selected users [{ value, label }, ...]
-    const [userSearchQuery, setUserSearchQuery] = useState(''); // State for search input
     const [previewVisible, setPreviewVisible] = useState(false);
     const [previewData, setPreviewData] = useState({});
     const [testRecipient, setTestRecipient] = useState('');
@@ -85,47 +83,6 @@ const NotificationDispatch = () => {
             // Clear fields if "Direct Input" is selected
             form.setFieldsValue({ title: '', content: '' });
         }
-    };
-
-    // Handle user search for AutoComplete/Input
-    const handleUserSearch = (searchText) => {
-        setUserSearchQuery(searchText); // Keep track of the query
-        if (!searchText) {
-            setUserSearchOptions([]);
-        } else {
-            // Simulate API call or filter mockUsers
-            // In a real app, debounce this call
-            setUserSearchOptions(
-                mockUsers.filter(user =>
-                    user.label.toLowerCase().includes(searchText.toLowerCase())
-                ).slice(0, 10) // Limit results displayed
-            );
-        }
-    };
-
-    // Handle adding a user to the selected list
-    const handleAddUser = (userToAdd) => {
-        if (!selectedUsers.find(u => u.value === userToAdd.value)) {
-            const newSelectedUsers = [...selectedUsers, userToAdd];
-            setSelectedUsers(newSelectedUsers);
-            // Update form value with array of IDs
-            form.setFieldsValue({ targetValue: newSelectedUsers.map(u => u.value) });
-             // Clear search input and results after adding
-             setUserSearchQuery('');
-             setUserSearchOptions([]);
-        }
-    };
-
-    // Handle removing a user from the selected list
-    const handleRemoveUser = (userIdToRemove) => {
-        const newSelectedUsers = selectedUsers.filter(u => u.value !== userIdToRemove);
-        setSelectedUsers(newSelectedUsers);
-        // Update form value
-        form.setFieldsValue({ targetValue: newSelectedUsers.map(u => u.value) });
-         // Trigger validation after removal if the list becomes empty
-         if (newSelectedUsers.length === 0) {
-             form.validateFields(['targetValue']);
-         }
     };
 
     // Handle Group Selection Change with simulated async fetch
@@ -156,11 +113,38 @@ const NotificationDispatch = () => {
         }
     };
 
+    const handleTargetChange = (value) => {
+        if (value && value !== 'all') {
+            setTargetType('group');
+            handleGroupChange(value);
+        } else {
+            setTargetType('all');
+            setSelectedGroupCount(null);
+            setGroupCountError(null);
+            setGroupCountLoading(false);
+            if (!value) {
+                form.setFieldsValue({ target: 'all' });
+            }
+        }
+    };
+
+    const handleNavigateToGroupManagement = () => {
+        Modal.confirm({
+          title: '페이지를 이동하시겠습니까?',
+          description: '페이지 이동 시 기존에 작성한 내용은 모두 지워집니다.',
+            icon: <ExclamationCircleOutlined />,
+            content: '페이지 이동 시 기존에 작성한 내용은 모두 지워집니다.',
+            okText: '이동',
+            cancelText: '취소',
+            onOk: () => navigate('/notifications/groups'),
+        });
+    };
+
     // Show preview
     const showPreview = () => {
         form.validateFields()
             .then(values => {
-                setPreviewData({ ...values, noticeType }); // Include noticeType in preview data
+                setPreviewData({ ...values, noticeType, targetType }); // Include noticeType in preview data
                 setTestRecipientError(null);
                 setPreviewVisible(true);
             })
@@ -202,20 +186,22 @@ const NotificationDispatch = () => {
             dispatchData = {
                 ...values,
                 noticeType: 'regular',
+                targetType: targetType,
                 linkUrl: values.linkUrl || null,
-                targetValue: targetType === 'all' ? null : values.targetValue,
+                targetValue: values.target === 'all' ? null : values.target,
                 scheduledTime: dispatchTime === 'scheduled' ? values.scheduledTime?.format('YYYY-MM-DD HH:mm:ss') : null,
             };
-             // Remove unnecessary fields for regular
-             delete dispatchData.level; // Ensure level is not sent for regular
-             delete dispatchData.scheduledTimeOption;
-             if (dispatchTime === 'immediate') delete dispatchData.scheduledTime;
-             if (targetType === 'all') delete dispatchData.targetValue;
+            // Remove unnecessary fields for regular
+            delete dispatchData.target;
+            delete dispatchData.level; // Ensure level is not sent for regular
+            delete dispatchData.scheduledTimeOption;
+            if (dispatchTime === 'immediate') delete dispatchData.scheduledTime;
+            if (targetType === 'all') delete dispatchData.targetValue;
         }
 
         // Note: Zero count check is now primarily handled before calling form.submit()
         // However, you might keep a secondary check here if needed for other submission paths.
-        if (values.targetType === 'group' && selectedGroupCount === 0 && values.noticeType === 'regular') {
+        if (noticeType === 'regular' && targetType === 'group' && selectedGroupCount === 0) {
              console.error("Attempted to dispatch to a group with 0 users. This should have been caught earlier.");
              message.error('선택된 그룹의 대상 회원이 0명입니다. 발송할 수 없습니다.', 5);
              setPreviewVisible(false); // Close modal if somehow submitted
@@ -264,7 +250,7 @@ const NotificationDispatch = () => {
             setTestRecipientError('유효한 이메일 형식이 아닙니다.');
             return;
         }
-        
+
         setTestRecipientError(null);
 
         const recipientType = channel === 'email' ? 'email' : 'phone';
@@ -279,7 +265,7 @@ const NotificationDispatch = () => {
         message.loading({ content: `'${testRecipient}'(으)로 테스트 발송 중...`, key: 'testSend' });
         // TODO: Implement actual API call for test send
         console.log('Test dispatch data:', testData);
-        setTimeout(() => { 
+        setTimeout(() => {
             message.success({ content: `'${testRecipient}'(으)로 테스트 발송 요청이 완료되었습니다!`, key: 'testSend', duration: 3 });
         }, 1500);
     };
@@ -300,13 +286,9 @@ const NotificationDispatch = () => {
     // --- Handler for the final submit button in the modal ---
     const handleFinalSubmit = () => {
         // Perform the zero-user check before submitting the form
-        const currentValues = form.getFieldsValue(); // Get current form values directly
-        if (currentValues.noticeType === 'regular' && currentValues.targetType === 'group') {
-            const selectedGroup = groupOptions.find(g => g.value === currentValues.targetValue);
-            if (selectedGroup && selectedGroup.userCount === 0) {
-                message.error('선택된 그룹의 대상 회원이 0명입니다. 발송할 수 없습니다.', 5);
-                return; // Stop the submission
-            }
+        if (noticeType === 'regular' && targetType === 'group' && selectedGroupCount === 0) {
+            message.error('선택된 그룹의 대상 회원이 0명입니다. 발송할 수 없습니다.', 5);
+            return; // Stop the submission
         }
         // If the check passes, submit the form
         form.submit();
@@ -324,7 +306,7 @@ const NotificationDispatch = () => {
                     onFinishFailed={onFinishFailed}
                     initialValues={{
                         channel: 'push', // Default channel
-                        targetType: 'all',
+                        target: 'all',
                         scheduledTimeOption: 'immediate',
                         noticeType: 'regular', // Default notice type
                         level: 'info', // Default emergency level
@@ -349,7 +331,7 @@ const NotificationDispatch = () => {
                                     <Option value="push"><BellOutlined /> 앱 푸시</Option>
                                     <Option value="email"><MailOutlined /> 이메일</Option>
                                     <Option value="sms"><MessageOutlined /> SMS</Option>
-                                    {/* Add more channels */} 
+                                    {/* Add more channels */}
                                 </Select>
                             </Form.Item>
                         </Col>
@@ -409,133 +391,56 @@ const NotificationDispatch = () => {
                         <>
                             <Divider>발송 대상 및 시점</Divider>
 
-                            <Form.Item name="targetType" label="발송 대상">
-                                <Radio.Group onChange={(e) => { setTargetType(e.target.value); setSelectedGroupCount(null); }} value={targetType}>
-                                    <Radio value="all">전체 사용자</Radio>
-                                    <Radio value="group">특정 그룹</Radio>
-                                    <Radio value="individual">특정 사용자</Radio>
-                                </Radio.Group>
+                            <Form.Item
+                                name="target"
+                                label="발송 대상"
+                                rules={[{ required: true, message: '발송 대상을 선택해주세요.' }]}
+                            >
+                                <Space.Compact style={{ width: '100%' }}>
+                                    <Select
+                                        placeholder="발송할 대상 선택"
+                                        onChange={handleTargetChange}
+                                        allowClear
+                                    >
+                                        <Option value="all">전체 사용자</Option>
+                                        {groupOptions.map(group => (
+                                            <Option key={group.key} value={group.value}>
+                                                {group.label}
+                                            </Option>
+                                        ))}
+                                    </Select>
+                                    <Popconfirm
+                      title="페이지를 이동하시겠습니까?"
+                      description= '페이지 이동 시 기존에 작성한 내용은 모두 지워집니다.'
+                                        onConfirm={() => navigate('/notifications/groups')}
+                                        okText="이동"
+                                        cancelText="취소"
+                                        placement="topRight"
+                                    >
+                                        <Button
+                                            icon={<UsergroupAddOutlined />}
+                                        >
+                                            발송 대상 관리
+                                        </Button>
+                                    </Popconfirm>
+                                </Space.Compact>
                             </Form.Item>
 
                             {targetType === 'group' && (
-                                <Form.Item
-                                    label="대상 그룹 선택" // Label remains the same
-                                    required // Keep required rule if needed, validation handled separately
-                                >
-                                    {/* Remove Row/Col structure */}
-                                    <Form.Item
-                                        name="targetValue" // Name for the Select value
-                                        noStyle // No extra styling from Form.Item wrapper
-                                        rules={[{ required: true, message: '대상 그룹을 선택해주세요!' }]}
-                                    >
-                                        <Select
-                                            placeholder="발송할 사용자 그룹 선택"
-                                            onChange={handleGroupChange} // Use the handler to update dummy count
-                                            style={{ width: '100%' }}
-                                            allowClear // Allow clearing the selection
-                                            // Disable select while loading count to prevent race conditions
-                                            disabled={groupCountLoading}
-                                        >
-                                            {groupOptions.map(group => (
-                                                <Option key={group.key} value={group.value}>
-                                                    {group.label}
-                                                </Option>
-                                            ))}
-                                        </Select>
-                                    </Form.Item>
-                                    {/* Display count/loading/error below the input box */}
-                                    <div style={{ marginTop: '4px', minHeight: '22px' }}> {/* Add minHeight to prevent layout shift */}
-                                        {groupCountLoading && (
-                                            <Spin size="small" style={{ marginRight: '8px' }} />
-                                        )}
-                                        {groupCountLoading && <Text type="secondary">인원 수 확인 중...</Text>}
-
-                                        {groupCountError && (
-                                            <Text type="danger">{groupCountError}</Text>
-                                        )}
-
-                                        {!groupCountLoading && !groupCountError && selectedGroupCount !== null && (
-                                            <Text type={selectedGroupCount === 0 ? 'danger' : 'secondary'}>
-                                                예상 발송 대상: {selectedGroupCount.toLocaleString()}명 (테스트 값)
-                                            </Text>
-                                        )}
-                                    </div>
-                                </Form.Item>
-                            )}
-
-                            {targetType === 'individual' && (
-                                <Form.Item
-                                    label="대상 사용자 검색 및 추가"
-                                    // We still need a Form.Item for the label and validation message area,
-                                    // but the actual value control is managed manually via selectedUsers state.
-                                    // The 'targetValue' field is set manually using form.setFieldsValue.
-                                    // We add a hidden Form.Item linked to targetValue just for validation trigger.
-                                    validateTrigger={['onChange', 'onBlur']} // Trigger validation when targetValue changes
-                                >
-                                    {/* Hidden field for validation */}
-                                    <Form.Item name="targetValue" noStyle rules={[{ required: true, message: '대상 사용자를 1명 이상 추가해주세요!', type: 'array' }]} />
-
-                                    {/* Search Input */}
-                                    <AutoComplete
-                                        options={userSearchOptions.map(user => {
-                                             // Check if the user is already selected
-                                             const isSelected = selectedUsers.some(selected => selected.value === user.value);
-                                             return {
-                                                 key: user.value,
-                                                 value: user.label, // Show label in dropdown
-                                                 label: (
-                                                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                                         {user.label}
-                                                         <Button
-                                                             type="link"
-                                                             size="small"
-                                                             onClick={(e) => { e.stopPropagation(); handleAddUser(user); }}
-                                                             // Disable button if already selected
-                                                             disabled={isSelected}
-                                                         >
-                                                             {/* Change button text if selected */}
-                                                             {isSelected ? '추가됨' : '추가'}
-                                                         </Button>
-                                                     </div>
-                                                 ),
-                                                 // Store the full user object for handleAddUser
-                                                 user: user
-                                             };
-                                         })}
-                                        onSearch={handleUserSearch}
-                                        onSelect={(value, option) => {
-                                            // Handle selection directly from AutoComplete dropdown if needed
-                                            handleAddUser(option.user); // Add the user object
-                                        }}
-                                        value={userSearchQuery} // Control input value
-                                        onChange={(data) => setUserSearchQuery(data)} // Update query state
-                                        placeholder="사용자 ID 또는 이름 검색"
-                                        style={{ width: '100%' }}
-                                    >
-                                        {/* We use options prop, no need for Input child? Maybe for custom styling */}
-                                         <Input />
-                                    </AutoComplete>
-
-                                    {/* Selected Users Display */}
-                                     <div style={{ marginTop: '8px', maxHeight: '150px', overflowY: 'auto', border: '1px solid #d9d9d9', borderRadius: '2px', padding: '4px' }}>
-                                         {selectedUsers.length === 0 ? (
-                                             <Text type="secondary">검색 후 '추가' 버튼을 눌러 사용자를 추가하세요.</Text>
-                                         ) : (
-                                             <Space wrap size={[4, 8]}>
-                                                 {selectedUsers.map(user => (
-                                                     <Tag
-                                                         key={user.value}
-                                                         closable
-                                                         onClose={() => handleRemoveUser(user.value)}
-                                                         style={{ margin: '2px' }}
-                                                     >
-                                                         {user.label}
-                                                     </Tag>
-                                                 ))}
-                                             </Space>
-                                         )}
-                                     </div>
-                                </Form.Item>
+                                <div style={{ marginTop: '-12px', marginBottom: '12px', minHeight: '22px' }}>
+                                    {groupCountLoading && (
+                                        <Spin size="small" style={{ marginRight: '8px' }} />
+                                    )}
+                                    {groupCountLoading && <Text type="secondary">인원 수 확인 중...</Text>}
+                                    {groupCountError && (
+                                        <Text type="danger">{groupCountError}</Text>
+                                    )}
+                                    {!groupCountLoading && !groupCountError && selectedGroupCount !== null && (
+                                        <Text type={selectedGroupCount === 0 ? 'danger' : 'secondary'}>
+                                            예상 발송 대상: {selectedGroupCount.toLocaleString()}명 (테스트 값)
+                                        </Text>
+                                    )}
+                                </div>
                             )}
 
                             <Form.Item name="scheduledTimeOption" label="발송 시점">
@@ -614,11 +519,8 @@ const NotificationDispatch = () => {
                             {previewData.noticeType === 'emergency' && '전체 사용자 (긴급)'}
                             {previewData.noticeType === 'regular' && previewData.targetType === 'all' && '전체 사용자'}
                             {previewData.noticeType === 'regular' && previewData.targetType === 'group' &&
-                                `그룹 (${groupOptions.find(g=>g.value === previewData.targetValue)?.label || previewData.targetValue})` +
+                                `그룹 (${groupOptions.find(g => g.value === previewData.target)?.label || previewData.target})` +
                                 (selectedGroupCount !== null ? ` (${selectedGroupCount.toLocaleString()}명)` : '')
-                            }
-                            {previewData.noticeType === 'regular' && previewData.targetType === 'individual' &&
-                                `특정 사용자 (${previewData.targetValue?.length || 0}명)`
                             }
                         </Descriptions.Item>
                         <Descriptions.Item label="발송 시점" labelStyle={{ width: '100px' }}>

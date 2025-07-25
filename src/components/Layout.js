@@ -45,7 +45,7 @@ const menuItems = [
     getItem('구독 내역 관리', '/users/subscriptions'),
     getItem('뱃지 관리', '/users/badges'),
   ]),
-  getItem('알림 관리', 'subNotifications', <NotificationOutlined />, [
+  getItem('알림 & PUSH 관리', 'subNotifications', <NotificationOutlined />, [
     getItem('알림 발송', '/notifications/dispatch'),
     getItem('알림 템플릿 관리', '/notifications/templates'),
     getItem('발송 내역 조회', '/notifications/history'),
@@ -179,4 +179,4 @@ const AppLayout = () => { // 컴포넌트 이름 변경 (Layout 중복 방지)
   );
 };
 
-export default AppLayout; // 변경된 이름으로 내보내기 
+export default AppLayout; // 변경된 이름으로 내보내기

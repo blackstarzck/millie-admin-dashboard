@@ -136,7 +136,6 @@ const processSeriesData = (books) => {
           category: randomCategory.main,
           subCategory: randomCategory.sub,
           introduction: "",
-          notificationSent: false,
         };
         seriesMap.set(book.SERIES_NAME, seriesDetail);
       } else {
@@ -226,7 +225,6 @@ const SeriesManagement = () => {
       subCategory: series.subCategory,
       introduction: series.introduction,
       books: series.booksInCurrentList.map((book) => book.bookKey),
-      sendNotification: series.notificationSent,
     });
     setSelectedCategory(series.category); // 수정 시 기존 카테고리 설정
     setIsModalOpen(true);
@@ -269,7 +267,6 @@ const SeriesManagement = () => {
           introduction: values.introduction,
           booksInCurrentList: selectedBooks,
           bookCount: selectedBooks.length,
-          notificationSent: !!values.sendNotification,
         };
 
         if (editingSeries) {
@@ -280,15 +277,6 @@ const SeriesManagement = () => {
           ) {
             message.error("이미 존재하는 시리즈명입니다.");
             return;
-          }
-          // 수정 시 알림 발송 로직
-          if (values.sendNotification && !editingSeries.notificationSent) {
-            console.log("알림 발송 요청 (from edit modal):", {
-              seriesName: values.name,
-            });
-            message.info(
-              `'${values.name}' 시리즈에 대한 알림이 발송되었습니다. (시뮬레이션)`
-            );
           }
           setSeriesDisplayList((prevList) =>
             prevList.map((s) =>
@@ -312,7 +300,6 @@ const SeriesManagement = () => {
             bookCount: seriesData.bookCount, // bookCount도 seriesData에서 가져옴
             booksInCurrentList: seriesData.booksInCurrentList, // booksInCurrentList도 seriesData에서 가져옴
             firstRegistrationDate: new Date().toISOString().split("T")[0],
-            notificationSent: !!values.sendNotification,
           };
           setSeriesDisplayList((prevList) =>
             [...prevList, newSeries].sort((a, b) =>
@@ -320,16 +307,6 @@ const SeriesManagement = () => {
             )
           );
           message.success("새 시리즈가 추가되었습니다.");
-
-          if (values.sendNotification) {
-            // 실제 알림 발송 로직은 여기에 구현합니다.
-            console.log("알림 발송 요청:", {
-              seriesName: newSeries.name,
-            });
-            message.info(
-              `'${newSeries.name}' 시리즈 추가 알림이 사용자에게 발송되었습니다. (시뮬레이션)`
-            );
-          }
         }
         handleCancelModal();
       })
@@ -344,35 +321,6 @@ const SeriesManagement = () => {
     );
     message.success(`'${seriesKey}' 시리즈가 삭제되었습니다.`);
   }, []);
-
-  const handleNotificationStatusChange = useCallback(
-    (seriesKey, newStatus) => {
-      setSeriesDisplayList((prevList) =>
-        prevList.map((series) =>
-          series.key === seriesKey
-            ? { ...series, notificationSent: newStatus }
-            : series
-        )
-      );
-
-      const series = seriesDisplayList.find((s) => s.key === seriesKey);
-      const seriesName = series ? series.name : `ID: ${seriesKey}`;
-
-      message.success(
-        `'${seriesName}' 시리즈의 알림 상태가 '${
-          newStatus ? "발송" : "미발송"
-        }'으로 변경되었습니다.`
-      );
-
-      if (newStatus) {
-        console.log(`알림 발송 요청 (from table):`, { seriesName });
-        message.info(
-          `'${seriesName}' 시리즈에 대한 알림이 발송되었습니다. (시뮬레이션)`
-        );
-      }
-    },
-    [seriesDisplayList]
-  );
 
   // 시리즈 내 도서 서비스 상태 변경 핸들러
   const handleBookServiceStatusChange = useCallback(
@@ -529,27 +477,6 @@ const SeriesManagement = () => {
       sorter: (a, b) =>
         new Date(a.firstRegistrationDate) - new Date(b.firstRegistrationDate),
       render: (date) => (date ? date : "-"),
-    },
-    {
-      title: (
-        <Tooltip title="사용자에게 신규 시리즈 알림을 발송했는지 여부입니다. 토글하여 발송할 수 있습니다.">
-          알림 발송 <InfoCircleOutlined />
-        </Tooltip>
-      ),
-      dataIndex: "notificationSent",
-      key: "notification",
-      align: "center",
-      width: 120,
-      render: (notificationSent, record) => (
-        <Switch
-          checked={notificationSent}
-          checkedChildren="발송"
-          unCheckedChildren="미발송"
-          onChange={(checked) =>
-            handleNotificationStatusChange(record.key, checked)
-          }
-        />
-      ),
     },
     {
       title: "관리",
@@ -751,19 +678,6 @@ const SeriesManagement = () => {
               rows={4}
               placeholder="시리즈에 대한 간략한 소개를 입력해주세요."
             />
-          </Form.Item>
-          <Form.Item
-            name="sendNotification"
-            label={editingSeries ? "알림 발송 상태" : "신규 시리즈 알림 발송"}
-            valuePropName="checked"
-            tooltip={
-              editingSeries
-                ? "이미 발송된 경우 상태만 표시됩니다. '미발송'에서 '발송'으로 변경 시에만 알림이 발송됩니다."
-                : "체크 시, 새로운 시리즈가 추가되었음을 사용자들에게 알립니다."
-            }
-            initialValue={false}
-          >
-            <Switch checkedChildren="발송" unCheckedChildren="미발송" />
           </Form.Item>
           <Form.Item name="books" label="도서 선택">
             <BookTransfer
