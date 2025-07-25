@@ -1,11 +1,15 @@
-import React, { createContext, useState, useContext, useCallback } from 'react';
 import { message } from 'antd';
+import React, { createContext, useCallback, useContext, useState } from 'react';
 
 // 초기 그룹 데이터 (TargetGroupManagement에서 가져옴)
 const initialGroupsData = [
     { key: 'G001', id: 'G001', name: 'VIP 고객', description: '구매 금액 상위 10% 고객 그룹',
       query: { combinator: 'and', rules: [{ field: 'totalPurchaseAmount', operator: '>=', value: 100000 }] } },
     { key: 'G003', id: 'G003', name: '이벤트 참여자 (7월)', description: '7월 신간 알림 이벤트 참여 고객',
+      query: { combinator: 'and', rules: [] } },
+    { key: 'G004', id: 'G004', name: '시리즈 알림 YES 그룹', description: '시리즈 알림 수신에 동의한 사용자 그룹',
+      query: { combinator: 'and', rules: [] } },
+    { key: 'G005', id: 'G005', name: '신간도서 알림 YES 그룹', description: '신간도서 알림 수신에 동의한 사용자 그룹',
       query: { combinator: 'and', rules: [] } },
     {
       key: 'ERR01', id: 'ERR01', name: '특정 프로모션 대상', description: '8월 프로모션 대상 고객 그룹 (값 오류 테스트)',
@@ -86,4 +90,4 @@ export const useGroups = () => {
         throw new Error('useGroups must be used within a GroupProvider');
     }
     return context;
-}; 
+};

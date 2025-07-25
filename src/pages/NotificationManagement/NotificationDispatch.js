@@ -1,16 +1,15 @@
 import {
-  BellOutlined, // 그룹 추가 아이콘
-  ExclamationCircleOutlined, // 발송 아이콘
+  BellOutlined, // 알림 아이콘
+  CommentOutlined, // 카카오 알림톡 아이콘
   EyeOutlined, // 미리보기 아이콘
-  MailOutlined,
-  MessageOutlined,
-  MobileOutlined,
+  MobileOutlined, // 모바일 아이콘
   SendOutlined, // 발송 아이콘
-  UsergroupAddOutlined, // 그룹 추가 아이콘
+  UsergroupAddOutlined
 } from '@ant-design/icons';
 import {
   Button,
   Card,
+  Checkbox,
   Col,
   DatePicker,
   Descriptions,
@@ -20,96 +19,135 @@ import {
   message,
   Modal,
   Popconfirm,
-  Radio, // For user search
+  Radio,
   Row,
   Select,
   Space,
-  Spin, // Import List
+  Spin,
+  Tabs, // Import Tabs
   Tag,
   Typography,
 } from 'antd';
 import moment from 'moment';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGroups } from '../../context/GroupContext'; // Import useGroups hook
 
 const { Title, Text, Paragraph } = Typography;
 const { Option } = Select;
 const { TextArea } = Input;
+const { TabPane } = Tabs;
 
-// --- Sample Data (Replace with API calls) ---
-const mockTemplates = [
-    { key: 'tpl001', id: 'tpl001', name: '환영 메시지', title: '회원가입을 환영합니다!', content: '[이름]님, 밀리의 서재에 오신 것을 환영합니다! 지금 바로 첫 달 무료 혜택을 확인해보세요.' },
-    { key: 'tpl003', id: 'tpl003', name: '독서 루틴 알림', title: '오늘의 독서, 시작하셨나요? 📚', content: '[이름]님, 잠시 밀리의 서재와 함께 마음의 양식을 쌓아보는 건 어때요? 꾸준한 독서는 성장의 밑거름이 됩니다.' },
-];
-
-const mockUsers = [
-    { value: 'user001', label: '김민지 (user001@example.com)' },
-    { value: 'user002', label: '이수현 (suhyun.lee@example.com)' },
-    { value: 'user003', label: '박서준 (seo.park@example.com)' },
-    { value: 'user004', label: '최유나 (yuna.choi@sample.net)' },
-];
+// --- Channel Configuration ---
+const channelConfigs = {
+  push: {
+    name: '앱 PUSH',
+    icon: <BellOutlined />,
+    isEditable: true,
+    maxLength: { title: 40, content: 120 },
+    placeholders: {
+      title: '앱 PUSH 제목 입력',
+      content: '사용자에게 보여질 PUSH 메시지 내용을 입력하세요.',
+    },
+  },
+  kakaotalk: {
+    name: '카카오 알림톡',
+    icon: <CommentOutlined />,
+    isEditable: true,
+    maxLength: { title: 50, content: 1000 },
+     placeholders: {
+      title: '알림톡 제목 입력 (선택 사항)',
+      content: '카카오 채널에 사전 승인된 알림톡 템플릿 내용을 입력하세요. 변수 부분은 [변수명] 형식으로 사용할 수 있습니다.',
+    },
+  },
+  notification: {
+    name: '알림',
+    icon: <MobileOutlined />,
+    isEditable: true,
+    maxLength: { title: 100, content: 500 },
+     placeholders: {
+      title: '앱 내 알림 제목 입력',
+      content: '앱 내 알림함에 표시될 메시지 내용을 입력하세요.',
+    },
+  },
+};
 
 // --- Component ---
 const NotificationDispatch = () => {
     const [form] = Form.useForm();
     const navigate = useNavigate();
-    const { groups } = useGroups(); // Get groups from context
-    const [targetType, setTargetType] = useState('all'); // all, group
-    const [dispatchTime, setDispatchTime] = useState('immediate'); // immediate, scheduled
+    const { groups } = useGroups();
+    const [targetType, setTargetType] = useState('all');
+    const [dispatchTime, setDispatchTime] = useState('immediate');
     const [previewVisible, setPreviewVisible] = useState(false);
     const [previewData, setPreviewData] = useState({});
     const [testRecipient, setTestRecipient] = useState('');
     const [testRecipientError, setTestRecipientError] = useState(null);
-    const [noticeType, setNoticeType] = useState('regular'); // 'regular' or 'emergency'
     const [selectedGroupCount, setSelectedGroupCount] = useState(null);
-    const [groupCountLoading, setGroupCountLoading] = useState(false); // State for loading count
-    const [groupCountError, setGroupCountError] = useState(null); // State for count fetch error
+    const [groupCountLoading, setGroupCountLoading] = useState(false);
+    const [groupCountError, setGroupCountError] = useState(null);
 
-    // Prepare group options for the select dropdown (Now includes ALL groups)
+    // --- State for Static UI ---
+    const [selectedChannels, setSelectedChannels] = useState([]);
+    const [channelContents, setChannelContents] = useState(
+      Object.keys(channelConfigs).reduce((acc, key) => {
+        acc[key] = { title: '', content: '' };
+        return acc;
+      }, {})
+    ); // Initialize content state for all channels
+
+    // Prepare group options for the select dropdown
     const groupOptions = groups
-        // .filter(group => !group.id.startsWith('ERR')) // Removed filter
-        .map(group => ({ key: group.key, value: group.id, label: group.name, userCount: group.userCount || 0 })); // Assume userCount exists, default to 0
+        .map(group => ({ key: group.key, value: group.id, label: group.name, userCount: group.userCount || 0 }));
 
-    // Load template when selected
-    const handleTemplateChange = (templateId) => {
-        const selectedTemplate = mockTemplates.find(t => t.id === templateId);
-        if (selectedTemplate) {
-            form.setFieldsValue({
-                title: selectedTemplate.title,
-                content: selectedTemplate.content,
-            });
-        } else {
-            // Clear fields if "Direct Input" is selected
-            form.setFieldsValue({ title: '', content: '' });
-        }
+    // --- Event Handlers for UI ---
+    const handleChannelSelectionChange = (checkedValues) => {
+        setSelectedChannels(checkedValues);
     };
 
-    // Handle Group Selection Change with simulated async fetch
+    // Sync content state when channel selection changes
+    useEffect(() => {
+        setChannelContents(prevContents => {
+            const newContents = {};
+            selectedChannels.forEach(channelKey => {
+                newContents[channelKey] = prevContents[channelKey] || { title: '', content: '' };
+            });
+            return newContents;
+        });
+    }, [selectedChannels]);
+
+
+    const handleContentChange = (channel, field, value) => {
+        setChannelContents(prev => ({
+            ...prev,
+            [channel]: {
+                ...prev[channel],
+                [field]: value,
+            },
+        }));
+    };
+
+    // Handle Group Selection Change
     const handleGroupChange = (groupId) => {
-        setSelectedGroupCount(null); // Reset count
-        setGroupCountError(null); // Reset error
+        setSelectedGroupCount(null);
+        setGroupCountError(null);
 
         if (groupId) {
-            setGroupCountLoading(true); // Start loading
-
-            // Simulate API call delay
+            setGroupCountLoading(true);
             setTimeout(() => {
-                // Simulate success (80% chance) or failure (20% chance)
                 const success = Math.random() < 0.8;
-
                 if (success) {
                     const dummyCount = Math.floor(Math.random() * 5001);
                     setSelectedGroupCount(dummyCount);
                     setGroupCountError(null);
                 } else {
                     setSelectedGroupCount(null);
-                    setGroupCountError("그룹 관리에서 선택한 그룹의 결과 미리보기를 통해 정확한 오류내용을 확인해주세요");
+                    setGroupCountError("그룹 인원 확인 중 오류가 발생했습니다.");
                 }
-                setGroupCountLoading(false); // Stop loading
-            }, 750); // Simulate 750ms network delay
+                setGroupCountLoading(false);
+            }, 750);
         } else {
-            setGroupCountLoading(false); // Stop loading if selection is cleared
+            setGroupCountLoading(false);
         }
     };
 
@@ -128,23 +166,16 @@ const NotificationDispatch = () => {
         }
     };
 
-    const handleNavigateToGroupManagement = () => {
-        Modal.confirm({
-          title: '페이지를 이동하시겠습니까?',
-          description: '페이지 이동 시 기존에 작성한 내용은 모두 지워집니다.',
-            icon: <ExclamationCircleOutlined />,
-            content: '페이지 이동 시 기존에 작성한 내용은 모두 지워집니다.',
-            okText: '이동',
-            cancelText: '취소',
-            onOk: () => navigate('/notifications/groups'),
-        });
-    };
-
     // Show preview
     const showPreview = () => {
         form.validateFields()
             .then(values => {
-                setPreviewData({ ...values, noticeType, targetType }); // Include noticeType in preview data
+                const dataForPreview = {
+                    ...values,
+                    channels: selectedChannels,
+                    contents: channelContents,
+                };
+                setPreviewData(dataForPreview);
                 setTestRecipientError(null);
                 setPreviewVisible(true);
             })
@@ -156,75 +187,49 @@ const NotificationDispatch = () => {
 
     // Handle final dispatch
     const onFinish = (values) => {
-        console.log('Received values of form: ', values);
-        const isEmergency = noticeType === 'emergency';
+        console.log('Form Values: ', values);
+        console.log('Current State for Dispatch:', { selectedChannels, channelContents });
 
-        let dispatchData = {
-            ...values,
-            noticeType: noticeType, // Add notice type
-        };
+        if (selectedChannels.length === 0) {
+            message.error("하나 이상의 발송 채널을 선택해주세요.");
+            return;
+        }
 
-        if (isEmergency) {
-            // Emergency Notice Payload
-            dispatchData = {
-                noticeType: 'emergency',
-                level: values.level,
-                channel: values.channel,
-                title: values.title,
-                content: values.content,
-                // Emergency notices are typically 'all' target and 'immediate' dispatch
-                targetType: 'all',
-                dispatchTime: 'immediate',
-            };
-             // Remove fields not applicable to emergency
-             delete dispatchData.linkUrl;
-             delete dispatchData.targetValue;
-             delete dispatchData.scheduledTimeOption;
-             delete dispatchData.scheduledTime;
-        } else {
-            // Regular Notice Payload (Adjust existing logic)
-            dispatchData = {
-                ...values,
-                noticeType: 'regular',
+        const dispatchPayloads = selectedChannels.map(channelKey => {
+            const content = channelContents[channelKey];
+            if (!content.title || !content.content) {
+                // This is a simple validation. Antd form validation on dynamic fields is more complex.
+                // We'll rely on the user to fill things out for now.
+            }
+            return {
+                channel: channelKey,
+                title: content.title,
+                content: content.content,
+                // Add common data
                 targetType: targetType,
-                linkUrl: values.linkUrl || null,
                 targetValue: values.target === 'all' ? null : values.target,
                 scheduledTime: dispatchTime === 'scheduled' ? values.scheduledTime?.format('YYYY-MM-DD HH:mm:ss') : null,
             };
-            // Remove unnecessary fields for regular
-            delete dispatchData.target;
-            delete dispatchData.level; // Ensure level is not sent for regular
-            delete dispatchData.scheduledTimeOption;
-            if (dispatchTime === 'immediate') delete dispatchData.scheduledTime;
-            if (targetType === 'all') delete dispatchData.targetValue;
-        }
+        });
 
-        // Note: Zero count check is now primarily handled before calling form.submit()
-        // However, you might keep a secondary check here if needed for other submission paths.
-        if (noticeType === 'regular' && targetType === 'group' && selectedGroupCount === 0) {
-             console.error("Attempted to dispatch to a group with 0 users. This should have been caught earlier.");
+        if (targetType === 'group' && selectedGroupCount === 0) {
              message.error('선택된 그룹의 대상 회원이 0명입니다. 발송할 수 없습니다.', 5);
-             setPreviewVisible(false); // Close modal if somehow submitted
-             return; // Prevent API call
+             setPreviewVisible(false);
+             return;
         }
 
-        message.loading({ content: '알림 발송 처리 중...', key: 'dispatch' });
-        // TODO: Implement actual API call here
-        // Consider using different endpoints for regular vs emergency notices
-        console.log('Dispatching notification:', dispatchData);
-        setTimeout(() => { // Simulate API delay
+        message.loading({ content: `[${selectedChannels.map(key => channelConfigs[key].name).join(', ')}] 알림 발송 처리 중...`, key: 'dispatch' });
+        console.log('Dispatching Payloads:', dispatchPayloads);
+
+        setTimeout(() => {
             message.success({
                 content: (
                     <span>
                         알림 발송 요청이 완료되었습니다!
                         <a
                             href="/notifications/history"
-                            onClick={(e) => {
-                                e.preventDefault();
-                                navigate('/notifications/history');
-                                message.destroy('dispatch');
-                            }}
-                            style={{ marginLeft: '8px', textDecoration: 'underline', cursor: 'pointer' }}
+                            onClick={(e) => { e.preventDefault(); navigate('/notifications/history'); message.destroy('dispatch'); }}
+                            style={{ marginLeft: '8px', textDecoration: 'underline' }}
                         >
                             발송 내역 보러가기
                         </a>
@@ -233,71 +238,65 @@ const NotificationDispatch = () => {
                 key: 'dispatch',
                 duration: 5
             });
-            setPreviewVisible(false); // Close preview modal on successful dispatch
+            setPreviewVisible(false);
         }, 1500);
     };
 
-    // Handle Test Send to Me
+    // Handle Test Send to Me (Simplified for one recipient)
     const handleSendToMe = () => {
-        const channel = previewData?.channel;
-        const inputLabel = channel === 'email' ? '테스트 이메일 주소' : '테스트 발송 번호';
-
+        // This is simplified. A real implementation might need channel-specific recipients.
         if (!testRecipient) {
-            setTestRecipientError(`${inputLabel}를 입력해주세요.`);
+            setTestRecipientError(`테스트 발송 대상을 입력해주세요.`);
             return;
         }
-        if (channel === 'email' && !testRecipient.includes('@')) {
-            setTestRecipientError('유효한 이메일 형식이 아닙니다.');
-            return;
-        }
-
         setTestRecipientError(null);
 
-        const recipientType = channel === 'email' ? 'email' : 'phone';
-        console.log(`Sending test notification via ${channel} to ${recipientType}:`, testRecipient);
+        console.log(`Sending test notifications to ${testRecipient}`);
         console.log('Test Notification Data:', previewData);
-        const testData = {
-            ...previewData,
-            recipient: testRecipient,
-            recipientType: recipientType,
-        };
 
         message.loading({ content: `'${testRecipient}'(으)로 테스트 발송 중...`, key: 'testSend' });
-        // TODO: Implement actual API call for test send
-        console.log('Test dispatch data:', testData);
         setTimeout(() => {
-            message.success({ content: `'${testRecipient}'(으)로 테스트 발송 요청이 완료되었습니다!`, key: 'testSend', duration: 3 });
+            message.success({ content: `'${testRecipient}'(으)로 ${selectedChannels.join(', ')} 채널 테스트 발송 완료!`, key: 'testSend', duration: 3 });
         }, 1500);
     };
 
     const onFinishFailed = (errorInfo) => {
         console.log('Failed:', errorInfo);
-        setTestRecipientError(null);
         message.error('폼 입력 내용을 확인해주세요.');
     };
 
     const handleTestRecipientChange = (e) => {
         setTestRecipient(e.target.value);
-        if (testRecipientError) {
-            setTestRecipientError(null);
-        }
+        if (testRecipientError) setTestRecipientError(null);
     };
 
-    // --- Handler for the final submit button in the modal ---
     const handleFinalSubmit = () => {
-        // Perform the zero-user check before submitting the form
-        if (noticeType === 'regular' && targetType === 'group' && selectedGroupCount === 0) {
+        if (targetType === 'group' && selectedGroupCount === 0) {
             message.error('선택된 그룹의 대상 회원이 0명입니다. 발송할 수 없습니다.', 5);
-            return; // Stop the submission
+            return;
         }
-        // If the check passes, submit the form
         form.submit();
     };
+
+    const renderChannelIcon = (channelKey) => {
+        const config = channelConfigs[channelKey];
+        return config ? config.icon : null;
+    };
+
+    const renderAvailableVariables = () => {
+        return (
+            <Text type="secondary" style={{ fontSize: '12px', display: 'block', marginTop: '8px', textAlign: 'right' }}>
+                사용 가능한 변수: {' '}
+                <Tag>[이름]</Tag>
+                <Tag>[이메일]</Tag>
+            </Text>
+        )
+    }
 
     return (
         <Space direction="vertical" size="large" style={{ display: 'flex' }}>
             <Title level={2}>알림 발송</Title>
-            <Card title="알림 내용 작성"> {/* Grouping content in a Card */}
+            <Card title="알림 내용 작성">
                 <Form
                     form={form}
                     layout="vertical"
@@ -305,161 +304,127 @@ const NotificationDispatch = () => {
                     onFinish={onFinish}
                     onFinishFailed={onFinishFailed}
                     initialValues={{
-                        channel: 'push', // Default channel
                         target: 'all',
                         scheduledTimeOption: 'immediate',
-                        noticeType: 'regular', // Default notice type
-                        level: 'info', // Default emergency level
                     }}
                 >
-                    {/* Notice Type Selection */}
-                    <Form.Item name="noticeType" label="알림 종류">
-                        <Radio.Group onChange={(e) => setNoticeType(e.target.value)} value={noticeType}>
-                            <Radio value="regular">일반 알림</Radio>
-                            <Radio value="emergency">긴급 공지</Radio>
+                    {/* Step 1: Channel Selection */}
+                     <Form.Item label="발송 채널 선택" required>
+                         <Checkbox.Group
+                             options={Object.keys(channelConfigs).map(key => ({
+                                 label: (
+                                     <>
+                                         {channelConfigs[key].icon}{' '}
+                                         {channelConfigs[key].name}
+                                     </>
+                                 ),
+                                 value: key,
+                             }))}
+                             value={selectedChannels}
+                             onChange={handleChannelSelectionChange}
+                         />
+                     </Form.Item>
+
+                    {/* Step 2: Content Editing via Tabs - Always visible */}
+                    <>
+                        <Tabs type="card" style={{ marginBottom: 24 }}>
+                            {Object.keys(channelConfigs).map(channelKey => {
+                                const channelConfig = channelConfigs[channelKey];
+                                const content = channelContents[channelKey] || {};
+                                const isDisabled = !selectedChannels.includes(channelKey);
+
+                                return (
+                                    <TabPane
+                                        tab={<>{channelConfig.icon} {channelConfig.name}</>}
+                                        key={channelKey}
+                                        disabled={isDisabled}
+                                    >
+                                        <Paragraph type="secondary">
+                                            {channelKey === 'kakaotalk'
+                                                ? '카카오 알림톡은 사전에 승인된 템플릿으로만 발송 가능합니다. 템플릿 내용을 정확히 입력해주세요.'
+                                                : '아래 내용을 수정하여 발송할 수 있습니다.'
+                                            }
+                                        </Paragraph>
+                                        <Input.Group>
+                                            <Row gutter={8}>
+                                                <Col span={24}>
+                                                    <strong style={{ display: 'block', marginBottom: 4 }}>알림 제목</strong>
+                                                    <Input
+                                                        value={content.title}
+                                                        onChange={(e) => handleContentChange(channelKey, 'title', e.target.value)}
+                                                        disabled={!channelConfig.isEditable}
+                                                        maxLength={channelConfig.maxLength?.title}
+                                                        placeholder={channelConfig.placeholders.title}
+                                                        showCount
+                                                    />
+                                                </Col>
+                                                <Col span={24} style={{ marginTop: 16 }}>
+                                                     <strong style={{ display: 'block', marginBottom: 4 }}>알림 내용</strong>
+                                                    <TextArea
+                                                        value={content.content}
+                                                        onChange={(e) => handleContentChange(channelKey, 'content', e.target.value)}
+                                                        disabled={!channelConfig.isEditable}
+                                                        rows={5}
+                                                        maxLength={channelConfig.maxLength?.content}
+                                                        placeholder={channelConfig.placeholders.content}
+                                                        showCount
+                                                    />
+                                                </Col>
+                                            </Row>
+                                        </Input.Group>
+                                    </TabPane>
+                                );
+                            })}
+                        </Tabs>
+                        {renderAvailableVariables()}
+                    </>
+
+                    {/* Step 3 & 4: Common Settings and Dispatch */}
+                    <Divider>발송 대상 및 시점</Divider>
+                    <Form.Item name="target" label="발송 대상" rules={[{ required: true }]}>
+                        <Space.Compact style={{ width: '100%' }}>
+                            <Select placeholder="발송할 대상 선택" onChange={handleTargetChange} allowClear>
+                                <Option value="all">전체 사용자</Option>
+                                {groupOptions.map(group => (
+                                    <Option key={group.key} value={group.value}>{group.label}</Option>
+                                ))}
+                            </Select>
+                            <Popconfirm
+                                title="페이지를 이동하시겠습니까?"
+                                description='페이지 이동 시 기존에 작성한 내용은 모두 지워집니다.'
+                                onConfirm={() => navigate('/notifications/groups')}
+                                okText="이동"
+                                cancelText="취소"
+                            >
+                                <Button icon={<UsergroupAddOutlined />}>발송 대상 관리</Button>
+                            </Popconfirm>
+                        </Space.Compact>
+                    </Form.Item>
+
+                    {targetType === 'group' && (
+                        <div style={{ marginTop: '-12px', marginBottom: '12px', minHeight: '22px' }}>
+                            {groupCountLoading && <Spin size="small" style={{ marginRight: '8px' }} />}
+                            {groupCountLoading && <Text type="secondary">인원 수 확인 중...</Text>}
+                            {groupCountError && <Text type="danger">{groupCountError}</Text>}
+                            {!groupCountLoading && !groupCountError && selectedGroupCount !== null && (
+                                <Text type={selectedGroupCount === 0 ? 'danger' : 'secondary'}>
+                                    예상 발송 대상: {selectedGroupCount.toLocaleString()}명 (테스트 값)
+                                </Text>
+                            )}
+                        </div>
+                    )}
+
+                    <Form.Item name="scheduledTimeOption" label="발송 시점">
+                        <Radio.Group onChange={(e) => setDispatchTime(e.target.value)} value={dispatchTime}>
+                            <Radio value="immediate">즉시 발송</Radio>
+                            <Radio value="scheduled">예약 발송</Radio>
                         </Radio.Group>
                     </Form.Item>
 
-                    <Row gutter={16}> {/* Use Grid for layout */}
-                        <Col xs={24} sm={12} md={8}>
-                            <Form.Item
-                                name="channel"
-                                label="알림 채널"
-                                rules={[{ required: true, message: '알림 채널을 선택해주세요!' }]}
-                            >
-                                <Select placeholder="채널 선택">
-                                    <Option value="push"><BellOutlined /> 앱 푸시</Option>
-                                    <Option value="email"><MailOutlined /> 이메일</Option>
-                                    <Option value="sms"><MessageOutlined /> SMS</Option>
-                                    {/* Add more channels */}
-                                </Select>
-                            </Form.Item>
-                        </Col>
-                        <Col xs={24} sm={12} md={16}>
-                             <Form.Item label="템플릿 사용 (선택 사항)">
-                                <Select
-                                     placeholder="템플릿 선택 시 제목과 내용 자동 입력"
-                                     allowClear
-                                     onChange={handleTemplateChange}
-                                     disabled={noticeType === 'emergency'} // Disable for emergency
-                                >
-                                     {mockTemplates.map(tpl => (
-                                        <Option key={tpl.key} value={tpl.id}>{tpl.name}</Option>
-                                     ))}
-                                </Select>
-                            </Form.Item>
-                        </Col>
-                    </Row>
-
-                    <Form.Item
-                        name="title"
-                        label="알림 제목"
-                        rules={[{ required: true, message: '알림 제목을 입력해주세요!' }]}
-                    >
-                        <Input placeholder="알림 제목 입력 (예: 특별 할인 이벤트 안내)" />
-                    </Form.Item>
-
-                    <Form.Item
-                        name="content"
-                        label="알림 내용"
-                        rules={[{ required: true, message: '알림 내용을 입력해주세요!' }]}
-                        tooltip="알림 내용에 사용자별 데이터를 넣으려면 아래 변수를 사용하세요."
-                        extra={
-                            <Text type="secondary" style={{ fontSize: '12px', display: 'block', marginTop: '8px', textAlign: 'right' }}>
-                                사용 가능한 변수: {' '}
-                                <Tag>[이름]</Tag>
-                                <Tag>[이메일]</Tag>
-                            </Text>
-                        }
-                    >
-                        <TextArea rows={6} placeholder="알림 내용 입력 (예: [이름]님, 오늘도 즐거운 하루보내세요!" />
-                    </Form.Item>
-
-                    {/* Added Link URL Input - Hide for Emergency */}
-                     {noticeType === 'regular' && (
-                        <Form.Item
-                            name="linkUrl"
-                            label="첨부 링크 (선택 사항)"
-                            rules={[{ type: 'url', warningOnly: true, message: '유효한 URL 형식이 아닙니다.' }]}
-                         >
-                            <Input placeholder="알림에 포함할 링크 URL 입력 (예: https://example.com/event)" />
-                         </Form.Item>
-                     )}
-
-                    {/* Conditional Rendering for Target and Schedule - Hide for Emergency */}
-                    {noticeType === 'regular' && (
-                        <>
-                            <Divider>발송 대상 및 시점</Divider>
-
-                            <Form.Item
-                                name="target"
-                                label="발송 대상"
-                                rules={[{ required: true, message: '발송 대상을 선택해주세요.' }]}
-                            >
-                                <Space.Compact style={{ width: '100%' }}>
-                                    <Select
-                                        placeholder="발송할 대상 선택"
-                                        onChange={handleTargetChange}
-                                        allowClear
-                                    >
-                                        <Option value="all">전체 사용자</Option>
-                                        {groupOptions.map(group => (
-                                            <Option key={group.key} value={group.value}>
-                                                {group.label}
-                                            </Option>
-                                        ))}
-                                    </Select>
-                                    <Popconfirm
-                      title="페이지를 이동하시겠습니까?"
-                      description= '페이지 이동 시 기존에 작성한 내용은 모두 지워집니다.'
-                                        onConfirm={() => navigate('/notifications/groups')}
-                                        okText="이동"
-                                        cancelText="취소"
-                                        placement="topRight"
-                                    >
-                                        <Button
-                                            icon={<UsergroupAddOutlined />}
-                                        >
-                                            발송 대상 관리
-                                        </Button>
-                                    </Popconfirm>
-                                </Space.Compact>
-                            </Form.Item>
-
-                            {targetType === 'group' && (
-                                <div style={{ marginTop: '-12px', marginBottom: '12px', minHeight: '22px' }}>
-                                    {groupCountLoading && (
-                                        <Spin size="small" style={{ marginRight: '8px' }} />
-                                    )}
-                                    {groupCountLoading && <Text type="secondary">인원 수 확인 중...</Text>}
-                                    {groupCountError && (
-                                        <Text type="danger">{groupCountError}</Text>
-                                    )}
-                                    {!groupCountLoading && !groupCountError && selectedGroupCount !== null && (
-                                        <Text type={selectedGroupCount === 0 ? 'danger' : 'secondary'}>
-                                            예상 발송 대상: {selectedGroupCount.toLocaleString()}명 (테스트 값)
-                                        </Text>
-                                    )}
-                                </div>
-                            )}
-
-                            <Form.Item name="scheduledTimeOption" label="발송 시점">
-                                <Radio.Group onChange={(e) => setDispatchTime(e.target.value)} value={dispatchTime}>
-                                    <Radio value="immediate">즉시 발송</Radio>
-                                    <Radio value="scheduled">예약 발송</Radio>
-                                </Radio.Group>
-                            </Form.Item>
-
-                            {dispatchTime === 'scheduled' && (
-                                <Form.Item
-                                    name="scheduledTime"
-                                    label="예약 시간"
-                                    rules={[{ required: true, message: '예약 발송 시간을 선택해주세요!' }]}
-                                >
-                                    <DatePicker showTime format="YYYY-MM-DD HH:mm:ss" />
-                                </Form.Item>
-                            )}
-                        </>
+                    {dispatchTime === 'scheduled' && (
+                        <Form.Item name="scheduledTime" label="예약 시간" rules={[{ required: true }]}>
+                            <DatePicker showTime format="YYYY-MM-DD HH:mm:ss" />
+                        </Form.Item>
                     )}
 
                     <Divider />
@@ -469,11 +434,9 @@ const NotificationDispatch = () => {
                              type="dashed"
                              icon={<EyeOutlined />}
                              onClick={showPreview}
-                             // Disable button logic
                              disabled={
-                                 noticeType === 'regular' &&
-                                 targetType === 'group' &&
-                                 (selectedGroupCount === 0 || groupCountError !== null)
+                                selectedChannels.length === 0 ||
+                                (targetType === 'group' && (selectedGroupCount === 0 || groupCountError !== null))
                              }
                         >
                             미리보기
@@ -482,90 +445,82 @@ const NotificationDispatch = () => {
                 </Form>
             </Card>
 
-            {/* Preview Modal with updated Footer AND Input inside */}
+            {/* Preview Modal */}
             <Modal
                 title="알림 미리보기"
                 open={previewVisible}
-                onCancel={() => {
-                    setPreviewVisible(false);
-                    setTestRecipientError(null);
-                }}
+                onCancel={() => setPreviewVisible(false)}
                 footer={[
-                     // Final Submit Button - Uses the new handler
                     <Button key="submit" type="primary" icon={<SendOutlined />} onClick={handleFinalSubmit}>
                         알림 발송
                     </Button>,
                 ]}
-                width={600}
+                width={800}
             >
-                {previewData && (
-                    <Descriptions bordered column={1} size="small">
-                         {/* Show Notice Type and Level for Emergency */}
-                         {previewData.noticeType === 'emergency' && (
-                             <>
-                                 <Descriptions.Item label="알림 종류" labelStyle={{ width: '100px' }}>
-                                     <Text type="danger">긴급 공지</Text>
-                                 </Descriptions.Item>
-                             </>
-                         )}
+                {previewData.channels && (
+                    <>
+                        <Descriptions bordered column={1} size="small" style={{ marginBottom: 24 }}>
+                             <Descriptions.Item label="발송 채널">
+                                 <Space>
+                                 {previewData.channels.map(key => (
+                                     <Tag key={key} icon={renderChannelIcon(key)}>
+                                         {channelConfigs[key].name}
+                                     </Tag>
+                                 ))}
+                                 </Space>
+                             </Descriptions.Item>
+                            <Descriptions.Item label="발송 대상">
+                                {targetType === 'all' && '전체 사용자'}
+                                {targetType === 'group' && `그룹 (${groupOptions.find(g => g.value === previewData.target)?.label || previewData.target})` +
+                                (selectedGroupCount !== null ? ` (${selectedGroupCount.toLocaleString()}명)` : '')}
+                            </Descriptions.Item>
+                            <Descriptions.Item label="발송 시점">
+                                {dispatchTime === 'immediate' ? '즉시 발송' : `예약 발송 (${moment(previewData.scheduledTime).format('YYYY-MM-DD HH:mm:ss')})`}
+                            </Descriptions.Item>
+                        </Descriptions>
 
-                        <Descriptions.Item label="채널" labelStyle={{ width: '100px' }}>
-                            {previewData.channel === 'push' && <><BellOutlined /> 앱 푸시</>}
-                            {previewData.channel === 'email' && <><MailOutlined /> 이메일</>}
-                            {previewData.channel === 'sms' && <><MessageOutlined /> SMS</>}
-                            {!['push', 'email', 'sms'].includes(previewData.channel) && previewData.channel}
-                        </Descriptions.Item>
-                        <Descriptions.Item label="발송 대상" labelStyle={{ width: '100px' }}>
-                            {previewData.noticeType === 'emergency' && '전체 사용자 (긴급)'}
-                            {previewData.noticeType === 'regular' && previewData.targetType === 'all' && '전체 사용자'}
-                            {previewData.noticeType === 'regular' && previewData.targetType === 'group' &&
-                                `그룹 (${groupOptions.find(g => g.value === previewData.target)?.label || previewData.target})` +
-                                (selectedGroupCount !== null ? ` (${selectedGroupCount.toLocaleString()}명)` : '')
-                            }
-                        </Descriptions.Item>
-                        <Descriptions.Item label="발송 시점" labelStyle={{ width: '100px' }}>
-                            {previewData.noticeType === 'emergency' && '즉시 발송 (긴급)'}
-                            {previewData.noticeType === 'regular' && (
-                                previewData.scheduledTimeOption === 'immediate' ? '즉시 발송' :
-                                (previewData.scheduledTime ? `예약 발송 (${moment(previewData.scheduledTime).format('YYYY-MM-DD HH:mm:ss')})` : '예약 발송 (시간 미정)')
-                            )}
-                        </Descriptions.Item>
-                        <Descriptions.Item label="알림 제목" labelStyle={{ width: '100px' }}>{previewData.title}</Descriptions.Item>
-                        <Descriptions.Item label="알림 내용" labelStyle={{ width: '100px' }}>
-                            <pre style={{ whiteSpace: 'pre-wrap', margin: 0, fontFamily: 'inherit' }}>
-                                {previewData.content}
-                            </pre>
-                        </Descriptions.Item>
-                    </Descriptions>
+                        <Tabs>
+                            {previewData.channels?.map(channelKey => (
+                                <TabPane
+                                    tab={<>{renderChannelIcon(channelKey)} {channelConfigs[channelKey].name}</>}
+                                    key={channelKey}
+                                >
+                                    <Descriptions bordered column={1} size="small">
+                                        <Descriptions.Item label="제목">{previewData.contents[channelKey].title}</Descriptions.Item>
+                                        <Descriptions.Item label="내용">
+                                            <pre style={{ whiteSpace: 'pre-wrap', margin: 0, fontFamily: 'inherit' }}>
+                                                {previewData.contents[channelKey].content}
+                                            </pre>
+                                        </Descriptions.Item>
+                                    </Descriptions>
+                                </TabPane>
+                            ))}
+                        </Tabs>
+
+                        {/* Test Send Input */}
+                        <Form layout="vertical" style={{ marginTop: '24px' }}>
+                            <Form.Item
+                                label="테스트 발송 대상"
+                                tooltip="모든 선택된 채널로 테스트 발송을 진행할 대상의 식별자(이메일, 전화번호 등)를 입력하세요."
+                                validateStatus={testRecipientError ? 'error' : ''}
+                                help={testRecipientError || ''}
+                            >
+                                <Space.Compact block style={{ width: '100%' }}>
+                                    <Input
+                                        placeholder="테스트 대상 식별자 입력"
+                                        value={testRecipient}
+                                        onChange={handleTestRecipientChange}
+                                        allowClear
+                                    />
+                                    <Button key="test" onClick={handleSendToMe} icon={<MobileOutlined />}>
+                                        테스트 발송
+                                    </Button>
+                                </Space.Compact>
+                            </Form.Item>
+                        </Form>
+                    </>
                  )}
-                  {/* Test Send Input and Button Row */}
-                     <Form layout="vertical" style={{ marginTop: '16px' }}>
-                          <Form.Item
-                              label={previewData?.channel === 'email' ? "테스트 이메일" : "테스트 번호"}
-                              tooltip={`'나에게 알림 발송' 버튼을 사용하려면 ${previewData?.channel === 'email' ? '이메일을' : '번호를'} 입력하세요.`}
-                              validateStatus={testRecipientError ? 'error' : ''}
-                              help={testRecipientError || ''}
-                          >
-                              <Space.Compact block style={{ width: '100%' }}>
-                                  <Input
-                                      placeholder={previewData?.channel === 'email'
-                                          ? "이메일 주소 입력 (예: test@example.com)"
-                                          : "숫자만 입력 (예: 01012345678)"}
-                                      value={testRecipient}
-                                      onChange={handleTestRecipientChange}
-                                      allowClear
-                                  />
-                                  <Button
-                                      key="test"
-                                      onClick={handleSendToMe}
-                                      icon={<MobileOutlined />}
-                                  >
-                                      나에게 알림 발송
-                                  </Button>
-                              </Space.Compact>
-                          </Form.Item>
-                     </Form>
-             </Modal>
+            </Modal>
         </Space>
     );
 };
