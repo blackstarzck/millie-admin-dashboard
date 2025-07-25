@@ -14,6 +14,7 @@
     "@tinymce/tinymce-react": "^6.2.1",
     "@toast-ui/react-editor": "^3.2.3",
     "ace-builds": "^1.43.2",
+    "ajv": "^8.8.2",
     "antd": "^5.26.4",
     "chart.js": "^4.4.9",
     "emoji-picker-react": "^4.13.2",
