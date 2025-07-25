@@ -26,6 +26,7 @@ import {
   Spin,
   Tabs, // Import Tabs
   Tag,
+  Tooltip,
   Typography,
 } from 'antd';
 import moment from 'moment';
@@ -89,6 +90,7 @@ const NotificationDispatch = () => {
 
     // --- State for Static UI ---
     const [selectedChannels, setSelectedChannels] = useState([]);
+    const [isTestSent, setIsTestSent] = useState(false); // State to track test send completion
     const [channelContents, setChannelContents] = useState(
       Object.keys(channelConfigs).reduce((acc, key) => {
         acc[key] = { title: '', content: '' };
@@ -177,6 +179,7 @@ const NotificationDispatch = () => {
                 };
                 setPreviewData(dataForPreview);
                 setTestRecipientError(null);
+                setIsTestSent(false); // Reset test send status when modal opens
                 setPreviewVisible(true);
             })
             .catch(info => {
@@ -257,6 +260,7 @@ const NotificationDispatch = () => {
         message.loading({ content: `'${testRecipient}'(으)로 테스트 발송 중...`, key: 'testSend' });
         setTimeout(() => {
             message.success({ content: `'${testRecipient}'(으)로 ${selectedChannels.join(', ')} 채널 테스트 발송 완료!`, key: 'testSend', duration: 3 });
+            setIsTestSent(true); // Enable dispatch button after successful test send
         }, 1500);
     };
 
@@ -449,11 +453,16 @@ const NotificationDispatch = () => {
             <Modal
                 title="알림 미리보기"
                 open={previewVisible}
-                onCancel={() => setPreviewVisible(false)}
+                onCancel={() => {
+                  setPreviewVisible(false);
+                  setIsTestSent(false); // Reset on cancel as well
+                }}
                 footer={[
-                    <Button key="submit" type="primary" icon={<SendOutlined />} onClick={handleFinalSubmit}>
-                        알림 발송
-                    </Button>,
+                    <Tooltip key="submit-tooltip" title={!isTestSent ? "알림을 발송하려면 먼저 테스트 발송을 완료해야 합니다." : ""}>
+                        <Button key="submit" type="primary" icon={<SendOutlined />} onClick={handleFinalSubmit} disabled={!isTestSent}>
+                            알림 발송
+                        </Button>
+                    </Tooltip>,
                 ]}
                 width={800}
             >
