@@ -17,6 +17,7 @@ import {
   message,
   Modal,
   Popconfirm,
+  Popover,
   Row,
   Select,
   Space,
@@ -286,14 +287,6 @@ const NotificationTemplate = () => {
   };
 
   // --- Modal Handling (Add/Edit) ---
-  const showAddModal = () => {
-    setEditingTemplate(null);
-    form.resetFields();
-    setSelectedChannels([]);
-    setChannelContents({});
-    setActiveTabKey(Object.keys(channelConfigs)[0]);
-    setIsModalOpen(true);
-  };
 
   const showEditModal = (template) => {
     setEditingTemplate(template);
@@ -505,9 +498,21 @@ const NotificationTemplate = () => {
         개인화된 메시지를 작성하고 저장할 수 있습니다.
       </Text>
       <div style={{ display: "flex", justifyContent: "flex-end" }}>
-        <Button type="primary" icon={<PlusOutlined />} onClick={showAddModal}>
-          새 템플릿 추가
-        </Button>
+        <Popover
+          content={
+            <div style={{ maxWidth: 250 }}>
+              새 템플릿을 추가 하기 위해서는 발송 시점, 어떤 상황에서 발송되는지
+              기획과 개발적인 부분에서 합의가 있어야합니다.
+            </div>
+          }
+          title="안내"
+          trigger="click"
+          placement="topRight"
+        >
+          <Button type="primary" icon={<PlusOutlined />}>
+            새 템플릿 추가
+          </Button>
+        </Popover>
       </div>
 
       <Table
