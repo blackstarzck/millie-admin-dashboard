@@ -1,48 +1,45 @@
-import React, { useState, useEffect, useMemo, useCallback, useContext } from 'react';
 import {
-    Table,
-    Tag,
-    Switch,
-    Button,
-    Space,
-    Typography,
-    Card,
-    Modal,
-    Form,
-    DatePicker,
-    Select,
-    InputNumber,
-    Input,
-    message,
-    Tooltip,
-    Badge,
-} from 'antd';
-import {
-    SettingOutlined,
-    EditOutlined,
-    EyeOutlined,
-    EyeInvisibleOutlined,
-    SearchOutlined,
-    ReloadOutlined,
-    CalendarOutlined,
-    HolderOutlined,
-    FolderOpenOutlined,
-    FileImageOutlined,
-    ProfileOutlined,
-    DownOutlined,
-    RightOutlined,
-    DeleteOutlined,
+  CalendarOutlined,
+  DeleteOutlined,
+  DownOutlined,
+  EditOutlined,
+  EyeInvisibleOutlined,
+  EyeOutlined,
+  FileImageOutlined,
+  FolderOpenOutlined,
+  HolderOutlined,
+  ProfileOutlined,
+  RightOutlined,
+  SettingOutlined
 } from '@ant-design/icons';
-import moment from 'moment';
 import { DndContext, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 import {
-    arrayMove,
-    SortableContext,
-    useSortable,
-    verticalListSortingStrategy,
+  arrayMove,
+  SortableContext,
+  useSortable,
+  verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import {
+  Badge,
+  Button,
+  Card,
+  DatePicker,
+  Form,
+  Input,
+  message,
+  Modal,
+  Select,
+  Space,
+  Switch,
+  Table,
+  Tag,
+  Tooltip,
+  Typography
+} from 'antd';
+import moment from 'moment';
+import React, { useCallback, useContext, useMemo, useState } from 'react';
 import { usePopupTemplates } from '../../context/PopupTemplateContext';
 
 const { Title, Text } = Typography;
@@ -50,29 +47,79 @@ const { RangePicker } = DatePicker;
 const { Option } = Select;
 const { TextArea } = Input;
 
-const initialPopupsRaw = [
-    { key: 'p1', id: 'pop001', name: '신규 기능 안내 (D-39 고정 표시)', status: true, startDate: '2024-08-10 00:00', endDate: '2024-08-22 10:00', frequencyType: 'once_per_day', frequencyValue: null, targetAudience: ['all'], targetPages: ['/dashboard'], priority: 1, creationDate: '2024-06-30', contentType: 'template', templateId: '신규 기능 안내 템플릿', linkUrl: 'https://example.com/new-feature', displayRemainingTime: 'D-39' },
-    { key: 'p2', id: 'pop002', name: '블랙프라이데이 할인 (종료 예시)', status: false, startDate: '2023-11-20 00:00', endDate: '2023-11-30 23:59', frequencyType: 'once_per_session', frequencyValue: null, targetAudience: ['vip', 'group_A'], targetPages: ['/products', '/sale'], priority: 5, creationDate: '2023-11-01', contentType: 'image', imageUrl: 'https://via.placeholder.com/300x200.png?text=Black+Friday', linkUrl: 'https://example.com/sale' },
-    { key: 'p3', id: 'pop003', name: '긴급 시스템 점검 (D-1 고정 표시)', status: true, startDate: '2024-08-14 18:00', endDate: '2024-08-15 12:00', frequencyType: 'every_time', frequencyValue: null, targetAudience: ['all'], targetPages: ['/'], priority: 10, creationDate: '2024-07-28', contentType: 'template', templateId: '긴급 공지 팝업 템플릿', displayRemainingTime: 'D-1' },
-    { key: 'p4', id: 'pop004', name: 'N시간마다 노출 테스트 (기본 표시)', status: true, startDate: '2024-08-01 00:00', endDate: '2024-09-14 14:00', frequencyType: 'every_n_hours', frequencyValue: 3, targetAudience: ['tester_group'], targetPages: ['/test'], priority: 2, creationDate: '2024-06-15', contentType: 'template', templateId: '할인 안내 템플릿' },
-    { key: 'p5', id: 'pop005', name: '대시보드 전용 공지 (162분 고정 표시)', status: true, startDate: '2024-08-01 00:00', endDate: '2024-08-10 23:59', frequencyType: 'once_per_day', frequencyValue: null, targetAudience: ['all'], targetPages: ['/dashboard'], priority: 3, creationDate: '2024-07-31', contentType: 'template', templateId: '긴급 공지 팝업 템플릿', displayRemainingTime: '162분' },
-    {
-        key: 'p6', id: 'pop006', name: '오늘 오후 11시 종료 이벤트 (기본 표시)', status: true,
-        startDate: '2024-08-15 00:00',
-        endDate: '2024-08-15 23:00',
-        frequencyType: 'once_per_day', frequencyValue: null, targetAudience: ['all'], targetPages: ['/events'],
-        priority: 4, creationDate: '2024-08-15', contentType: 'image',
-        imageUrl: 'https://via.placeholder.com/300x150.png?text=Ends+Today+11PM', linkUrl: 'https://example.com/event-11pm'
-    },
-    {
-        key: 'p7', id: 'pop007', name: '내일 오후 1시 종료 설문 (기본 표시)', status: true,
-        startDate: '2024-08-15 10:00',
-        endDate: '2024-08-16 13:00',
-        frequencyType: 'once_per_session', frequencyValue: null, targetAudience: ['loggedIn'], targetPages: ['/survey'],
-        priority: 1, creationDate: '2024-08-16', contentType: 'template',
-        templateId: '설문 참여 독려 템플릿'
-    },
-];
+const generateInitialPopups = () => {
+    const now = moment();
+    return [
+        // 1. 수동 설정 (고정값 표시)
+        { key: 'p1', id: 'pop001', name: '신규 기능 안내 (고정 D-39)', status: true, startDate: '2024-09-10 00:00', endDate: '2024-09-22 10:00', frequencyType: 'once_per_day', targetAudience: ['all'], targetPages: ['/dashboard'], priority: 1, creationDate: '2024-08-01', contentType: 'template', templateId: '신규 기능 안내 템플릿', displayRemainingTime: 'D-39' },
+        { key: 'p5', id: 'pop005', name: '대시보드 전용 공지 (고정 162분)', status: true, startDate: now.clone().add(162, 'minutes').format('YYYY-MM-DD HH:mm'), endDate: now.clone().add(1, 'day').format('YYYY-MM-DD HH:mm'), frequencyType: 'once_per_day', targetAudience: ['all'], targetPages: ['/dashboard'], priority: 2, creationDate: now.clone().subtract(1, 'day').format('YYYY-MM-DD'), contentType: 'template', templateId: '긴급 공지 팝업 템플릿', displayRemainingTime: '162분' },
+
+        // 2. 노출 종료
+        { key: 'p2', id: 'pop002', name: '블랙프라이데이 (종료됨)', status: false, startDate: '2023-11-20 00:00', endDate: '2023-11-30 23:59', frequencyType: 'once_per_session', targetAudience: ['vip', 'group_A'], targetPages: ['/sale'], priority: 1, creationDate: '2023-11-01', contentType: 'image', imageUrl: 'https://via.placeholder.com/300x200.png?text=Black+Friday', linkUrl: 'https://example.com/sale' },
+
+        // 3. 시작 전
+        {
+            key: 'p8', id: 'pop008', name: '출시 예고 (10일 뒤 시작)', status: true,
+            startDate: now.clone().add(10, 'days').format('YYYY-MM-DD HH:mm'),
+            endDate: now.clone().add(20, 'days').format('YYYY-MM-DD HH:mm'),
+            frequencyType: 'once_per_day', targetAudience: ['all'], targetPages: ['/upcoming'],
+            priority: 1, creationDate: now.clone().subtract(1, 'day').format('YYYY-MM-DD'), contentType: 'template',
+            templateId: '신규 기능 안내 템플릿'
+        },
+        {
+            key: 'p9', id: 'pop009', name: '타임세일 (5시간 뒤 시작)', status: true,
+            startDate: now.clone().add(5, 'hours').format('YYYY-MM-DD HH:mm'),
+            endDate: now.clone().add(1, 'day').format('YYYY-MM-DD HH:mm'),
+            frequencyType: 'once_per_session', targetAudience: ['vip'], targetPages: ['/sale'],
+            priority: 2, creationDate: now.clone().subtract(1, 'day').format('YYYY-MM-DD'), contentType: 'image',
+            imageUrl: 'https://via.placeholder.com/300x150.png?text=Time+Sale+Soon', linkUrl: 'https://example.com/sale-soon'
+        },
+        {
+            key: 'p10', id: 'pop010', name: '긴급 설문 (30분 뒤 시작)', status: true,
+            startDate: now.clone().add(30, 'minutes').format('YYYY-MM-DD HH:mm'),
+            endDate: now.clone().add(2, 'hours').format('YYYY-MM-DD HH:mm'),
+            frequencyType: 'every_time', targetAudience: ['loggedIn'], targetPages: ['/survey'],
+            priority: 1, creationDate: now.clone().subtract(1, 'hour').format('YYYY-MM-DD'), contentType: 'template',
+            templateId: '설문 참여 독려 템플릿'
+        },
+
+        // 4. 진행 중
+        {
+            key: 'p11', id: 'pop011', name: '진행중 이벤트 (3일 남음)', status: true,
+            startDate: now.clone().subtract(2, 'days').format('YYYY-MM-DD HH:mm'),
+            endDate: now.clone().add(3, 'days').format('YYYY-MM-DD HH:mm'),
+            frequencyType: 'once_per_day', targetAudience: ['all'], targetPages: ['/events'],
+            priority: 1, creationDate: now.clone().subtract(3, 'days').format('YYYY-MM-DD'), contentType: 'image',
+            imageUrl: 'https://via.placeholder.com/300x150.png?text=Event+Ongoing', linkUrl: 'https://example.com/event-ongoing'
+        },
+        {
+            key: 'p12', id: 'pop012', name: '오늘 마감 세일 (12시간 남음)', status: true,
+            startDate: now.clone().subtract(1, 'day').format('YYYY-MM-DD HH:mm'),
+            endDate: now.clone().add(12, 'hours').format('YYYY-MM-DD HH:mm'),
+            frequencyType: 'once_per_session', targetAudience: ['all'], targetPages: ['/sale'],
+            priority: 3, creationDate: now.clone().subtract(2, 'days').format('YYYY-MM-DD'), contentType: 'template',
+            templateId: '할인 안내 템플릿'
+        },
+        {
+            key: 'p13', id: 'pop013', name: '마감 임박 (45분 남음)', status: true,
+            startDate: now.clone().subtract(2, 'hours').format('YYYY-MM-DD HH:mm'),
+            endDate: now.clone().add(45, 'minutes').format('YYYY-MM-DD HH:mm'),
+            frequencyType: 'every_time', targetAudience: ['all'], targetPages: ['/'],
+            priority: 1, creationDate: now.clone().subtract(1, 'day').format('YYYY-MM-DD'), contentType: 'template',
+            templateId: '긴급 공지 팝업 템플릿'
+        },
+
+        // 5. 기간 미설정
+        {
+            key: 'p15', id: 'pop015', name: '기간 미설정 테스트', status: true,
+            startDate: null,
+            endDate: null,
+            frequencyType: 'once_per_day', targetAudience: ['all'], targetPages: ['/'],
+            priority: 2, creationDate: now.clone().format('YYYY-MM-DD'), contentType: 'template',
+            templateId: '신규 기능 안내 템플릿'
+        }
+    ];
+};
 
 const groupPopupsByPage = (popups) => {
     const groups = {};
@@ -146,7 +193,7 @@ const SortableRow = (props) => {
 const PopupExposureSettings = () => {
     const { templates } = usePopupTemplates();
 
-    const [groupedPopups, setGroupedPopups] = useState(() => groupPopupsByPage(initialPopupsRaw));
+    const [groupedPopups, setGroupedPopups] = useState(() => groupPopupsByPage(generateInitialPopups()));
     const [loading, setLoading] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingPopup, setEditingPopup] = useState(null);
@@ -433,9 +480,50 @@ const PopupExposureSettings = () => {
                             color = 'orange';
                         }
                         return <Tag color={color}>{record.displayRemainingTime}</Tag>;
-                    } else {
+                    }
+
+                    const now = moment();
+                    const start = moment(record.startDate);
+                    const end = moment(record.endDate);
+
+                    if (!start.isValid() || !end.isValid()) {
+                        return <Tag>기간 미설정</Tag>;
+                    }
+
+                    if (now.isBefore(start)) {
+                        const diffDays = start.diff(now, 'days');
+                        if (diffDays > 0) {
+                            return <Tag color="geekblue">시작 D-{diffDays}</Tag>;
+                        }
+                        const diffHours = start.diff(now, 'hours');
+                        if (diffHours > 0) {
+                            return <Tag color="geekblue">시작까지 {diffHours}시간</Tag>;
+                        }
+                        const diffMinutes = start.diff(now, 'minutes');
+                        if (diffMinutes > 0) {
+                            return <Tag color="geekblue">시작까지 {diffMinutes}분</Tag>;
+                        }
+                        return <Tag color="geekblue">시작 예정</Tag>;
+                    }
+
+                    if (now.isAfter(end)) {
                         return <Tag color="default">종료</Tag>;
                     }
+
+                    const diffDays = end.diff(now, 'days');
+                    if (diffDays > 0) {
+                        return <Tag color="blue">종료 D-{diffDays}</Tag>;
+                    }
+                    const diffHours = end.diff(now, 'hours');
+                    if (diffHours > 0) {
+                        return <Tag color="orange">종료까지 {diffHours}시간</Tag>;
+                    }
+                    const diffMinutes = end.diff(now, 'minutes');
+                    if (diffMinutes >= 0) {
+                        return <Tag color="orange">종료까지 {diffMinutes}분</Tag>;
+                    }
+
+                    return <Tag color="default">종료</Tag>;
                 },
             },
              { title: '우선순위', dataIndex: 'priority', key: 'priority', align: 'right' },
@@ -600,10 +688,52 @@ const PopupExposureSettings = () => {
                                     color = 'orange';
                                 }
                                 return <Tag color={color}>{editingPopup.displayRemainingTime}</Tag>;
-                            } else {
-                                // displayRemainingTime 값이 없는 경우, "종료" 표시
+                            }
+
+                            if (!editingPopup) return null;
+
+                            const now = moment();
+                            const start = moment(editingPopup.startDate);
+                            const end = moment(editingPopup.endDate);
+
+                            if (!start.isValid() || !end.isValid()) {
+                                return <Tag>기간 미설정</Tag>;
+                            }
+
+                            if (now.isBefore(start)) {
+                                const diffDays = start.diff(now, 'days');
+                                if (diffDays > 0) {
+                                    return <Tag color="geekblue">시작 D-{diffDays}</Tag>;
+                                }
+                                const diffHours = start.diff(now, 'hours');
+                                if (diffHours > 0) {
+                                    return <Tag color="geekblue">시작까지 {diffHours}시간</Tag>;
+                                }
+                                const diffMinutes = start.diff(now, 'minutes');
+                                if (diffMinutes > 0) {
+                                    return <Tag color="geekblue">시작까지 {diffMinutes}분</Tag>;
+                                }
+                                return <Tag color="geekblue">시작 예정</Tag>;
+                            }
+
+                            if (now.isAfter(end)) {
                                 return <Tag color="default">종료</Tag>;
                             }
+
+                            const diffDays = end.diff(now, 'days');
+                            if (diffDays > 0) {
+                                return <Tag color="blue">종료 D-{diffDays}</Tag>;
+                            }
+                            const diffHours = end.diff(now, 'hours');
+                            if (diffHours > 0) {
+                                return <Tag color="orange">종료까지 {diffHours}시간</Tag>;
+                            }
+                            const diffMinutes = end.diff(now, 'minutes');
+                            if (diffMinutes >= 0) {
+                                return <Tag color="orange">종료까지 {diffMinutes}분</Tag>;
+                            }
+
+                            return <Tag color="default">종료</Tag>;
                          })()}
                      </Form.Item>
 
