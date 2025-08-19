@@ -310,7 +310,7 @@ const menuItems = [
       {
         key: "/fixed-content/book-ranking",
         path: "/fixed-content/book-ranking",
-        name: "도서 랭킹 관리",
+        name: "랭킹 관리",
         icon: <OrderedListOutlined />,
       },
       {

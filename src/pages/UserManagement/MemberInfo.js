@@ -52,12 +52,15 @@ const initialUsers = [
     { key: '14', userId: 'user014', name: '윤아린', email: 'arin@example.com', phone: '010-6767-8989', signupDate: '2024-07-18 13:00:00', lastLogin: '2024-07-26 14:00:00', status: 'active', userGroup: '일반', purchaseAmount: 65000, suspensionReason: null, birthdate: '1994-04-15', gender: 'female', notifications: { appPush: true, sms: false, email: false }, signupType: 'email', socialProvider: null },
     { key: '15', userId: 'user015', name: '임로건', email: 'logan@example.co.kr', phone: '010-8989-1010', signupDate: '2024-01-05 20:00:00', lastLogin: '2024-07-25 21:00:00', status: 'active', userGroup: '일반', purchaseAmount: 95000, suspensionReason: null, birthdate: '1997-10-05', gender: 'male', notifications: { appPush: true, sms: false, email: true }, signupType: 'social', socialProvider: 'apple' },
     { key: '16', userId: 'user016', name: '송채원', email: 'chaewon@email.com', phone: '010-1010-2323', signupDate: '2024-06-30 23:50:00', lastLogin: '2024-07-01 08:00:00', status: 'pending', userGroup: '일반', purchaseAmount: 0, suspensionReason: null, birthdate: '2002-08-18', gender: 'female', notifications: { appPush: true, sms: true, email: true }, signupType: 'email', socialProvider: null },
+    { key: '17', userId: 'user017', name: '김탈퇴', email: 'withdraw@example.com', phone: '010-0000-0000', signupDate: '2023-01-01 10:00:00', lastLogin: '2023-01-02 12:00:00', status: 'withdrawn', userGroup: '일반', purchaseAmount: 15000, suspensionReason: '본인 요청', birthdate: '1991-01-01', gender: 'female', notifications: { appPush: false, sms: false, email: false }, signupType: 'email', socialProvider: null },
 ];
 
 const statusMap = {
     active: { color: 'success', text: '활성', icon: <CheckCircleOutlined /> },
     dormant: { color: 'default', text: '휴면', icon: <StopOutlined /> },
     pending: { color: 'warning', text: '대기', icon: <ClockCircleOutlined /> },
+    suspended: { color: 'error', text: '정지', icon: <StopOutlined /> },
+    withdrawn: { color: 'volcano', text: '탈퇴', icon: <StopOutlined /> },
 };
 
 const signupTypeMap = {
@@ -473,9 +476,13 @@ const MemberInfo = () => {
                 if (!text) return '-';
                 const lastLoginDate = moment(text);
                 const today = moment();
+                const yearsDiff = today.diff(lastLoginDate, 'years');
                 const daysDiff = today.diff(lastLoginDate, 'days');
                 let diffText = '';
-                if (daysDiff === 0) {
+
+                if (yearsDiff >= 1) {
+                    diffText = `(${yearsDiff}년 전)`;
+                } else if (daysDiff === 0) {
                     diffText = '(오늘)';
                 } else if (daysDiff > 0) {
                     diffText = `(${daysDiff}일 전)`;

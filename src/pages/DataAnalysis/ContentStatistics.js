@@ -119,6 +119,7 @@ const generateDummyContent = (count = 20, daysRange = 365) => {
           0,
           baseReviews + Math.floor((Math.random() - 0.5) * baseReviews * 0.5)
         ),
+        reviewRating: Math.round((Math.random() * 2 + 3) * 10) / 10, // 3.0 ~ 5.0 사이의 평점 (소수점 첫째자리)
         downloads: Math.max(
           0,
           baseDownloads +
@@ -144,7 +145,7 @@ const generateDummyContent = (count = 20, daysRange = 365) => {
 
         items.push({
             key: `content_${i}`,
-            title: `인기 콘텐츠 ${i}`,
+            title: `인기 도서 ${i}`,
       contentType: Math.random() < 0.5 ? "10" : "20", // '10' (전자책), '20' (오디오북)으로 변경
       dailyMetrics: dailyMetrics.sort(
         (a, b) => new Date(a.date) - new Date(b.date)
@@ -192,11 +193,12 @@ const getContentTypeTagForStats = (contentType) => {
 
 const metricDisplayNames = {
     views: '조회수',
-    likes: '관심등록',
+    likes: '좋아요',
     downloads: '다운로드',
     shares: '공유',
     posts: '포스트',
     reviews: '리뷰',
+    reviewRating: '리뷰 평점',
     completionRate: '완독률',
     estimatedReadingTime: '평균 완독 시간',
 };
@@ -209,6 +211,7 @@ const metricChartColors = {
     shares: BAR_CHART_COLORS[1],
     posts: BAR_CHART_COLORS[2],
     reviews: BAR_CHART_COLORS[3],
+    reviewRating: 'rgba(255, 193, 7, 0.7)', // 노란색 계열 (별점을 연상시키는 색상)
     completionRate: 'rgba(255, 99, 71, 0.7)',
     estimatedReadingTime: 'rgba(60, 179, 113, 0.7)',
 };
@@ -260,7 +263,7 @@ const categoryDistribution = rawCategoryData.map(category => {
 // Updated categoryColumns for tree data (simplified tags for now)
 const categoryColumns = [
     { title: '카테고리', dataIndex: 'name', key: 'name' }, // Ant Table handles indentation for tree data
-    { title: '콘텐츠 수', dataIndex: 'value', key: 'value', align: 'right', render: (value) => value != null ? value.toLocaleString() : '0' },
+    { title: '도서 수', dataIndex: 'value', key: 'value', align: 'right', render: (value) => value != null ? value.toLocaleString() : '0' },
 ];
 
 const categoryChartColors = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#AF69EE', '#FF6384']; // 색상 추가 가능
@@ -322,6 +325,7 @@ const ContentStatistics = () => {
 
         let processedItems = filteredByDetail.map(item => {
             let views = 0, likes = 0, shares = 0, posts = 0, reviews = 0, downloads = 0;
+            let ratingSum = 0, ratingCount = 0;
             let filteredMetrics = item.dailyMetrics;
 
             filteredMetrics.forEach(metric => {
@@ -331,7 +335,15 @@ const ContentStatistics = () => {
                 posts += metric.posts;
                 reviews += metric.reviews;
                 downloads += metric.downloads;
+
+                // 리뷰 평점 평균 계산
+                if (metric.reviewRating && metric.reviewRating > 0) {
+                    ratingSum += metric.reviewRating;
+                    ratingCount += 1;
+                }
             });
+
+            const avgRating = ratingCount > 0 ? Math.round((ratingSum / ratingCount) * 10) / 10 : 0;
 
             return {
                 ...item,
@@ -340,6 +352,7 @@ const ContentStatistics = () => {
                 totalShares: shares,
                 totalPosts: posts,
                 totalReviews: reviews,
+                avgReviewRating: avgRating,
                 totalDownloads: downloads,
                 completionRate: item.completionRate,
                 estimatedReadingTime: item.estimatedReadingTime,
@@ -439,8 +452,8 @@ const ContentStatistics = () => {
                     order: 0,
                 });
 
-                // 2. Other metrics as Bars (Likes, Shares, Posts, Reviews)
-                const otherMetricKeys = ['likes', 'downloads', 'shares', 'posts', 'reviews'];
+                // 2. Other metrics as Bars (Likes, Shares, Posts, Reviews, ReviewRating)
+                const otherMetricKeys = ['likes', 'downloads', 'shares', 'posts', 'reviews', 'reviewRating'];
                 let hasOtherMetrics = false;
 
                 otherMetricKeys.forEach((metricKey, index) => {
@@ -560,17 +573,21 @@ const ContentStatistics = () => {
             ),
             dataIndex: mKey === 'completionRate' || mKey === 'estimatedReadingTime'
                        ? mKey
+                       : mKey === 'reviewRating'
+                       ? 'avgReviewRating'
                        : `total${mKey.charAt(0).toUpperCase() + mKey.slice(1)}`,
             key: mKey,
             render: (text, record) => {
                 if (mKey === 'completionRate') return record.completionRate !== undefined ? `${record.completionRate}%` : '-';
                 if (mKey === 'estimatedReadingTime') return record.estimatedReadingTime !== undefined ? `${record.estimatedReadingTime} 분` : '-';
+                if (mKey === 'reviewRating') return record.avgReviewRating !== undefined && record.avgReviewRating > 0 ? `${record.avgReviewRating}점` : '-';
                 return text?.toLocaleString() ?? '-';
             },
             align: 'right',
             width: mKey === 'views' ? 110 :
                    mKey === 'estimatedReadingTime' ? 140 :
-                   mKey === 'completionRate' ? 100 : 110,
+                   mKey === 'completionRate' ? 100 :
+                   mKey === 'reviewRating' ? 110 : 110,
         });
     }
 
@@ -584,7 +601,7 @@ const ContentStatistics = () => {
             labels: labels,
             datasets: [
                 {
-                    label: '콘텐츠 수',
+                    label: '도서 수',
                     data: dataValues,
                     backgroundColor: categoryDistribution.map((cat, index) => categoryChartColors[index % categoryChartColors.length]),
                     borderColor: categoryDistribution.map((cat, index) => categoryChartColors[index % categoryChartColors.length].replace('0.7', '1').replace('0.2','1')), // Adapting from bar chart colors if needed
@@ -602,7 +619,7 @@ const ContentStatistics = () => {
                 },
                 title: {
                     display: true,
-                    text: '상위 카테고리별 콘텐츠 분포',
+                    text: '상위 카테고리별 도서 분포',
                     font: { size: 14 }
                 },
                 tooltip: {
@@ -629,9 +646,9 @@ const ContentStatistics = () => {
 
   return (
     <Space direction="vertical" style={{ width: '100%' }} size="large">
-      <Title level={4}>콘텐츠 통계 분석</Title>
+      <Title level={4}>도서 통계 분석</Title>
 
-            <Card title="콘텐츠 데이터 분석 차트">
+            <Card title="도서 데이터 분석 차트">
                  <div style={{ height: '350px' }}>
                     <Bar options={combinedChartOptions} data={combinedChartData} />
                 </div>
@@ -639,11 +656,11 @@ const ContentStatistics = () => {
 
             <Row gutter={[16, 16]}>
                 <Col span={24}>
-                    <Card title="콘텐츠 데이터 테이블">
+                    <Card title="도서 데이터 테이블">
                         <Row gutter={[16,16]} justify="space-between" align="middle" style={{ marginBottom: 24 }}>
                             <Col>
                                 <Search
-                                    placeholder="콘텐츠 제목 검색..."
+                                    placeholder="도서 제목 검색..."
                                     value={searchText}
                                     onChange={(e) => setSearchText(e.target.value)}
                                     allowClear
@@ -762,7 +779,7 @@ const ContentStatistics = () => {
                                                     </Row>
                                                     <Row gutter={24}>
                                                         <Col span={12}>
-                                                            <Form.Item label="관심등록">
+                                                            <Form.Item label="좋아요">
                                                                 <Input.Group compact>
                                                                     <Form.Item name="LIKES_MIN" noStyle><InputNumber style={{ width: "45%", textAlign: "center" }} placeholder="Min" /></Form.Item>
                                                                     <Input style={{ width: "10%", borderLeft: 0, borderRight: 0, pointerEvents: "none", background: "#fff" }} placeholder="~" disabled />
@@ -835,8 +852,8 @@ const ContentStatistics = () => {
                 </Col>
             </Row>
 
-      {/* 카테고리별 콘텐츠 분포 */}
-      <Card title="카테고리별 콘텐츠 분포">
+      {/* 카테고리별 도서 분포 */}
+      <Card title="카테고리별 도서 분포">
         <Row gutter={[16, 16]} align="middle">
            <Col xs={24} md={12}>
                    <div style={{ height: 300, position: 'relative' }}> {/* maintainAspectRatio:false needs relative parent */}
@@ -860,7 +877,7 @@ const ContentStatistics = () => {
             {/* 추가 통계 예시 (기존 유지) */}
       <Row gutter={[16, 16]}>
           <Col xs={24} sm={12} md={8}>
-                    <Card><Statistic title="총 등록 콘텐츠 수" value={allDummyContent.length} /></Card>
+                    <Card><Statistic title="총 등록 도서 수" value={allDummyContent.length} /></Card>
           </Col>
                 <Col xs={24} sm={12} md={8}><Card><Statistic title="평균 완독률" value={75} suffix="%" /></Card></Col>
                 <Col xs={24} sm={12} md={8}><Card><Statistic title="인기 검색 키워드" value="#React" /></Card></Col>
