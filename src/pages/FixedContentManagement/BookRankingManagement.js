@@ -42,14 +42,95 @@ const AlgorithmExplanation = ({ visible, onClose }) => {
         <p style={{ marginBottom: '32px' }}>도서의 실제 인기도와 품질을 객관적으로 평가하여 사용자에게 의미있는 랭킹을 제공합니다.</p>
 
         <Title level={4} style={{ marginTop: '32px', marginBottom: '16px' }}>가중치 기반 종합 점수</Title>
+
+        <Table
+          dataSource={[
+            {
+              key: '1',
+              variable: 'Downloads',
+              description: '다운로드 수 정규화 (실제 읽기 의도)',
+              weight: '0.30',
+              level: '높음'
+            },
+            {
+              key: '2',
+              variable: 'Completion Rate',
+              description: '완독률 (직접 읽음 지표)',
+              weight: '0.25',
+              level: '높음'
+            },
+            {
+              key: '3',
+              variable: 'Average Reading Time',
+              description: '평균 읽은 시간 정규화 (몰입도 반영)',
+              weight: '0.15',
+              level: '중간'
+            },
+            {
+              key: '4',
+              variable: 'Review Score',
+              description: '베이지안 보정 평점 × 리뷰 수',
+              weight: '0.15',
+              level: '중간'
+            },
+            {
+              key: '5',
+              variable: 'Posts',
+              description: '포스트 수 정규화 (커뮤니티 반응)',
+              weight: '0.10',
+              level: '낮음'
+            },
+            {
+              key: '6',
+              variable: 'Likes',
+              description: '좋아요 수 정규화 (보조 지표)',
+              weight: '0.05',
+              level: '낮음'
+            }
+          ]}
+          columns={[
+            {
+              title: '변수',
+              dataIndex: 'variable',
+              key: 'variable',
+              width: 140,
+              render: (text) => <strong>{text}</strong>
+            },
+            {
+              title: '설명',
+              dataIndex: 'description',
+              key: 'description',
+              width: 250
+            },
+            {
+              title: '가중치',
+              dataIndex: 'weight',
+              key: 'weight',
+              width: 80,
+              align: 'center',
+              render: (text) => <span style={{ color: '#1890ff' }}>{text}</span>
+            },
+            {
+              title: '기여도 수준',
+              dataIndex: 'level',
+              key: 'level',
+              width: 100,
+              align: 'center',
+              render: (text) => {
+                const color = text === '높음' ? '#52c41a' : text === '중간' ? '#faad14' : '#ff4d4f';
+                return <span style={{ color }}>{text}</span>;
+              }
+            }
+          ]}
+          pagination={false}
+          size="small"
+          style={{ marginBottom: '32px' }}
+        />
+
         <div style={{ background: '#f0f2f5', padding: '16px', borderRadius: '8px', marginBottom: '32px' }}>
-          <strong>최종 점수 = </strong>
-          <br />• 다운로드 수 × 30% (가장 중요)
-          <br />• 완독률 × 25% (품질 지표)
-          <br />• 평균 읽은 시간 × 15% (몰입도)
-          <br />• 리뷰 점수 × 15% (만족도)
-          <br />• 포스트 수 × 10% (커뮤니티 반응)
-          <br />• 좋아요 수 × 5% (보조 지표)
+          정규화 예시: Downloads = (다운로드 수 ÷ 전체 최대 다운로드 수) × 100
+          <br />
+          최종 점수: Downloads×0.30 + Completion Rate×0.25 + Average Reading Time×0.15 + Review Score×0.15 + Posts×0.10 + Likes×0.05
         </div>
 
         <Title level={4} style={{ marginTop: '32px', marginBottom: '16px' }}>베이지안 평균 보정 (신뢰성 향상)</Title>
@@ -92,9 +173,8 @@ const AlgorithmExplanation = ({ visible, onClose }) => {
         </div>
 
         <Title level={4} style={{ marginTop: '32px', marginBottom: '16px' }}>랭킹의 의미</Title>
-        <p style={{ color: '#52c41a', fontWeight: 'bold', marginBottom: '0' }}>
-          이 알고리즘으로 산출된 랭킹은 단순 인기도가 아닌,
-          <strong> 실제 독서 품질과 사용자 만족도를 종합적으로 반영한 객관적 순위</strong>입니다.
+        <p style={{ color: '#000', fontWeight: 'normal', marginBottom: '0' }}>
+          이 알고리즘으로 산출된 랭킹은 단순 인기도가 아닌, 실제 독서 품질과 사용자 만족도를 종합적으로 반영한 객관적 순위입니다.
         </p>
       </div>
     </Modal>
