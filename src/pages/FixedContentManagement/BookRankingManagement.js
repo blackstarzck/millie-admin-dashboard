@@ -1,5 +1,24 @@
 import { Button, Card, Modal, Select, Switch, Table, Tabs, Typography } from 'antd';
+import {
+  BarElement,
+  CategoryScale,
+  Chart as ChartJS,
+  Title as ChartTitle,
+  Legend,
+  LinearScale,
+  Tooltip,
+} from 'chart.js';
 import React, { useState } from 'react';
+import { Bar } from 'react-chartjs-2';
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  ChartTitle,
+  Tooltip,
+  Legend
+);
 
 const { Title } = Typography;
 const { Option } = Select;
@@ -303,6 +322,8 @@ const RankingTable = ({ contentType, data, onVisibilityChange }) => {
 
   return (
     <>
+      <TopRankingChart data={dataWithRank} contentType={contentType} />
+
       <Card style={{ marginBottom: '20px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
           <div>
@@ -352,6 +373,138 @@ const RankingTable = ({ contentType, data, onVisibilityChange }) => {
         onClose={() => setIsAlgorithmModalVisible(false)}
       />
     </>
+  );
+};
+
+// 차트 컴포넌트
+const TopRankingChart = ({ data, contentType }) => {
+  // 상위 12위 데이터 추출
+  const topBooks = data.slice(0, 12);
+
+  const chartData = {
+    labels: topBooks.map(book => book.title.length > 20 ? book.title.substring(0, 20) + '...' : book.title),
+    datasets: [
+      {
+        label: '종합점수',
+        data: topBooks.map(book => book.rankingScore),
+        backgroundColor: 'rgba(54, 162, 235, 0.6)',
+        borderColor: 'rgba(54, 162, 235, 1)',
+        borderWidth: 1,
+        hidden: false, // 기본적으로 표시
+      },
+      {
+        label: '다운로드',
+        data: topBooks.map(book => book.downloadCount / 100), // 스케일 조정
+        backgroundColor: 'rgba(255, 99, 132, 0.6)',
+        borderColor: 'rgba(255, 99, 132, 1)',
+        borderWidth: 1,
+        hidden: true, // 기본적으로 숨김
+      },
+      {
+        label: '완독률 (%)',
+        data: topBooks.map(book => book.completionRate),
+        backgroundColor: 'rgba(75, 192, 192, 0.6)',
+        borderColor: 'rgba(75, 192, 192, 1)',
+        borderWidth: 1,
+        hidden: true, // 기본적으로 숨김
+      },
+      {
+        label: '평균 읽은 시간',
+        data: topBooks.map(book => book.avgReadingTime),
+        backgroundColor: 'rgba(153, 102, 255, 0.6)',
+        borderColor: 'rgba(153, 102, 255, 1)',
+        borderWidth: 1,
+        hidden: true, // 기본적으로 숨김
+      },
+      {
+        label: '리뷰 점수',
+        data: topBooks.map(book => parseFloat(book.reviewRating) * 100), // 스케일 조정
+        backgroundColor: 'rgba(255, 159, 64, 0.6)',
+        borderColor: 'rgba(255, 159, 64, 1)',
+        borderWidth: 1,
+        hidden: true, // 기본적으로 숨김
+      },
+    ],
+  };
+
+  const options = {
+    indexAxis: 'y',
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: 'top',
+        labels: {
+          usePointStyle: true,
+          padding: 20,
+        },
+        onClick: function(e, legendItem, legend) {
+          const index = legendItem.datasetIndex;
+          const chart = legend.chart;
+
+          // 모든 데이터셋을 숨김
+          chart.data.datasets.forEach((dataset, i) => {
+            chart.setDatasetVisibility(i, false);
+          });
+
+          // 클릭한 데이터셋만 표시
+          chart.setDatasetVisibility(index, true);
+          chart.update();
+        },
+      },
+      title: {
+        display: true,
+        text: `상위 12위 ${contentType === 'ebook' ? '전자책' : '오디오북'} 랭킹`,
+        font: {
+          size: 16,
+          weight: 'bold',
+        },
+      },
+      tooltip: {
+        callbacks: {
+          label: function(context) {
+            const book = topBooks[context.dataIndex];
+            const datasetLabel = context.dataset.label;
+            let value = context.parsed.x;
+
+            if (datasetLabel === '다운로드') {
+              value = book.downloadCount;
+              return `${datasetLabel}: ${value.toLocaleString()}`;
+            } else if (datasetLabel === '리뷰 점수') {
+              value = book.reviewRating;
+              return `${datasetLabel}: ${value}점 (${book.reviewCount}개 리뷰)`;
+            } else if (datasetLabel === '완독률 (%)') {
+              return `${datasetLabel}: ${value}%`;
+            } else if (datasetLabel === '평균 읽은 시간') {
+              return `${datasetLabel}: ${value}분`;
+            } else {
+              return `${datasetLabel}: ${value.toLocaleString()}`;
+            }
+          }
+        }
+      }
+    },
+    scales: {
+      x: {
+        beginAtZero: true,
+        title: {
+          display: false,
+        },
+      },
+      y: {
+        title: {
+          display: false,
+        },
+      },
+    },
+  };
+
+  return (
+    <Card style={{ marginBottom: '20px' }}>
+      <div style={{ height: '400px' }}>
+        <Bar data={chartData} options={options} />
+      </div>
+    </Card>
   );
 };
 
