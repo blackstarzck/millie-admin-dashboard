@@ -378,8 +378,9 @@ const RankingTable = ({ contentType, data, onVisibilityChange }) => {
 
 // 차트 컴포넌트
 const TopRankingChart = ({ data, contentType }) => {
-  // 상위 12위 데이터 추출
-  const topBooks = data.slice(0, 12);
+  // 노출 상태가 true인 도서만 필터링 후 상위 12위 데이터 추출
+  const visibleBooks = data.filter(book => book.isVisible);
+  const topBooks = visibleBooks.slice(0, 12);
 
   const chartData = {
     labels: topBooks.map(book => book.title.length > 20 ? book.title.substring(0, 20) + '...' : book.title),
@@ -502,7 +503,20 @@ const TopRankingChart = ({ data, contentType }) => {
   return (
     <Card style={{ marginBottom: '20px' }}>
       <div style={{ height: '400px' }}>
-        <Bar data={chartData} options={options} />
+        {topBooks.length > 0 ? (
+          <Bar data={chartData} options={options} />
+        ) : (
+          <div style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: '100%',
+            color: '#999',
+            fontSize: '16px'
+          }}>
+            노출 상태인 {contentType === 'ebook' ? '전자책' : '오디오북'}이 없습니다.
+          </div>
+        )}
       </div>
     </Card>
   );
