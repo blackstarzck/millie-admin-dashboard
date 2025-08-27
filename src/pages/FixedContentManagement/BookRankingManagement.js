@@ -128,9 +128,9 @@ const AlgorithmExplanation = ({ visible, onClose }) => {
         />
 
         <div style={{ background: '#f0f2f5', padding: '16px', borderRadius: '8px', marginBottom: '32px' }}>
-          정규화 예시: Downloads = (다운로드 수 ÷ 전체 최대 다운로드 수) × 100
+          <strong>정규화 예시:</strong> Downloads = (다운로드 수 ÷ 전체 최대 다운로드 수) × 100
           <br />
-          최종 점수: Downloads×0.30 + Completion Rate×0.25 + Average Reading Time×0.15 + Review Score×0.15 + Posts×0.10 + Likes×0.05
+          <strong>최종 점수:</strong> Downloads×0.30 + Completion Rate×0.25 + Average Reading Time×0.15 + Review Score×0.15 + Posts×0.10 + Likes×0.05
         </div>
 
         <Title level={4} style={{ marginTop: '32px', marginBottom: '16px' }}>베이지안 평균 보정 (신뢰성 향상)</Title>
@@ -138,8 +138,7 @@ const AlgorithmExplanation = ({ visible, onClose }) => {
         <p style={{ marginBottom: '16px' }}><strong>해결:</strong> 베이지안 평균으로 공정한 평점 계산</p>
 
         <div style={{ background: '#f0f2f5', padding: '12px', borderRadius: '6px', margin: '16px 0' }}>
-          <strong>보정 공식:</strong><br />
-          보정 평점 = [(리뷰수 ÷ (리뷰수 + 100)) × 책 평점] + [(100 ÷ (리뷰수 + 100)) × 전체 평균 4.2점]
+          <strong>보정 공식:</strong> 보정 평점 = [(리뷰수 ÷ (리뷰수 + 100)) × 책 평점] + [(100 ÷ (리뷰수 + 100)) × 전체 평균 4.2점]
         </div>
 
         <div style={{ fontSize: '14px', color: '#666', marginBottom: '32px' }}>
@@ -233,11 +232,31 @@ const calculateRankingScore = (book, allBooks) => {
   return Math.round(score);
 };
 
-// 더미 데이터 생성
-const generateMockData = (contentType) => {
+// 주기별 데이터 변동을 위한 함수
+const getPeriodMultiplier = (period, baseValue) => {
+  const multipliers = {
+    daily: Math.random() * 0.3 + 0.8,    // 80-110% 변동
+    weekly: Math.random() * 0.5 + 0.7,   // 70-120% 변동
+    monthly: Math.random() * 0.7 + 0.6,  // 60-130% 변동
+    yearly: Math.random() * 1.0 + 0.5,   // 50-150% 변동
+  };
+  return Math.floor(baseValue * multipliers[period]);
+};
+
+// 더미 데이터 생성 (주기별 데이터 포함)
+const generateMockData = (contentType, period = 'daily') => {
   const books = [];
   for (let i = 1; i <= 50; i++) {
     const category = bookCategories[Math.floor(Math.random() * (bookCategories.length - 1)) + 1];
+
+    // 기본값 설정
+    const baseDownloadCount = Math.floor(Math.random() * 10000) + 1000;
+    const baseCompletionRate = Math.floor(Math.random() * 100) + 1;
+    const baseAvgReadingTime = Math.floor(Math.random() * 300) + 30;
+    const baseReviewCount = Math.floor(Math.random() * 500) + 10;
+    const basePostCount = Math.floor(Math.random() * 100) + 5;
+    const baseLikeCount = Math.floor(Math.random() * 1000) + 50;
+
     const book = {
       key: `${contentType}-${i}`,
       rank: i,
@@ -245,14 +264,15 @@ const generateMockData = (contentType) => {
       author: `작가 ${i}`,
       category: category,
       contentType: contentType,
-      downloadCount: Math.floor(Math.random() * 10000) + 1000,
-      completionRate: Math.floor(Math.random() * 100) + 1,
-      avgReadingTime: Math.floor(Math.random() * 300) + 30,
+      downloadCount: getPeriodMultiplier(period, baseDownloadCount),
+      completionRate: Math.min(100, getPeriodMultiplier(period, baseCompletionRate)),
+      avgReadingTime: getPeriodMultiplier(period, baseAvgReadingTime),
       reviewRating: (Math.random() * 2 + 3).toFixed(1),
-      reviewCount: Math.floor(Math.random() * 500) + 10,
-      postCount: Math.floor(Math.random() * 100) + 5,
-      likeCount: Math.floor(Math.random() * 1000) + 50,
+      reviewCount: getPeriodMultiplier(period, baseReviewCount),
+      postCount: getPeriodMultiplier(period, basePostCount),
+      likeCount: getPeriodMultiplier(period, baseLikeCount),
       isVisible: Math.random() > 0.3, // 70% 확률로 노출
+      period: period, // 주기 정보 추가
     };
 
     books.push(book);
@@ -268,7 +288,7 @@ const generateMockData = (contentType) => {
 };
 
 // 랭킹 테이블 컴포넌트
-const RankingTable = ({ contentType, data, onVisibilityChange }) => {
+const RankingTable = ({ contentType, data, onVisibilityChange, period, onPeriodChange }) => {
   const [selectedCategory, setSelectedCategory] = useState('전체');
   const [isAlgorithmModalVisible, setIsAlgorithmModalVisible] = useState(false);
 
@@ -402,35 +422,46 @@ const RankingTable = ({ contentType, data, onVisibilityChange }) => {
 
   return (
     <>
-      <TopRankingChart data={dataWithRank} contentType={contentType} />
+      <TopRankingChart data={dataWithRank} contentType={contentType} period={period} />
 
       <Card style={{ marginBottom: '20px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-          <div>
-            <span style={{ marginRight: '10px', fontWeight: 'bold' }}>카테고리 필터:</span>
-            <Select
-              value={selectedCategory}
-              onChange={setSelectedCategory}
-              style={{ width: 200 }}
-            >
-              {bookCategories.map(category => (
-                <Option key={category} value={category}>
-                  {category}
-                </Option>
-              ))}
-            </Select>
+          <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
+            <div>
+              <span style={{ marginRight: '10px', fontWeight: 'bold' }}>랭킹 주기:</span>
+              <Select
+                value={period}
+                onChange={onPeriodChange}
+                style={{ width: 120 }}
+              >
+                <Option value="daily">일간</Option>
+                <Option value="weekly">주간</Option>
+                <Option value="monthly">월간</Option>
+                <Option value="yearly">연간</Option>
+              </Select>
+            </div>
+            <div>
+              <span style={{ marginRight: '10px', fontWeight: 'bold' }}>카테고리 필터:</span>
+              <Select
+                value={selectedCategory}
+                onChange={setSelectedCategory}
+                style={{ width: 200 }}
+              >
+                {bookCategories.map(category => (
+                  <Option key={category} value={category}>
+                    {category}
+                  </Option>
+                ))}
+              </Select>
+            </div>
           </div>
-                    <Button
+          <Button
             type="default"
             onClick={() => setIsAlgorithmModalVisible(true)}
             style={{ background: '#f0f2f5' }}
           >
             랭킹 알고리즘 설명
           </Button>
-        </div>
-
-        <div style={{ color: '#666', fontSize: '14px' }}>
-          총 {dataWithRank.length}개의 {contentType === 'ebook' ? '전자책' : '오디오북'}이 검색되었습니다.
         </div>
       </Card>
 
@@ -457,7 +488,7 @@ const RankingTable = ({ contentType, data, onVisibilityChange }) => {
 };
 
 // 차트 컴포넌트
-const TopRankingChart = ({ data, contentType }) => {
+const TopRankingChart = ({ data, contentType, period }) => {
   // 노출 상태가 true인 도서만 필터링 후 상위 12위 데이터 추출
   const visibleBooks = data.filter(book => book.isVisible);
   const topBooks = visibleBooks.slice(0, 12);
@@ -535,7 +566,7 @@ const TopRankingChart = ({ data, contentType }) => {
       },
       title: {
         display: true,
-        text: `상위 12위 ${contentType === 'ebook' ? '전자책' : '오디오북'} 랭킹`,
+        text: `상위 12위 ${contentType === 'ebook' ? '전자책' : '오디오북'} 랭킹 (${period === 'daily' ? '일간' : period === 'weekly' ? '주간' : period === 'monthly' ? '월간' : '연간'})`,
         font: {
           size: 16,
           weight: 'bold',
@@ -603,8 +634,16 @@ const TopRankingChart = ({ data, contentType }) => {
 };
 
 const BookRankingManagement = () => {
-  const [ebookData, setEbookData] = useState(() => generateMockData('ebook'));
-  const [audiobookData, setAudiobookData] = useState(() => generateMockData('audiobook'));
+  const [period, setPeriod] = useState('daily');
+  const [ebookData, setEbookData] = useState(() => generateMockData('ebook', 'daily'));
+  const [audiobookData, setAudiobookData] = useState(() => generateMockData('audiobook', 'daily'));
+
+  // 주기 변경 핸들러
+  const handlePeriodChange = (newPeriod) => {
+    setPeriod(newPeriod);
+    setEbookData(generateMockData('ebook', newPeriod));
+    setAudiobookData(generateMockData('audiobook', newPeriod));
+  };
 
   // 스위치 변경 핸들러
   const handleVisibilityChange = (key, checked) => {
@@ -634,6 +673,8 @@ const BookRankingManagement = () => {
           contentType="ebook"
           data={ebookData}
           onVisibilityChange={handleVisibilityChange}
+          period={period}
+          onPeriodChange={handlePeriodChange}
         />
       ),
     },
@@ -645,6 +686,8 @@ const BookRankingManagement = () => {
           contentType="audiobook"
           data={audiobookData}
           onVisibilityChange={handleVisibilityChange}
+          period={period}
+          onPeriodChange={handlePeriodChange}
         />
       ),
     },
