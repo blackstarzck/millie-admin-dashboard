@@ -126,9 +126,11 @@ const BannerCreation = () => {
                                                                   extra={<MinusCircleOutlined onClick={() => remove(field.name)} style={{color: 'red'}}/>}
                                                                   style={{ height: '100%' }}
                                                               >
-                                                                  <Form.Item {...field} name={[field.name, 'title']} label="제목" rules={[{ required: true, message: '제목을 입력해주세요.' }]}><Input placeholder="배너 제목" /></Form.Item>
+                                                                  <Form.Item {...field} name={[field.name, 'title-01']} label="제목 01" rules={[{ required: true, message: '제목 01을 입력해주세요.' }]}><Input placeholder="배너 제목" /></Form.Item>
+                                                                  <Form.Item {...field} name={[field.name, 'title-02']} label="제목 02" rules={[{ required: true, message: '제목 02을 입력해주세요.' }]}><Input placeholder="배너 제목" /></Form.Item>
                                                                   <Form.Item {...field} name={[field.name, 'description']} label="설명"><Input placeholder="배너 설명" /></Form.Item>
-                                                                  <Form.Item {...field} name={[field.name, 'imageUrl']} label="이미지 URL" rules={[{ required: true, message: '이미지 URL을 입력해주세요.' }, { type: 'url', message: '유효한 URL을 입력해주세요.' }]}><Input placeholder="https://example.com/image.png" /></Form.Item>
+                                                                  <Form.Item {...field} name={[field.name, 'DesktopImageUrl']} label="PC 배경 이미지" rules={[{ required: true, message: 'PC 배경 이미지 URL를 입력해주세요.' }, { type: 'url', message: '유효한 URL을 입력해주세요.' }]}><Input placeholder="https://example.com/image.png" /></Form.Item>
+                                                                  <Form.Item {...field} name={[field.name, 'MobileImageUrl']} label="모바일일 배경 이미지" rules={[{ required: true, message: '모바일일 배경 이미지 URL를 입력해주세요.' }, { type: 'url', message: '유효한 URL을 입력해주세요.' }]}><Input placeholder="https://example.com/image.png" /></Form.Item>
                                                                   <Form.Item {...field} name={[field.name, 'navigationUrl']} label="네비게이션 URL" rules={[{ required: true, message: '네비게이션 URL을 입력해주세요.' }]}><Input placeholder="/target-page" /></Form.Item>
                                                                   <Form.Item {...field} name={[field.name, 'id']} hidden initialValue={`item-${Date.now()}-${index}`}><Input /></Form.Item>
                                                               </Card>
