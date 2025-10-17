@@ -71,6 +71,9 @@ import CouponForm from "./pages/CouponManagement/CouponForm";
 import BannerCreation from "./pages/BannerManagement/BannerCreation";
 import BannerList from "./pages/BannerManagement/BannerList";
 
+// 리뷰 관리 페이지
+import AppReviewManagement from "./pages/ReviewManagement/AppReviewManagement";
+
 function App() {
   const [coupons, setCoupons] = useState([
     {
@@ -269,6 +272,8 @@ function App() {
                 path="banner/edit/:bannerId"
                 element={<BannerCreation />}
               />
+              {/* 리뷰 관리 */}
+              <Route path="reviews/manage" element={<AppReviewManagement />} />
               {/* 쿠폰 관리 */}
               <Route
                 path="coupons/list"
