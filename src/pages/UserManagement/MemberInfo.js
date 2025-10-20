@@ -758,67 +758,67 @@ const MemberInfo = () => {
             <Title level={2}><UserOutlined /> 회원 정보 관리</Title>
             <Text>시스템에 등록된 회원 정보를 조회하고 관리합니다.</Text>
 
-            <Card>
-                <Space style={{ marginBottom: 16 }} wrap>
-                    <Input.Search
-                        placeholder="ID, 이름, 이메일 검색"
-                        allowClear
-                        onSearch={(value) => handleFilterChange('search', value)}
-                        onChange={(e) => !e.target.value && handleFilterChange('search', '')}
-                        style={{ width: 250 }}
-                        value={filters.search || ''}
-                    />
-                    <Select
-                        placeholder="상태 필터"
-                        allowClear
-                        style={{ width: 120 }}
-                        onChange={(value) => handleFilterChange('status', value)}
-                         value={filters.status || undefined}
-                    >
-                        {Object.entries(statusMap)
-                            .map(([key, { text }]) => (
-                                <Option key={key} value={key}>{text}</Option>
-                            ))}
-                    </Select>
-                    <Select
-                        placeholder="가입 유형 필터"
-                        allowClear
-                        style={{ width: 140 }}
-                        onChange={(value) => handleFilterChange('signupType', value)}
-                        value={filters.signupType || undefined}
-                    >
-                        {Object.entries(signupTypeMap)
-                            .map(([key, { text }]) => (
-                                <Option key={key} value={key}>{text}</Option>
-                            ))}
-                    </Select>
-                    <Text>가입일:</Text>
-                    <RangePicker
-                        onChange={(dates) => handleFilterChange('signupDateRange', dates)}
-                        value={filters.signupDateRange || null}
-                    />
-                    <Button icon={<ReloadOutlined />} onClick={handleResetFilters}>초기화</Button>
-                </Space>
 
-                <Table
-                    columns={columns}
-                    dataSource={users}
-                    loading={loading}
-                    pagination={{ pageSize: 10, showSizeChanger: true }}
-                    scroll={{ x: 1300 }}
-                    bordered
-                    size="small"
-                    rowKey="key"
-                    onRow={(record) => {
-                        return {
-                            onClick: (event) => {
-                                openEditModalForRow(record); // 수정 모달 바로 열기
-                            },
-                            style: { cursor: 'pointer' }
-                        };
-                    }}
-                />
-            </Card>
+              <Space style={{ marginBottom: 16 }} wrap>
+                  <Input.Search
+                      placeholder="ID, 이름, 이메일 검색"
+                      allowClear
+                      onSearch={(value) => handleFilterChange('search', value)}
+                      onChange={(e) => !e.target.value && handleFilterChange('search', '')}
+                      style={{ width: 250 }}
+                      value={filters.search || ''}
+                  />
+                  <Select
+                      placeholder="상태 필터"
+                      allowClear
+                      style={{ width: 120 }}
+                      onChange={(value) => handleFilterChange('status', value)}
+                        value={filters.status || undefined}
+                  >
+                      {Object.entries(statusMap)
+                          .map(([key, { text }]) => (
+                              <Option key={key} value={key}>{text}</Option>
+                          ))}
+                  </Select>
+                  <Select
+                      placeholder="가입 유형 필터"
+                      allowClear
+                      style={{ width: 140 }}
+                      onChange={(value) => handleFilterChange('signupType', value)}
+                      value={filters.signupType || undefined}
+                  >
+                      {Object.entries(signupTypeMap)
+                          .map(([key, { text }]) => (
+                              <Option key={key} value={key}>{text}</Option>
+                          ))}
+                  </Select>
+                  <Text>가입일:</Text>
+                  <RangePicker
+                      onChange={(dates) => handleFilterChange('signupDateRange', dates)}
+                      value={filters.signupDateRange || null}
+                  />
+                  <Button icon={<ReloadOutlined />} onClick={handleResetFilters}>초기화</Button>
+              </Space>
+
+              <Table
+                  columns={columns}
+                  dataSource={users}
+                  loading={loading}
+                  pagination={{ pageSize: 10, showSizeChanger: true }}
+                  scroll={{ x: 1300 }}
+                  bordered
+                  size="small"
+                  rowKey="key"
+                  onRow={(record) => {
+                      return {
+                          onClick: (event) => {
+                              openEditModalForRow(record); // 수정 모달 바로 열기
+                          },
+                          style: { cursor: 'pointer' }
+                      };
+                  }}
+              />
+
 
             <Modal
                 title={isEditMode ? "회원 정보 수정" : "회원 상세 정보"}
