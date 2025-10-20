@@ -140,8 +140,7 @@ const MemberInfo = () => {
     const [selectedUser, setSelectedUser] = useState(null);
     const [isEditMode, setIsEditMode] = useState(false);
     const [editedUser, setEditedUser] = useState(null);
-    const [editingDeviceId, setEditingDeviceId] = useState(null);
-    const [editingDeviceName, setEditingDeviceName] = useState('');
+    const [deviceNames, setDeviceNames] = useState({});
     const navigate = useNavigate();
     let searchInput = null;
 
@@ -275,6 +274,16 @@ const MemberInfo = () => {
         };
         setSelectedUser(userWithHistory);
         setEditedUser({ ...userWithHistory }); // Initialize editedUser with history too
+
+        // Initialize device names
+        const names = {};
+        if (userWithHistory.devices) {
+            userWithHistory.devices.forEach(device => {
+                names[device.deviceId] = device.deviceName;
+            });
+        }
+        setDeviceNames(names);
+
         setIsModalVisible(true);
         setIsEditMode(false); // Always start in view mode
     };
@@ -284,8 +293,7 @@ const MemberInfo = () => {
         setSelectedUser(null);
         setEditedUser(null);
         setIsEditMode(false);
-        setEditingDeviceId(null);
-        setEditingDeviceName('');
+        setDeviceNames({});
     };
 
     const handleEditModeToggle = () => {
@@ -365,31 +373,43 @@ const MemberInfo = () => {
         }
     };
 
-    // 기기명 수정 시작
-    const handleDeviceNameEditStart = (device) => {
-        setEditingDeviceId(device.deviceId);
-        setEditingDeviceName(device.deviceName);
+    // 기기명 변경 핸들러
+    const handleDeviceNameChange = (deviceId, newName) => {
+        setDeviceNames(prev => ({
+            ...prev,
+            [deviceId]: newName
+        }));
     };
 
-    // 기기명 수정 취소
-    const handleDeviceNameEditCancel = () => {
-        setEditingDeviceId(null);
-        setEditingDeviceName('');
-    };
-
-    // 기기명 수정 저장
+    // 기기명 저장 (blur 또는 Enter 시)
     const handleDeviceNameSave = (deviceId) => {
-        if (!editingDeviceName.trim()) {
+        const newName = deviceNames[deviceId];
+
+        if (!newName || !newName.trim()) {
             message.error('기기명을 입력해주세요.');
+            // 원래 이름으로 복원
+            const originalDevice = selectedUser.devices.find(d => d.deviceId === deviceId);
+            if (originalDevice) {
+                setDeviceNames(prev => ({
+                    ...prev,
+                    [deviceId]: originalDevice.deviceName
+                }));
+            }
             return;
         }
 
-        console.log(`Updating device ${deviceId} name to ${editingDeviceName}`);
+        // 이름이 변경되지 않았으면 저장하지 않음
+        const originalDevice = selectedUser.devices.find(d => d.deviceId === deviceId);
+        if (originalDevice && originalDevice.deviceName === newName.trim()) {
+            return;
+        }
+
+        console.log(`Updating device ${deviceId} name to ${newName}`);
         message.loading({ content: '기기명 변경 중...', key: 'device-name-update' });
 
         setTimeout(() => {
             const updatedDevices = selectedUser.devices.map(d =>
-                d.deviceId === deviceId ? { ...d, deviceName: editingDeviceName } : d
+                d.deviceId === deviceId ? { ...d, deviceName: newName.trim() } : d
             );
             const updatedUser = { ...selectedUser, devices: updatedDevices };
 
@@ -398,8 +418,6 @@ const MemberInfo = () => {
             ));
             setSelectedUser(updatedUser);
             setEditedUser(updatedUser);
-            setEditingDeviceId(null);
-            setEditingDeviceName('');
 
             message.success({ content: '기기명이 변경되었습니다.', key: 'device-name-update' });
         }, 500);
@@ -451,6 +469,16 @@ const MemberInfo = () => {
                 // Open modal directly in edit mode
                 setSelectedUser(userWithHistory);
                 setEditedUser({ ...userWithHistory });
+
+                // Initialize device names
+                const names = {};
+                if (userWithHistory.devices) {
+                    userWithHistory.devices.forEach(device => {
+                        names[device.deviceId] = device.deviceName;
+                    });
+                }
+                setDeviceNames(names);
+
                 setIsModalVisible(true);
                 setIsEditMode(true);
                 break;
@@ -471,6 +499,16 @@ const MemberInfo = () => {
         };
         setSelectedUser(userWithHistory);
         setEditedUser({ ...userWithHistory }); // 수정 모드니까 editedUser도 바로 설정
+
+        // Initialize device names
+        const names = {};
+        if (userWithHistory.devices) {
+            userWithHistory.devices.forEach(device => {
+                names[device.deviceId] = device.deviceName;
+            });
+        }
+        setDeviceNames(names);
+
         setIsModalVisible(true);
         setIsEditMode(true); // 수정 모드로 설정
     };
@@ -870,60 +908,37 @@ const MemberInfo = () => {
                                             size="small"
                                         >
                                             <Space direction="vertical" size="small" style={{ width: '100%' }}>
-                                                <Space style={{ width: '100%', justifyContent: 'space-between' }}>
-                                                    {editingDeviceId === device.deviceId ? (
-                                                        <Space style={{ flex: 1 }}>
+                                                <Space style={{ width: '100%', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                    <Space style={{ flex: 1, maxWidth: '70%' }}>
+                                                        <span style={{ fontSize: 16 }}>
                                                             {getDeviceIcon(device)}
-                                                            <Input
-                                                                value={editingDeviceName}
-                                                                onChange={(e) => setEditingDeviceName(e.target.value)}
-                                                                onPressEnter={() => handleDeviceNameSave(device.deviceId)}
-                                                                style={{ flex: 1, maxWidth: 300 }}
-                                                                autoFocus
-                                                            />
-                                                            <Button
-                                                                type="primary"
-                                                                size="small"
-                                                                onClick={() => handleDeviceNameSave(device.deviceId)}
-                                                            >
-                                                                저장
-                                                            </Button>
-                                                            <Button
-                                                                size="small"
-                                                                onClick={handleDeviceNameEditCancel}
-                                                            >
-                                                                취소
-                                                            </Button>
-                                                        </Space>
-                                                    ) : (
-                                                        <>
-                                                            <Text
-                                                                strong
-                                                                style={{ fontSize: 16, cursor: 'pointer' }}
-                                                                onClick={() => handleDeviceNameEditStart(device)}
-                                                            >
-                                                                {getDeviceIcon(device)}
-                                                                {' '}{device.deviceName}
-                                                            </Text>
-                                                            <Popconfirm
-                                                                title="기기 삭제"
-                                                                description="이 기기를 삭제하시겠습니까?"
-                                                                onConfirm={() => handleDeviceRemove(device.deviceId)}
-                                                                okText="삭제"
-                                                                cancelText="취소"
-                                                                okButtonProps={{ danger: true }}
-                                                            >
-                                                                <Button
-                                                                    type="text"
-                                                                    danger
-                                                                    size="small"
-                                                                    icon={<DeleteOutlined />}
-                                                                >
-                                                                    삭제
-                                                                </Button>
-                                                            </Popconfirm>
-                                                        </>
-                                                    )}
+                                                        </span>
+                                                        <Input
+                                                            value={deviceNames[device.deviceId] || device.deviceName}
+                                                            onChange={(e) => handleDeviceNameChange(device.deviceId, e.target.value)}
+                                                            onBlur={() => handleDeviceNameSave(device.deviceId)}
+                                                            onPressEnter={() => handleDeviceNameSave(device.deviceId)}
+                                                            placeholder="기기명을 입력하세요"
+                                                            style={{ flex: 1 }}
+                                                        />
+                                                    </Space>
+                                                    <Popconfirm
+                                                        title="기기 삭제"
+                                                        description="이 기기를 삭제하시겠습니까?"
+                                                        onConfirm={() => handleDeviceRemove(device.deviceId)}
+                                                        okText="삭제"
+                                                        cancelText="취소"
+                                                        okButtonProps={{ danger: true }}
+                                                    >
+                                                        <Button
+                                                            type="text"
+                                                            danger
+                                                            size="small"
+                                                            icon={<DeleteOutlined />}
+                                                        >
+                                                            삭제
+                                                        </Button>
+                                                    </Popconfirm>
                                                 </Space>
 
                                                 <Descriptions size="small" column={1}>
