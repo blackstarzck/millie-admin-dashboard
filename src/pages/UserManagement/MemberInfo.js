@@ -5,6 +5,8 @@ import {
   ClockCircleOutlined,
   DeleteOutlined,
   DesktopOutlined,
+  FacebookOutlined,
+  GoogleOutlined,
   MailOutlined,
   MessageOutlined,
   MobileOutlined,
@@ -12,7 +14,8 @@ import {
   SearchOutlined,
   StopOutlined,
   TabletOutlined,
-  UserOutlined
+  UserOutlined,
+  WechatOutlined
 } from '@ant-design/icons';
 import {
   Avatar,
@@ -94,23 +97,23 @@ const generateDevices = (count) => {
 };
 
 const initialUsers = [
-    { key: '1', userId: 'user001', name: '홍길동', email: 'gildong@example.com', phone: '010-1234-5678', signupDate: '2024-07-01 10:30:00', lastLogin: '2024-07-25 15:00:00', status: 'active', userGroup: ' 일반', purchaseAmount: 50000, suspensionReason: null, birthdate: '1990-05-15', gender: 'male', notifications: { appPush: true, sms: true, email: false }, signupType: 'email', socialProvider: null, devices: generateDevices(3) },
-    { key: '2', userId: 'user002', name: '김철수', email: 'chulsoo@example.com', phone: '010-9876-5432', signupDate: '2024-06-15 09:00:00', lastLogin: '2024-07-20 11:20:00', status: 'active', userGroup: 'VIP', purchaseAmount: 250000, suspensionReason: null, birthdate: '1985-11-20', gender: 'male', notifications: { appPush: true, sms: false, email: true }, signupType: 'social', socialProvider: 'kakao', devices: generateDevices(5) },
-    { key: '3', userId: 'user003', name: '박영희', email: 'younghee@example.com', phone: '010-1111-2222', signupDate: '2024-05-20 14:00:00', lastLogin: '2024-06-10 08:00:00', status: 'dormant', userGroup: '일반', purchaseAmount: 10000, suspensionReason: null, birthdate: null, gender: 'female', notifications: { appPush: false, sms: false, email: false }, signupType: 'email', socialProvider: null, devices: generateDevices(2) },
-    { key: '4', userId: 'user004', name: '최미영', email: 'miyoung@example.net', phone: '010-5555-4444', signupDate: '2023-11-30 18:45:00', lastLogin: '2024-07-24 10:00:00', status: 'suspended', userGroup: '일반', purchaseAmount: 120000, suspensionReason: '어뷰징 활동', birthdate: '1992-02-28', gender: 'female', notifications: { appPush: true, sms: true, email: true }, signupType: 'social', socialProvider: 'naver', devices: generateDevices(4) },
-    { key: '5', userId: 'user005', name: '강민준', email: 'minjun@example.co.kr', phone: '010-3333-7777', signupDate: '2024-07-22 16:00:00', lastLogin: '2024-07-26 09:10:00', status: 'active', userGroup: '일반', purchaseAmount: 30000, suspensionReason: null, birthdate: '2001-08-25', gender: null, notifications: { appPush: true, sms: false, email: false }, signupType: 'social', socialProvider: 'google', devices: generateDevices(1) },
-    { key: '6', userId: 'user006', name: '오서아', email: 'seoa@email.com', phone: '010-6666-9999', signupDate: '2024-04-01 12:00:00', lastLogin: '2024-05-15 18:30:00', status: 'dormant', userGroup: '일반', purchaseAmount: 0, suspensionReason: null, birthdate: null, gender: null, notifications: { appPush: false, sms: true, email: true }, signupType: 'email', socialProvider: null, devices: generateDevices(3) },
-    { key: '7', userId: 'user007', name: '이하준', email: 'hajun@example.com', phone: '010-1212-3434', signupDate: '2024-07-10 11:00:00', lastLogin: '2024-07-25 10:00:00', status: 'active', userGroup: '일반', purchaseAmount: 80000, suspensionReason: null, birthdate: '1995-03-10', gender: 'male', notifications: { appPush: true, sms: true, email: false }, signupType: 'social', socialProvider: 'kakao', devices: generateDevices(2) },
-    { key: '8', userId: 'user008', name: '정서윤', email: 'seoyun@example.com', phone: '010-3434-5656', signupDate: '2024-07-05 16:20:00', lastLogin: '2024-07-22 13:00:00', status: 'active', userGroup: 'VIP', purchaseAmount: 320000, suspensionReason: null, birthdate: '1998-07-22', gender: 'female', notifications: { appPush: true, sms: false, email: true }, signupType: 'email', socialProvider: null, devices: generateDevices(5) },
-    { key: '9', userId: 'user009', name: '박도윤', email: 'doyun@example.com', phone: '010-5656-7878', signupDate: '2024-06-20 09:30:00', lastLogin: '2024-07-15 11:45:00', status: 'dormant', userGroup: '일반', purchaseAmount: 5000, suspensionReason: null, birthdate: '2000-01-01', gender: 'male', notifications: { appPush: false, sms: true, email: false }, signupType: 'social', socialProvider: 'naver', devices: generateDevices(1) },
-    { key: '10', userId: 'user010', name: '김하윤', email: 'hayun@example.co.kr', phone: '010-7878-9090', signupDate: '2024-05-15 14:00:00', lastLogin: '2024-06-28 22:00:00', status: 'suspended', userGroup: '일반', purchaseAmount: 0, suspensionReason: '불법 프로그램 사용', birthdate: '1993-11-30', gender: 'female', notifications: { appPush: false, sms: false, email: false }, signupType: 'email', socialProvider: null, devices: generateDevices(2) },
-    { key: '11', userId: 'user011', name: '최시우', email: 'siwoo@example.net', phone: '010-9090-1212', signupDate: '2024-07-25 08:00:00', lastLogin: '2024-07-26 11:00:00', status: 'active', userGroup: '일반', purchaseAmount: 15000, suspensionReason: null, birthdate: '1999-09-09', gender: 'male', notifications: { appPush: true, sms: true, email: true }, signupType: 'social', socialProvider: 'google', devices: generateDevices(3) },
-    { key: '12', userId: 'user012', name: '강지아', email: 'jia@email.com', phone: '010-2323-4545', signupDate: '2024-03-10 18:00:00', lastLogin: '2024-07-20 19:30:00', status: 'active', userGroup: 'VIP', purchaseAmount: 550000, suspensionReason: null, birthdate: '1988-12-25', gender: 'female', notifications: { appPush: true, sms: true, email: true }, signupType: 'email', socialProvider: null, devices: generateDevices(4) },
-    { key: '13', userId: 'user013', name: '한이준', email: 'ijun@example.com', phone: '010-4545-6767', signupDate: '2024-02-01 10:10:00', lastLogin: '2024-04-01 10:00:00', status: 'dormant', userGroup: '일반', purchaseAmount: 20000, suspensionReason: null, birthdate: '1996-06-07', gender: 'male', notifications: { appPush: false, sms: false, email: false }, signupType: 'social', socialProvider: 'facebook', devices: generateDevices(1) },
-    { key: '14', userId: 'user014', name: '윤아린', email: 'arin@example.com', phone: '010-6767-8989', signupDate: '2024-07-18 13:00:00', lastLogin: '2024-07-26 14:00:00', status: 'active', userGroup: '일반', purchaseAmount: 65000, suspensionReason: null, birthdate: '1994-04-15', gender: 'female', notifications: { appPush: true, sms: false, email: false }, signupType: 'email', socialProvider: null, devices: generateDevices(2) },
-    { key: '15', userId: 'user015', name: '임로건', email: 'logan@example.co.kr', phone: '010-8989-1010', signupDate: '2024-01-05 20:00:00', lastLogin: '2024-07-25 21:00:00', status: 'active', userGroup: '일반', purchaseAmount: 95000, suspensionReason: null, birthdate: '1997-10-05', gender: 'male', notifications: { appPush: true, sms: false, email: true }, signupType: 'social', socialProvider: 'apple', devices: generateDevices(3) },
-    { key: '16', userId: 'user016', name: '송채원', email: 'chaewon@email.com', phone: '010-1010-2323', signupDate: '2024-06-30 23:50:00', lastLogin: '2024-07-01 08:00:00', status: 'pending', userGroup: '일반', purchaseAmount: 0, suspensionReason: null, birthdate: '2002-08-18', gender: 'female', notifications: { appPush: true, sms: true, email: true }, signupType: 'email', socialProvider: null, devices: generateDevices(1) },
-    { key: '17', userId: 'user017', name: '김탈퇴', email: 'withdraw@example.com', phone: '010-0000-0000', signupDate: '2023-01-01 10:00:00', lastLogin: '2023-01-02 12:00:00', status: 'withdrawn', userGroup: '일반', purchaseAmount: 15000, suspensionReason: '본인 요청', birthdate: '1991-01-01', gender: 'female', notifications: { appPush: false, sms: false, email: false }, signupType: 'email', socialProvider: null, devices: [] },
+    { key: '1', userId: 'user001', name: '홍길동', email: 'gildong@example.com', phone: '010-1234-5678', signupDate: '2024-07-01 10:30:00', lastLogin: '2024-07-25 15:00:00', status: 'active', userGroup: ' 일반', purchaseAmount: 50000, suspensionReason: null, birthdate: '1990-05-15', gender: 'male', notifications: { appPush: true, sms: true, email: false }, signupType: 'email', socialProvider: null, devices: generateDevices(3), connectedSns: ['google', 'kakao'] },
+    { key: '2', userId: 'user002', name: '김철수', email: 'chulsoo@example.com', phone: '010-9876-5432', signupDate: '2024-06-15 09:00:00', lastLogin: '2024-07-20 11:20:00', status: 'active', userGroup: 'VIP', purchaseAmount: 250000, suspensionReason: null, birthdate: '1985-11-20', gender: 'male', notifications: { appPush: true, sms: false, email: true }, signupType: 'social', socialProvider: 'kakao', devices: generateDevices(5), connectedSns: ['kakao', 'naver', 'google'] },
+    { key: '3', userId: 'user003', name: '박영희', email: 'younghee@example.com', phone: '010-1111-2222', signupDate: '2024-05-20 14:00:00', lastLogin: '2024-06-10 08:00:00', status: 'dormant', userGroup: '일반', purchaseAmount: 10000, suspensionReason: null, birthdate: null, gender: 'female', notifications: { appPush: false, sms: false, email: false }, signupType: 'email', socialProvider: null, devices: generateDevices(2), connectedSns: [] },
+    { key: '4', userId: 'user004', name: '최미영', email: 'miyoung@example.net', phone: '010-5555-4444', signupDate: '2023-11-30 18:45:00', lastLogin: '2024-07-24 10:00:00', status: 'suspended', userGroup: '일반', purchaseAmount: 120000, suspensionReason: '어뷰징 활동', birthdate: '1992-02-28', gender: 'female', notifications: { appPush: true, sms: true, email: true }, signupType: 'social', socialProvider: 'naver', devices: generateDevices(4), connectedSns: ['naver', 'kakao'] },
+    { key: '5', userId: 'user005', name: '강민준', email: 'minjun@example.co.kr', phone: '010-3333-7777', signupDate: '2024-07-22 16:00:00', lastLogin: '2024-07-26 09:10:00', status: 'active', userGroup: '일반', purchaseAmount: 30000, suspensionReason: null, birthdate: '2001-08-25', gender: null, notifications: { appPush: true, sms: false, email: false }, signupType: 'social', socialProvider: 'google', devices: generateDevices(1), connectedSns: ['google'] },
+    { key: '6', userId: 'user006', name: '오서아', email: 'seoa@email.com', phone: '010-6666-9999', signupDate: '2024-04-01 12:00:00', lastLogin: '2024-05-15 18:30:00', status: 'dormant', userGroup: '일반', purchaseAmount: 0, suspensionReason: null, birthdate: null, gender: null, notifications: { appPush: false, sms: true, email: true }, signupType: 'email', socialProvider: null, devices: generateDevices(3), connectedSns: ['kakao'] },
+    { key: '7', userId: 'user007', name: '이하준', email: 'hajun@example.com', phone: '010-1212-3434', signupDate: '2024-07-10 11:00:00', lastLogin: '2024-07-25 10:00:00', status: 'active', userGroup: '일반', purchaseAmount: 80000, suspensionReason: null, birthdate: '1995-03-10', gender: 'male', notifications: { appPush: true, sms: true, email: false }, signupType: 'social', socialProvider: 'kakao', devices: generateDevices(2), connectedSns: ['kakao', 'google'] },
+    { key: '8', userId: 'user008', name: '정서윤', email: 'seoyun@example.com', phone: '010-3434-5656', signupDate: '2024-07-05 16:20:00', lastLogin: '2024-07-22 13:00:00', status: 'active', userGroup: 'VIP', purchaseAmount: 320000, suspensionReason: null, birthdate: '1998-07-22', gender: 'female', notifications: { appPush: true, sms: false, email: true }, signupType: 'email', socialProvider: null, devices: generateDevices(5), connectedSns: ['google', 'apple'] },
+    { key: '9', userId: 'user009', name: '박도윤', email: 'doyun@example.com', phone: '010-5656-7878', signupDate: '2024-06-20 09:30:00', lastLogin: '2024-07-15 11:45:00', status: 'dormant', userGroup: '일반', purchaseAmount: 5000, suspensionReason: null, birthdate: '2000-01-01', gender: 'male', notifications: { appPush: false, sms: true, email: false }, signupType: 'social', socialProvider: 'naver', devices: generateDevices(1), connectedSns: ['naver'] },
+    { key: '10', userId: 'user010', name: '김하윤', email: 'hayun@example.co.kr', phone: '010-7878-9090', signupDate: '2024-05-15 14:00:00', lastLogin: '2024-06-28 22:00:00', status: 'suspended', userGroup: '일반', purchaseAmount: 0, suspensionReason: '불법 프로그램 사용', birthdate: '1993-11-30', gender: 'female', notifications: { appPush: false, sms: false, email: false }, signupType: 'email', socialProvider: null, devices: generateDevices(2), connectedSns: [] },
+    { key: '11', userId: 'user011', name: '최시우', email: 'siwoo@example.net', phone: '010-9090-1212', signupDate: '2024-07-25 08:00:00', lastLogin: '2024-07-26 11:00:00', status: 'active', userGroup: '일반', purchaseAmount: 15000, suspensionReason: null, birthdate: '1999-09-09', gender: 'male', notifications: { appPush: true, sms: true, email: true }, signupType: 'social', socialProvider: 'google', devices: generateDevices(3), connectedSns: ['google', 'facebook'] },
+    { key: '12', userId: 'user012', name: '강지아', email: 'jia@email.com', phone: '010-2323-4545', signupDate: '2024-03-10 18:00:00', lastLogin: '2024-07-20 19:30:00', status: 'active', userGroup: 'VIP', purchaseAmount: 550000, suspensionReason: null, birthdate: '1988-12-25', gender: 'female', notifications: { appPush: true, sms: true, email: true }, signupType: 'email', socialProvider: null, devices: generateDevices(4), connectedSns: ['kakao', 'naver', 'google', 'apple'] },
+    { key: '13', userId: 'user013', name: '한이준', email: 'ijun@example.com', phone: '010-4545-6767', signupDate: '2024-02-01 10:10:00', lastLogin: '2024-04-01 10:00:00', status: 'dormant', userGroup: '일반', purchaseAmount: 20000, suspensionReason: null, birthdate: '1996-06-07', gender: 'male', notifications: { appPush: false, sms: false, email: false }, signupType: 'social', socialProvider: 'facebook', devices: generateDevices(1), connectedSns: ['facebook'] },
+    { key: '14', userId: 'user014', name: '윤아린', email: 'arin@example.com', phone: '010-6767-8989', signupDate: '2024-07-18 13:00:00', lastLogin: '2024-07-26 14:00:00', status: 'active', userGroup: '일반', purchaseAmount: 65000, suspensionReason: null, birthdate: '1994-04-15', gender: 'female', notifications: { appPush: true, sms: false, email: false }, signupType: 'email', socialProvider: null, devices: generateDevices(2), connectedSns: ['naver', 'kakao'] },
+    { key: '15', userId: 'user015', name: '임로건', email: 'logan@example.co.kr', phone: '010-8989-1010', signupDate: '2024-01-05 20:00:00', lastLogin: '2024-07-25 21:00:00', status: 'active', userGroup: '일반', purchaseAmount: 95000, suspensionReason: null, birthdate: '1997-10-05', gender: 'male', notifications: { appPush: true, sms: false, email: true }, signupType: 'social', socialProvider: 'apple', devices: generateDevices(3), connectedSns: ['apple'] },
+    { key: '16', userId: 'user016', name: '송채원', email: 'chaewon@email.com', phone: '010-1010-2323', signupDate: '2024-06-30 23:50:00', lastLogin: '2024-07-01 08:00:00', status: 'pending', userGroup: '일반', purchaseAmount: 0, suspensionReason: null, birthdate: '2002-08-18', gender: 'female', notifications: { appPush: true, sms: true, email: true }, signupType: 'email', socialProvider: null, devices: generateDevices(1), connectedSns: [] },
+    { key: '17', userId: 'user017', name: '김탈퇴', email: 'withdraw@example.com', phone: '010-0000-0000', signupDate: '2023-01-01 10:00:00', lastLogin: '2023-01-02 12:00:00', status: 'withdrawn', userGroup: '일반', purchaseAmount: 15000, suspensionReason: '본인 요청', birthdate: '1991-01-01', gender: 'female', notifications: { appPush: false, sms: false, email: false }, signupType: 'email', socialProvider: null, devices: [], connectedSns: [] },
 ];
 
 const statusMap = {
@@ -373,6 +376,18 @@ const MemberInfo = () => {
         }
     };
 
+    // SNS 아이콘 및 정보 반환
+    const getSnsInfo = (snsType) => {
+        const snsMap = {
+            kakao: { icon: <WechatOutlined />, color: '#FEE500', name: 'Kakao' },
+            naver: { icon: <span style={{ fontWeight: 'bold' }}>N</span>, color: '#03C75A', name: 'Naver' },
+            google: { icon: <GoogleOutlined />, color: '#4285F4', name: 'Google' },
+            facebook: { icon: <FacebookOutlined />, color: '#1877F2', name: 'Facebook' },
+            apple: { icon: <AppleOutlined />, color: '#000000', name: 'Apple' }
+        };
+        return snsMap[snsType] || { icon: null, color: '#999999', name: snsType };
+    };
+
     // 기기명 변경 핸들러
     const handleDeviceNameChange = (deviceId, newName) => {
         setDeviceNames(prev => ({
@@ -579,6 +594,43 @@ const MemberInfo = () => {
                 const typeInfo = signupTypeMap[signupType] || { text: signupType };
                 return typeInfo.text;
             }
+        },
+        {
+            title: 'SNS 연동',
+            dataIndex: 'connectedSns',
+            key: 'connectedSns',
+            width: 120,
+            align: 'center',
+            render: (connectedSns) => {
+                if (!connectedSns || connectedSns.length === 0) {
+                    return <Text type="secondary">-</Text>;
+                }
+
+                const snsLetterMap = {
+                    kakao: 'K',
+                    google: 'G',
+                    facebook: 'F',
+                    naver: 'N',
+                    apple: 'A'
+                };
+
+                const letters = connectedSns.map(sns => snsLetterMap[sns] || sns.charAt(0).toUpperCase()).join(', ');
+
+                return (
+                    <Tooltip
+                        title={
+                            <Space direction="vertical" size="small">
+                                {connectedSns.map(sns => (
+                                    <span key={sns}>{getSnsInfo(sns).name}</span>
+                                ))}
+                            </Space>
+                        }
+                    >
+                        <Text strong>{letters}</Text>
+                    </Tooltip>
+                );
+            },
+            sorter: (a, b) => (a.connectedSns?.length || 0) - (b.connectedSns?.length || 0),
         },
         {
             title: '생년월일',
@@ -885,6 +937,43 @@ const MemberInfo = () => {
                                     <Tag color={selectedUser.notifications?.email ? 'blue' : 'default'}>
                                         {selectedUser.notifications?.email ? '수신' : '미수신'}
                                     </Tag>
+                                </Descriptions.Item>
+                                <Descriptions.Item label="SNS 계정 연동" span={1}>
+                                    {selectedUser.connectedSns && selectedUser.connectedSns.length > 0 ? (
+                                        <Space wrap size="small">
+                                            {selectedUser.connectedSns.map((sns) => {
+                                                const snsInfo = getSnsInfo(sns);
+                                                const snsLetterMap = {
+                                                    kakao: 'K',
+                                                    google: 'G',
+                                                    facebook: 'F',
+                                                    naver: 'N',
+                                                    apple: 'A'
+                                                };
+                                                const letter = snsLetterMap[sns] || sns.charAt(0).toUpperCase();
+
+                                                return (
+                                                    <Tooltip key={sns} title={snsInfo.name}>
+                                                        <Tag
+                                                            color={snsInfo.color}
+                                                            style={{
+                                                                fontSize: 14,
+                                                                fontWeight: 'bold',
+                                                                padding: '4px 12px',
+                                                                color: sns === 'kakao' ? '#000' : '#fff',
+                                                                minWidth: 32,
+                                                                textAlign: 'center'
+                                                            }}
+                                                        >
+                                                            {letter}
+                                                        </Tag>
+                                                    </Tooltip>
+                                                );
+                                            })}
+                                        </Space>
+                                    ) : (
+                                        <Text type="secondary">-</Text>
+                                    )}
                                 </Descriptions.Item>
                             </Descriptions>
                         </Tabs.TabPane>
