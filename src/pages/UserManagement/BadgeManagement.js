@@ -4,10 +4,10 @@ import {
   TrophyOutlined
 } from '@ant-design/icons';
 import {
-  Avatar,
   Button,
   Divider,
   Form,
+  Image,
   Input,
   message,
   Modal,
@@ -18,7 +18,8 @@ import {
   Table,
   Tabs,
   Tag,
-  Typography
+  Typography,
+  Upload
 } from 'antd';
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { formatQuery, QueryBuilder } from 'react-querybuilder';
@@ -290,6 +291,15 @@ const initialBadgesMaster = {
   'audio_consecutive_master': { name: '오디오 지켜주는 주인', category: '오디오북 마니아', description: '100일 연속 오디오북 청취', tier: '마스터', icon: 'https://via.placeholder.com/48/0000cd/ffffff?text=AC3', isActive: true, createdAt: '2024-01-01' },
 };
 
+// Base64 변환 함수
+const getBase64 = (file) =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = (error) => reject(error);
+  });
+
 const BadgeManagement = () => {
   // 배지 데이터 상태
   const [allBadgesMaster, setAllBadgesMaster] = useState(initialBadgesMaster);
@@ -304,6 +314,9 @@ const BadgeManagement = () => {
   const [editingBadge, setEditingBadge] = useState(null);
   const [badgeForm] = Form.useForm();
   const [unlockQuery, setUnlockQuery] = useState({ combinator: 'and', rules: [] });
+  const [fileList, setFileList] = useState([]);
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewImage, setPreviewImage] = useState('');
 
   // 탭 추가 모달
   const [tabModalVisible, setTabModalVisible] = useState(false);
@@ -421,6 +434,16 @@ const BadgeManagement = () => {
     });
   };
 
+  // 이미지 미리보기 핸들러
+  const handlePreview = async (file) => {
+    if (!file.url && !file.preview) {
+      file.preview = await getBase64(file.originFileObj);
+    }
+
+    setPreviewImage(file.url || file.preview);
+    setPreviewOpen(true);
+  };
+
   // 배지 생성/수정 모달 열기 (카테고리는 필수)
   const openBadgeModal = (badge = null, category = null) => {
     if (!badge && !category) {
@@ -469,6 +492,19 @@ const BadgeManagement = () => {
       });
       // QueryBuilder 상태 설정
       setUnlockQuery(badge.unlockQueryObj || { combinator: 'and', rules: [] });
+      // 이미지 파일 리스트 설정
+      if (badge.icon) {
+        setFileList([
+          {
+            uid: '-1',
+            name: 'image.png',
+            status: 'done',
+            url: badge.icon,
+          },
+        ]);
+        } else {
+        setFileList([]);
+      }
         } else {
       // 새 배지 생성 시
       const currentGroup = activeTab === 'all' ? '전체' : activeTab;
@@ -482,6 +518,7 @@ const BadgeManagement = () => {
         tier: '초보',
       });
       setUnlockQuery({ combinator: 'and', rules: [] });
+      setFileList([]);
     }
     setBadgeModalVisible(true);
   };
@@ -498,12 +535,24 @@ const BadgeManagement = () => {
         return;
       }
 
+      // 이미지 URL 가져오기
+      let iconUrl = '';
+      if (fileList.length > 0) {
+        iconUrl = fileList[0].url || fileList[0].response?.url || '';
+      }
+
+      if (!iconUrl) {
+        message.error('이미지를 업로드해주세요.');
+        return;
+      }
+
       // _category는 저장하지 않음
-      const { _category, ...badgeData } = values;
+      const { _category, icon, ...badgeData } = values;
 
       // QueryBuilder 데이터 추가
       const badgeDataWithQuery = {
         ...badgeData,
+        icon: iconUrl, // 업로드된 이미지 URL 사용
         unlockQueryObj: unlockQuery, // QueryBuilder 객체 저장
         unlockQueryString: formatQuery(unlockQuery, 'json'), // JSON 문자열로도 저장
       };
@@ -564,6 +613,9 @@ const BadgeManagement = () => {
       badgeForm.resetFields();
       setEditingBadge(null);
       setUnlockQuery({ combinator: 'and', rules: [] });
+      setFileList([]);
+      setPreviewOpen(false);
+      setPreviewImage('');
     } catch (error) {
       console.error('Validation failed:', error);
     }
@@ -858,8 +910,11 @@ const BadgeManagement = () => {
       dataIndex: 'icon',
       key: 'icon',
       width: 80,
-      render: (icon, record) => (
-        <Avatar src={icon} shape="square" size={48} alt={record.name} />
+      render: (icon) => (
+        <Image
+          width={48}
+          src={icon}
+        />
       ),
     },
     {
@@ -1109,6 +1164,9 @@ const BadgeManagement = () => {
           badgeForm.resetFields();
           setEditingBadge(null);
           setUnlockQuery({ combinator: 'and', rules: [] });
+          setFileList([]);
+          setPreviewOpen(false);
+          setPreviewImage('');
         }}
         width={800}
         okText="저장"
@@ -1169,10 +1227,75 @@ const BadgeManagement = () => {
 
             <Form.Item
               name="icon"
-              label="이미지 URL"
-              rules={[{ required: true, message: '이미지 URL을 입력해주세요' }]}
+              label="배지 이미지"
+              rules={[{ required: false }]}
             >
-              <Input placeholder="https://..." />
+              <Upload
+                listType="picture-card"
+                fileList={fileList}
+                onPreview={handlePreview}
+                onChange={({ fileList: newFileList }) => setFileList(newFileList)}
+                beforeUpload={(file) => {
+                  // 이미지 파일만 허용
+                  const isImage = file.type.startsWith('image/');
+                  if (!isImage) {
+                    message.error('이미지 파일만 업로드 가능합니다.');
+                    return false;
+                  }
+
+                  // 파일 크기 제한 (5MB)
+                  const isLt5M = file.size / 1024 / 1024 < 5;
+                  if (!isLt5M) {
+                    message.error('이미지 크기는 5MB 이하여야 합니다.');
+                    return false;
+                  }
+
+                  // 미리보기를 위해 로컬 URL 생성
+                  const reader = new FileReader();
+                  reader.onload = (e) => {
+                    setFileList([
+                      {
+                        uid: file.uid,
+                        name: file.name,
+                        status: 'done',
+                        url: e.target.result,
+                        originFileObj: file,
+                      },
+                    ]);
+                  };
+                  reader.readAsDataURL(file);
+
+                  // 실제 업로드는 하지 않음 (false 반환)
+                  return false;
+                }}
+                onRemove={() => {
+                  setFileList([]);
+                }}
+                maxCount={1}
+              >
+                {fileList.length === 0 && (
+                  <div>
+                    <PlusOutlined />
+                    <div style={{ marginTop: 8 }}>업로드</div>
+                  </div>
+                )}
+              </Upload>
+              {fileList.length > 0 && (
+                <Text type="secondary" style={{ display: 'block', marginTop: 8 }}>
+                  파일명: {fileList[0].name}
+                </Text>
+              )}
+              {previewImage && (
+                <Image
+                  wrapperStyle={{ display: 'none' }}
+                  preview={{
+                    visible: previewOpen,
+                    onVisibleChange: (visible) => setPreviewOpen(visible),
+                    afterOpenChange: (visible) => !visible && setPreviewImage(''),
+                  }}
+                  src={previewImage}
+                />
+              )}
             </Form.Item>
 
             <Form.Item
