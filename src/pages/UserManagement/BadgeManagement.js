@@ -84,6 +84,8 @@ const EditableCell = ({
   useEffect(() => {
     if (editing) {
       inputRef.current?.focus();
+      // 편집 모드 진입 시 기존 값 설정
+      form.setFieldsValue({ [dataIndex]: record[dataIndex] });
     }
   }, [editing]);
 
@@ -95,11 +97,22 @@ const EditableCell = ({
   const save = async () => {
     try {
       const values = await form.validateFields();
-      toggleEdit();
+      setEditing(false);
       handleSave({ ...record, ...values });
     } catch (errInfo) {
       console.log('Save failed:', errInfo);
     }
+  };
+
+  const cancel = () => {
+    // 편집 취소 시 원래 값으로 되돌림
+    form.setFieldsValue({ [dataIndex]: record[dataIndex] });
+    setEditing(false);
+  };
+
+  const handleBlur = () => {
+    // focus-out 시 편집 모드 해제 (기존 값 유지)
+    cancel();
   };
 
   let childNode = children;
@@ -110,8 +123,29 @@ const EditableCell = ({
         style={{ margin: 0 }}
         name={dataIndex}
         rules={[{ required: true, message: `${title}을(를) 입력해주세요.` }]}
+        initialValue={record[dataIndex]}
       >
-        <Input ref={inputRef} onPressEnter={save} onBlur={save} />
+        <Space.Compact style={{ width: '100%' }}>
+          <Input
+            ref={inputRef}
+            defaultValue={record[dataIndex]}
+            onPressEnter={save}
+            onBlur={handleBlur}
+          />
+          <Button
+            type="primary"
+            onMouseDown={(e) => e.preventDefault()} // blur 이벤트 전에 클릭 처리
+            onClick={save}
+          >
+            저장
+          </Button>
+          <Button
+            onMouseDown={(e) => e.preventDefault()} // blur 이벤트 전에 클릭 처리
+            onClick={cancel}
+          >
+            취소
+          </Button>
+        </Space.Compact>
       </Form.Item>
     ) : (
       <div
