@@ -195,34 +195,34 @@ const getGroupCategories = (badges, groupType) => {
 // 초기 배지 데이터
 const initialBadgesMaster = {
   // 장르 탐험가 - 로맨스
-  'romance_beginner': { name: '첫사랑 수집가', category: '로맨스 정복자', description: '로맨스 장르 5권 완독', tier: '초보', icon: 'https://via.placeholder.com/48/ff69b4/ffffff?text=R1', isActive: true, createdAt: '2024-01-01' },
-  'romance_intermediate': { name: '하트 도둑', category: '로맨스 정복자', description: '로맨스 장르 15권 완독', tier: '숙련', icon: 'https://via.placeholder.com/48/ff1493/ffffff?text=R2', isActive: true, createdAt: '2024-01-01' },
-  'romance_master': { name: '로맨스 황제', category: '로맨스 정복자', description: '로맨스 장르 30권 완독', tier: '마스터', icon: 'https://via.placeholder.com/48/c71585/ffffff?text=R3', isActive: true, createdAt: '2024-01-01' },
+  'romance_beginner': { name: '첫사랑 수집가', category: '로맨스 정복자', description: '로맨스 장르 5권 완독', tier: '초보', icon: 'https://via.placeholder.com/48/ff69b4/ffffff?text=R1', isActive: true, createdAt: '2024-01-01', keywords: ['로맨스', '독서', '초보'] },
+  'romance_intermediate': { name: '하트 도둑', category: '로맨스 정복자', description: '로맨스 장르 15권 완독', tier: '숙련', icon: 'https://via.placeholder.com/48/ff1493/ffffff?text=R2', isActive: true, createdAt: '2024-01-01', keywords: ['로맨스', '독서', '숙련'] },
+  'romance_master': { name: '로맨스 황제', category: '로맨스 정복자', description: '로맨스 장르 30권 완독', tier: '마스터', icon: 'https://via.placeholder.com/48/c71585/ffffff?text=R3', isActive: true, createdAt: '2024-01-01', keywords: ['로맨스', '마스터', '완독'] },
 
   // 장르 탐험가 - 판타지
-  'fantasy_beginner': { name: '마법 초심자', category: '판타지 모험가', description: '판타지 장르 5권 완독', tier: '초보', icon: 'https://via.placeholder.com/48/9370db/ffffff?text=F1', isActive: true, createdAt: '2024-01-01' },
-  'fantasy_intermediate': { name: '드래곤 기사', category: '판타지 모험가', description: '판타지 장르 15권 완독', tier: '숙련', icon: 'https://via.placeholder.com/48/8a2be2/ffffff?text=F2', isActive: true, createdAt: '2024-01-01' },
-  'fantasy_master': { name: '판타지 대마법사', category: '판타지 모험가', description: '판타지 장르 30권 완독', tier: '마스터', icon: 'https://via.placeholder.com/48/4b0082/ffffff?text=F3', isActive: true, createdAt: '2024-01-01' },
+  'fantasy_beginner': { name: '마법 초심자', category: '판타지 모험가', description: '판타지 장르 5권 완독', tier: '초보', icon: 'https://via.placeholder.com/48/9370db/ffffff?text=F1', isActive: true, createdAt: '2024-01-01', keywords: ['판타지', '마법', '초보'] },
+  'fantasy_intermediate': { name: '드래곤 기사', category: '판타지 모험가', description: '판타지 장르 15권 완독', tier: '숙련', icon: 'https://via.placeholder.com/48/8a2be2/ffffff?text=F2', isActive: true, createdAt: '2024-01-01', keywords: ['판타지', '드래곤', '숙련'] },
+  'fantasy_master': { name: '판타지 대마법사', category: '판타지 모험가', description: '판타지 장르 30권 완독', tier: '마스터', icon: 'https://via.placeholder.com/48/4b0082/ffffff?text=F3', isActive: true, createdAt: '2024-01-01', keywords: ['판타지', '대마법사', '마스터'] },
 
   // 장르 탐험가 - 스릴러
-  'thriller_beginner': { name: '단서 탐구자', category: '스릴러 추적자', description: '스릴러 장르 5권 완독', tier: '초보', icon: 'https://via.placeholder.com/48/696969/ffffff?text=T1', isActive: true, createdAt: '2024-01-01' },
-  'thriller_intermediate': { name: '진실 사냥꾼', category: '스릴러 추적자', description: '스릴러 장르 15권 완독', tier: '숙련', icon: 'https://via.placeholder.com/48/2f4f4f/ffffff?text=T2', isActive: true, createdAt: '2024-01-01' },
-  'thriller_master': { name: '미스터리 해결사', category: '스릴러 추적자', description: '스릴러 장르 30권 완독', tier: '마스터', icon: 'https://via.placeholder.com/48/000000/ffffff?text=T3', isActive: true, createdAt: '2024-01-01' },
+  'thriller_beginner': { name: '단서 탐구자', category: '스릴러 추적자', description: '스릴러 장르 5권 완독', tier: '초보', icon: 'https://via.placeholder.com/48/696969/ffffff?text=T1', isActive: true, createdAt: '2024-01-01', keywords: ['스릴러', '추리', '초보'] },
+  'thriller_intermediate': { name: '진실 사냥꾼', category: '스릴러 추적자', description: '스릴러 장르 15권 완독', tier: '숙련', icon: 'https://via.placeholder.com/48/2f4f4f/ffffff?text=T2', isActive: true, createdAt: '2024-01-01', keywords: ['스릴러', '미스터리', '숙련'] },
+  'thriller_master': { name: '미스터리 해결사', category: '스릴러 추적자', description: '스릴러 장르 30권 완독', tier: '마스터', icon: 'https://via.placeholder.com/48/000000/ffffff?text=T3', isActive: true, createdAt: '2024-01-01', keywords: ['스릴러', '해결사', '마스터'] },
 
   // 장르 탐험가 - 자기계발
-  'selfdev_beginner': { name: '성장 신입', category: '자기계발 선구자', description: '자기계발 장르 5권 완독', tier: '초보', icon: 'https://via.placeholder.com/48/ffa500/ffffff?text=S1', isActive: true, createdAt: '2024-01-01' },
-  'selfdev_intermediate': { name: '목표 달인', category: '자기계발 선구자', description: '자기계발 장르 15권 완독', tier: '숙련', icon: 'https://via.placeholder.com/48/ff8c00/ffffff?text=S2', isActive: true, createdAt: '2024-01-01' },
-  'selfdev_master': { name: '인생 설계자', category: '자기계발 선구자', description: '자기계발 장르 30권 완독', tier: '마스터', icon: 'https://via.placeholder.com/48/ff6347/ffffff?text=S3', isActive: true, createdAt: '2024-01-01' },
+  'selfdev_beginner': { name: '성장 신입', category: '자기계발 선구자', description: '자기계발 장르 5권 완독', tier: '초보', icon: 'https://via.placeholder.com/48/ffa500/ffffff?text=S1', isActive: true, createdAt: '2024-01-01', keywords: ['자기계발', '성장', '초보'] },
+  'selfdev_intermediate': { name: '목표 달인', category: '자기계발 선구자', description: '자기계발 장르 15권 완독', tier: '숙련', icon: 'https://via.placeholder.com/48/ff8c00/ffffff?text=S2', isActive: true, createdAt: '2024-01-01', keywords: ['자기계발', '목표', '숙련'] },
+  'selfdev_master': { name: '인생 설계자', category: '자기계발 선구자', description: '자기계발 장르 30권 완독', tier: '마스터', icon: 'https://via.placeholder.com/48/ff6347/ffffff?text=S3', isActive: true, createdAt: '2024-01-01', keywords: ['자기계발', '설계', '마스터'] },
 
   // 장르 탐험가 - 인문
-  'humanities_beginner': { name: '지식 방랑자', category: '인문 탐구자', description: '인문 장르 5권 완독', tier: '초보', icon: 'https://via.placeholder.com/48/4682b4/ffffff?text=H1', isActive: true, createdAt: '2024-01-01' },
-  'humanities_intermediate': { name: '철학 산책자', category: '인문 탐구자', description: '인문 장르 15권 완독', tier: '숙련', icon: 'https://via.placeholder.com/48/1e90ff/ffffff?text=H2', isActive: true, createdAt: '2024-01-01' },
-  'humanities_master': { name: '지혜의 수호자', category: '인문 탐구자', description: '인문 장르 30권 완독', tier: '마스터', icon: 'https://via.placeholder.com/48/0000cd/ffffff?text=H3', isActive: true, createdAt: '2024-01-01' },
+  'humanities_beginner': { name: '지식 방랑자', category: '인문 탐구자', description: '인문 장르 5권 완독', tier: '초보', icon: 'https://via.placeholder.com/48/4682b4/ffffff?text=H1', isActive: true, createdAt: '2024-01-01', keywords: ['인문', '지식', '초보'] },
+  'humanities_intermediate': { name: '철학 산책자', category: '인문 탐구자', description: '인문 장르 15권 완독', tier: '숙련', icon: 'https://via.placeholder.com/48/1e90ff/ffffff?text=H2', isActive: true, createdAt: '2024-01-01', keywords: ['인문', '철학', '숙련'] },
+  'humanities_master': { name: '지혜의 수호자', category: '인문 탐구자', description: '인문 장르 30권 완독', tier: '마스터', icon: 'https://via.placeholder.com/48/0000cd/ffffff?text=H3', isActive: true, createdAt: '2024-01-01', keywords: ['인문', '지혜', '마스터'] },
 
   // 장르 탐험가 - 다장르 개척자
-  'multigenre_beginner': { name: '호기심 탐험가', category: '다장르 개척자', description: '5개 장르 각 5권', tier: '초보', icon: 'https://via.placeholder.com/48/ff00ff/ffffff?text=M1', isActive: true, createdAt: '2024-01-01' },
-  'multigenre_intermediate': { name: '저재 순례자', category: '다장르 개척자', description: '5개 장르 각 5권', tier: '숙련', icon: 'https://via.placeholder.com/48/da70d6/ffffff?text=M2', isActive: true, createdAt: '2024-01-01' },
-  'multigenre_master': { name: '만화경 독자', category: '다장르 개척자', description: '5개 장르 각 5권', tier: '마스터', icon: 'https://via.placeholder.com/48/ba55d3/ffffff?text=M3', isActive: true, createdAt: '2024-01-01' },
+  'multigenre_beginner': { name: '호기심 탐험가', category: '다장르 개척자', description: '5개 장르 각 5권', tier: '초보', icon: 'https://via.placeholder.com/48/ff00ff/ffffff?text=M1', isActive: true, createdAt: '2024-01-01', keywords: ['다장르', '호기심', '탐험'] },
+  'multigenre_intermediate': { name: '저재 순례자', category: '다장르 개척자', description: '5개 장르 각 5권', tier: '숙련', icon: 'https://via.placeholder.com/48/da70d6/ffffff?text=M2', isActive: true, createdAt: '2024-01-01', keywords: ['다장르', '순례', '숙련'] },
+  'multigenre_master': { name: '만화경 독자', category: '다장르 개척자', description: '5개 장르 각 5권', tier: '마스터', icon: 'https://via.placeholder.com/48/ba55d3/ffffff?text=M3', isActive: true, createdAt: '2024-01-01', keywords: ['다장르', '만화경', '마스터'] },
 
   // 장르별 배지 - 오디오북
   'audiobook_beginner': { name: '소리 탐험가', category: '오디오북', description: '오디오북 5권 완독', tier: '초보', icon: 'https://via.placeholder.com/48/20b2aa/ffffff?text=A1', isActive: true, createdAt: '2024-01-01' },
@@ -245,14 +245,14 @@ const initialBadgesMaster = {
   'essay_master': { name: '에세이 마스터', category: '에세이', description: '에세이 30권 완독', tier: '마스터', icon: 'https://via.placeholder.com/48/9acd32/ffffff?text=E3', isActive: true, createdAt: '2024-01-01' },
 
   // 커뮤니티 빌더 - 리뷰 크리에이터
-  'review_beginner': { name: '첫 감상 기록자', category: '리뷰 크리에이터', description: '10개 리뷰 작성', tier: '초보', icon: 'https://via.placeholder.com/48/87ceeb/000000?text=RC1', isActive: true, createdAt: '2024-01-01' },
-  'review_intermediate': { name: '서평 비평가', category: '리뷰 크리에이터', description: '50개 리뷰 작성', tier: '숙련', icon: 'https://via.placeholder.com/48/4169e1/ffffff?text=RC2', isActive: true, createdAt: '2024-01-01' },
-  'review_master': { name: '밀리 평론가', category: '리뷰 크리에이터', description: '200개 리뷰 작성', tier: '마스터', icon: 'https://via.placeholder.com/48/0000ff/ffffff?text=RC3', isActive: true, createdAt: '2024-01-01' },
+  'review_beginner': { name: '첫 감상 기록자', category: '리뷰 크리에이터', description: '10개 리뷰 작성', tier: '초보', icon: 'https://via.placeholder.com/48/87ceeb/000000?text=RC1', isActive: true, createdAt: '2024-01-01', keywords: ['리뷰', '감상', '초보'] },
+  'review_intermediate': { name: '서평 비평가', category: '리뷰 크리에이터', description: '50개 리뷰 작성', tier: '숙련', icon: 'https://via.placeholder.com/48/4169e1/ffffff?text=RC2', isActive: true, createdAt: '2024-01-01', keywords: ['리뷰', '서평', '숙련'] },
+  'review_master': { name: '밀리 평론가', category: '리뷰 크리에이터', description: '200개 리뷰 작성', tier: '마스터', icon: 'https://via.placeholder.com/48/0000ff/ffffff?text=RC3', isActive: true, createdAt: '2024-01-01', keywords: ['리뷰', '평론', '마스터'] },
 
   // 커뮤니티 빌더 - 책 전파자
-  'share_beginner': { name: '서재 메신저', category: '책 전파자', description: '10회 책 공유', tier: '초보', icon: 'https://via.placeholder.com/48/98fb98/000000?text=SH1', isActive: true, createdAt: '2024-01-01' },
-  'share_intermediate': { name: '독서 전도사', category: '책 전파자', description: '50회 책 공유', tier: '숙련', icon: 'https://via.placeholder.com/48/00fa9a/ffffff?text=SH2', isActive: true, createdAt: '2024-01-01' },
-  'share_master': { name: '밀리 전령사', category: '책 전파자', description: '150회 책 공유', tier: '마스터', icon: 'https://via.placeholder.com/48/00ff7f/000000?text=SH3', isActive: true, createdAt: '2024-01-01' },
+  'share_beginner': { name: '서재 메신저', category: '책 전파자', description: '10회 책 공유', tier: '초보', icon: 'https://via.placeholder.com/48/98fb98/000000?text=SH1', isActive: true, createdAt: '2024-01-01', keywords: ['공유', '전파', '초보'] },
+  'share_intermediate': { name: '독서 전도사', category: '책 전파자', description: '50회 책 공유', tier: '숙련', icon: 'https://via.placeholder.com/48/00fa9a/ffffff?text=SH2', isActive: true, createdAt: '2024-01-01', keywords: ['공유', '전도', '숙련'] },
+  'share_master': { name: '밀리 전령사', category: '책 전파자', description: '150회 책 공유', tier: '마스터', icon: 'https://via.placeholder.com/48/00ff7f/000000?text=SH3', isActive: true, createdAt: '2024-01-01', keywords: ['공유', '전령', '마스터'] },
 
   // 커뮤니티 빌더 - 이벤트 열정가
   'event_beginner': { name: '서재 신참', category: '이벤트 열정가', description: '5회 이벤트 참여', tier: '초보', icon: 'https://via.placeholder.com/48/ffb6c1/000000?text=EV1', isActive: true, createdAt: '2024-01-01' },
@@ -265,24 +265,24 @@ const initialBadgesMaster = {
   'post_master': { name: '마스터 포스팅', category: '포스트 생성자', description: '200개 포스트 작성', tier: '마스터', icon: 'https://via.placeholder.com/48/9370db/ffffff?text=P3', isActive: true, createdAt: '2024-01-01' },
 
   // 이벤트 마스터 - 챌린지 스타
-  'challenge_beginner': { name: '이벤트 새싹', category: '챌린지 스타', description: '5회 이벤트 참여', tier: '초보', icon: 'https://via.placeholder.com/48/ffd700/000000?text=CH1', isActive: true, createdAt: '2024-01-01' },
-  'challenge_intermediate': { name: '이벤트 사냥꾼', category: '챌린지 스타', description: '20회 이벤트 참여', tier: '숙련', icon: 'https://via.placeholder.com/48/ffdf00/000000?text=CH2', isActive: true, createdAt: '2024-01-01' },
-  'challenge_master': { name: '밀리 레전드', category: '챌린지 스타', description: '50회 이벤트 참여', tier: '마스터', icon: 'https://via.placeholder.com/48/ffa500/ffffff?text=CH3', isActive: true, createdAt: '2024-01-01' },
+  'challenge_beginner': { name: '이벤트 새싹', category: '챌린지 스타', description: '5회 이벤트 참여', tier: '초보', icon: 'https://via.placeholder.com/48/ffd700/000000?text=CH1', isActive: true, createdAt: '2024-01-01', keywords: ['이벤트', '챌린지', '초보'] },
+  'challenge_intermediate': { name: '이벤트 사냥꾼', category: '챌린지 스타', description: '20회 이벤트 참여', tier: '숙련', icon: 'https://via.placeholder.com/48/ffdf00/000000?text=CH2', isActive: true, createdAt: '2024-01-01', keywords: ['이벤트', '챌린지', '숙련'] },
+  'challenge_master': { name: '밀리 레전드', category: '챌린지 스타', description: '50회 이벤트 참여', tier: '마스터', icon: 'https://via.placeholder.com/48/ffa500/ffffff?text=CH3', isActive: true, createdAt: '2024-01-01', keywords: ['이벤트', '레전드', '마스터'] },
 
   // 이벤트 마스터 - 특별 이벤트 헌터
-  'special_event_beginner': { name: '신규 도전자', category: '특별 이벤트 헌터', description: '3회 특별 이벤트 참여', tier: '초보', icon: 'https://via.placeholder.com/48/7fffd4/000000?text=SE1', isActive: true, createdAt: '2024-01-01' },
-  'special_event_intermediate': { name: '축제 마니아', category: '특별 이벤트 헌터', description: '10회 특별 이벤트 참여', tier: '숙련', icon: 'https://via.placeholder.com/48/40e0d0/ffffff?text=SE2', isActive: true, createdAt: '2024-01-01' },
-  'special_event_master': { name: '이벤트 제왕', category: '특별 이벤트 헌터', description: '30회 특별 이벤트 참여', tier: '마스터', icon: 'https://via.placeholder.com/48/48d1cc/ffffff?text=SE3', isActive: true, createdAt: '2024-01-01' },
+  'special_event_beginner': { name: '신규 도전자', category: '특별 이벤트 헌터', description: '3회 특별 이벤트 참여', tier: '초보', icon: 'https://via.placeholder.com/48/7fffd4/000000?text=SE1', isActive: true, createdAt: '2024-01-01', keywords: ['특별', '도전', '초보'] },
+  'special_event_intermediate': { name: '축제 마니아', category: '특별 이벤트 헌터', description: '10회 특별 이벤트 참여', tier: '숙련', icon: 'https://via.placeholder.com/48/40e0d0/ffffff?text=SE2', isActive: true, createdAt: '2024-01-01', keywords: ['특별', '축제', '숙련'] },
+  'special_event_master': { name: '이벤트 제왕', category: '특별 이벤트 헌터', description: '30회 특별 이벤트 참여', tier: '마스터', icon: 'https://via.placeholder.com/48/48d1cc/ffffff?text=SE3', isActive: true, createdAt: '2024-01-01', keywords: ['특별', '제왕', '마스터'] },
 
   // 이벤트 마스터 - 시즌 챔피언
-  'season_beginner': { name: '시즌 초심자', category: '시즌 챔피언', description: '2회 시즌 이벤트 1위', tier: '초보', icon: 'https://via.placeholder.com/48/ff6347/ffffff?text=SC1', isActive: true, createdAt: '2024-01-01' },
-  'season_intermediate': { name: '시즌 강자', category: '시즌 챔피언', description: '5회 시즌 이벤트 1위', tier: '숙련', icon: 'https://via.placeholder.com/48/dc143c/ffffff?text=SC2', isActive: true, createdAt: '2024-01-01' },
-  'season_master': { name: '시즌 패왕', category: '시즌 챔피언', description: '15회 시즌 이벤트 1위', tier: '마스터', icon: 'https://via.placeholder.com/48/b22222/ffffff?text=SC3', isActive: true, createdAt: '2024-01-01' },
+  'season_beginner': { name: '시즌 초심자', category: '시즌 챔피언', description: '2회 시즌 이벤트 1위', tier: '초보', icon: 'https://via.placeholder.com/48/ff6347/ffffff?text=SC1', isActive: true, createdAt: '2024-01-01', keywords: ['시즌', '챔피언', '초보'] },
+  'season_intermediate': { name: '시즌 강자', category: '시즌 챔피언', description: '5회 시즌 이벤트 1위', tier: '숙련', icon: 'https://via.placeholder.com/48/dc143c/ffffff?text=SC2', isActive: true, createdAt: '2024-01-01', keywords: ['시즌', '강자', '숙련'] },
+  'season_master': { name: '시즌 패왕', category: '시즌 챔피언', description: '15회 시즌 이벤트 1위', tier: '마스터', icon: 'https://via.placeholder.com/48/b22222/ffffff?text=SC3', isActive: true, createdAt: '2024-01-01', keywords: ['시즌', '패왕', '마스터'] },
 
   // 꾸준한 독서 - 연속 독서
-  'consecutive_beginner': { name: '매일 독자', category: '연속 독서', description: '7일 연속 독서', tier: '초보', icon: 'https://via.placeholder.com/48/32cd32/ffffff?text=CR1', isActive: true, createdAt: '2024-01-01' },
-  'consecutive_intermediate': { name: '서재 지킴이', category: '연속 독서', description: '30일 연속 독서', tier: '숙련', icon: 'https://via.placeholder.com/48/228b22/ffffff?text=CR2', isActive: true, createdAt: '2024-01-01' },
-  'consecutive_master': { name: '불멸의 독서가', category: '연속 독서', description: '100일 연속 독서', tier: '마스터', icon: 'https://via.placeholder.com/48/006400/ffffff?text=CR3', isActive: true, createdAt: '2024-01-01' },
+  'consecutive_beginner': { name: '매일 독자', category: '연속 독서', description: '7일 연속 독서', tier: '초보', icon: 'https://via.placeholder.com/48/32cd32/ffffff?text=CR1', isActive: true, createdAt: '2024-01-01', keywords: ['꾸준함', '연속', '초보'] },
+  'consecutive_intermediate': { name: '서재 지킴이', category: '연속 독서', description: '30일 연속 독서', tier: '숙련', icon: 'https://via.placeholder.com/48/228b22/ffffff?text=CR2', isActive: true, createdAt: '2024-01-01', keywords: ['꾸준함', '지킴이', '숙련'] },
+  'consecutive_master': { name: '불멸의 독서가', category: '연속 독서', description: '100일 연속 독서', tier: '마스터', icon: 'https://via.placeholder.com/48/006400/ffffff?text=CR3', isActive: true, createdAt: '2024-01-01', keywords: ['꾸준함', '불멸', '마스터'] },
 
   // 꾸준한 독서 - 오디오북 마니아
   'audio_consecutive_beginner': { name: '소리 탐험가', category: '오디오북 마니아', description: '7일 연속 오디오북 청취', tier: '초보', icon: 'https://via.placeholder.com/48/00bfff/ffffff?text=AC1', isActive: true, createdAt: '2024-01-01' },
@@ -430,19 +430,57 @@ const BadgeManagement = () => {
 
     setEditingBadge(badge);
     if (badge) {
+      // 배지 수정 시 - 배지가 속한 실제 그룹 찾기
+      let badgeGroup = badge.categoryGroup;
+
+      // categoryGroup이 없으면 카테고리로부터 그룹 추론
+      if (!badgeGroup) {
+        // 1. 고정 그룹에서 찾기
+        for (const [groupName, groupType] of Object.entries(BADGE_GROUP_TYPES)) {
+          const groupCategories = getGroupCategories(allBadges, groupType);
+          if (Object.keys(groupCategories).includes(badge.category)) {
+            badgeGroup = groupName;
+            break;
+          }
+        }
+
+        // 2. 커스텀 탭에서 찾기
+        if (!badgeGroup) {
+          const customTab = customTabs.find(tab =>
+            tab.categories && tab.categories.includes(badge.category)
+          );
+          if (customTab) {
+            badgeGroup = customTab.label;
+          }
+        }
+      }
+
+      const groupLabel = badgeGroup || '미분류';
+
       badgeForm.setFieldsValue({
         name: badge.name,
         description: badge.description,
         tier: badge.tier,
         icon: badge.icon,
         unlockDescription: badge.unlockDescription || '',
+        keywords: badge.keywords || [],
         _category: badge.category, // 내부 참조용
+        _groupName: groupLabel, // 그룹명 표시용
       });
       // QueryBuilder 상태 설정
       setUnlockQuery(badge.unlockQueryObj || { combinator: 'and', rules: [] });
-    } else {
+        } else {
+      // 새 배지 생성 시
+      const currentGroup = activeTab === 'all' ? '전체' : activeTab;
+      const groupLabel = customTabs.find(tab => tab.key === currentGroup)?.label ||
+                        Object.entries(BADGE_GROUP_TYPES).find(([key]) => key === currentGroup)?.[0] || currentGroup;
+
       badgeForm.resetFields();
-      badgeForm.setFieldsValue({ _category: category }); // 내부 참조용
+      badgeForm.setFieldsValue({
+        _category: category, // 내부 참조용
+        _groupName: groupLabel, // 그룹명 표시용
+        tier: '초보',
+      });
       setUnlockQuery({ combinator: 'and', rules: [] });
     }
     setBadgeModalVisible(true);
@@ -805,6 +843,14 @@ const BadgeManagement = () => {
     },
   };
 
+  // 해금 조건 간략 표시
+  const getUnlockConditionSummary = (badge) => {
+    if (badge.unlockDescription) {
+      return badge.unlockDescription;
+    }
+    return '조건 미설정';
+  };
+
   // 2depth 테이블 컬럼 (배지 테이블)
   const badgeColumns = [
     {
@@ -820,13 +866,14 @@ const BadgeManagement = () => {
       title: '배지명',
       dataIndex: 'name',
       key: 'name',
+      width: 150,
       render: (name) => <Text strong>{name}</Text>,
     },
     {
       title: '티어',
       dataIndex: 'tier',
       key: 'tier',
-      width: 100,
+      width: 80,
       render: (tier) => (
         <Tag color={tier === '마스터' ? 'gold' : tier === '숙련' ? 'blue' : 'green'}>
           {tier}
@@ -837,7 +884,38 @@ const BadgeManagement = () => {
       title: '설명',
       dataIndex: 'description',
       key: 'description',
+      width: 200,
       ellipsis: true,
+    },
+    {
+      title: '키워드',
+      dataIndex: 'keywords',
+      key: 'keywords',
+      width: 150,
+      render: (keywords) => (
+        <Space size={4} wrap>
+          {keywords && keywords.length > 0 ? (
+            keywords.map((keyword, index) => (
+              <Tag key={index} color="blue" style={{ margin: 0 }}>
+                {keyword}
+              </Tag>
+            ))
+          ) : (
+            <Text type="secondary" style={{ fontSize: '12px' }}>-</Text>
+          )}
+        </Space>
+      ),
+    },
+    {
+      title: '해금 조건',
+      key: 'unlockCondition',
+      width: 200,
+      ellipsis: true,
+      render: (_, record) => (
+        <Text type="secondary" style={{ fontSize: '12px' }}>
+          {getUnlockConditionSummary(record)}
+        </Text>
+      ),
     },
     {
       title: '상태',
@@ -847,7 +925,10 @@ const BadgeManagement = () => {
       render: (isActive, record) => (
         <Switch
           checked={isActive}
-          onChange={() => handleToggleBadgeStatus(record)}
+          onChange={(checked, e) => {
+            e.stopPropagation();
+            handleToggleBadgeStatus(record);
+          }}
           checkedChildren="활성"
           unCheckedChildren="비활성"
         />
@@ -862,13 +943,20 @@ const BadgeManagement = () => {
           <Button
             type="link"
             size="small"
-            onClick={() => openBadgeModal(record)}
+            onClick={(e) => {
+              e.stopPropagation();
+              openBadgeModal(record);
+            }}
           >
             수정
           </Button>
           <Popconfirm
             title="배지를 삭제하시겠습니까?"
-            onConfirm={() => handleDeleteBadge(record.id)}
+            onConfirm={(e) => {
+              e?.stopPropagation();
+              handleDeleteBadge(record.id);
+            }}
+            onCancel={(e) => e?.stopPropagation()}
             okText="삭제"
             cancelText="취소"
             okButtonProps={{ danger: true }}
@@ -877,6 +965,7 @@ const BadgeManagement = () => {
               type="link"
               size="small"
               danger
+              onClick={(e) => e.stopPropagation()}
             >
               삭제
             </Button>
@@ -1038,6 +1127,22 @@ const BadgeManagement = () => {
           </Form.Item>
 
           <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+            {/* 그룹명 표시 */}
+            <Form.Item
+              name="_groupName"
+              label="그룹 (탭 메뉴)"
+            >
+              <Select disabled placeholder="그룹명">
+                <Option value="장르 탐험가">장르 탐험가</Option>
+                <Option value="커뮤니티 빌더">커뮤니티 빌더</Option>
+                <Option value="이벤트 마스터">이벤트 마스터</Option>
+                <Option value="꾸준한 독서">꾸준한 독서</Option>
+                {customTabs.map(tab => (
+                  <Option key={tab.key} value={tab.label}>{tab.label}</Option>
+                ))}
+              </Select>
+            </Form.Item>
+
             <Space style={{ width: '100%' }}>
               <Form.Item
                 name="name"
@@ -1078,6 +1183,28 @@ const BadgeManagement = () => {
               <Input.TextArea
                 rows={2}
                 placeholder="배지에 대한 간단한 설명을 입력하세요"
+              />
+            </Form.Item>
+
+            <Form.Item
+              name="keywords"
+              label="키워드 (최대 3개)"
+              rules={[
+                { type: 'array', max: 3, message: '최대 3개까지만 등록 가능합니다' }
+              ]}
+              extra="Enter 키를 눌러 키워드를 추가하세요"
+            >
+              <Select
+                mode="tags"
+                placeholder="키워드를 입력하고 Enter를 누르세요"
+                maxTagCount={3}
+                style={{ width: '100%' }}
+                onChange={(value) => {
+                  if (value.length > 3) {
+                    message.warning('키워드는 최대 3개까지만 등록 가능합니다');
+                    badgeForm.setFieldsValue({ keywords: value.slice(0, 3) });
+                  }
+                }}
               />
             </Form.Item>
 
@@ -1184,6 +1311,7 @@ const BadgeManagement = () => {
           </div>
         </Form>
       </Modal>
+
         </Space>
     );
 };
