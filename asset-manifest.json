@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/millie-admin-dashboard/static/css/main.7fb254e6.css",
-    "main.js": "/millie-admin-dashboard/static/js/main.2f327719.js",
+    "main.js": "/millie-admin-dashboard/static/js/main.a36bef76.js",
     "index.html": "/millie-admin-dashboard/index.html",
     "main.7fb254e6.css.map": "/millie-admin-dashboard/static/css/main.7fb254e6.css.map",
-    "main.2f327719.js.map": "/millie-admin-dashboard/static/js/main.2f327719.js.map"
+    "main.a36bef76.js.map": "/millie-admin-dashboard/static/js/main.a36bef76.js.map"
   },
   "entrypoints": [
     "static/css/main.7fb254e6.css",
-    "static/js/main.2f327719.js"
+    "static/js/main.a36bef76.js"
   ]
 }
