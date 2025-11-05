@@ -304,7 +304,7 @@ const menuItems = [
   },
   {
     key: "/fixed-content",
-    name: "고정 이벤트 관리",
+    name: "랭킹/인기도서 관리",
     icon: <FileTextOutlined />,
     subMenu: [
       {
@@ -316,13 +316,13 @@ const menuItems = [
       {
         key: "/fixed-content/new-books",
         path: "/fixed-content/new-books",
-        name: "신규 도서 관리",
+        name: "장르별 인기 도서 관리",
         icon: <BookOutlined />,
       },
       {
         key: "/fixed-content/new-audiobooks",
         path: "/fixed-content/new-audiobooks",
-        name: "신규 오디오북 관리",
+        name: "장르별 인기 오디오북 관리",
         icon: <CustomerServiceOutlined />,
       },
     ],
