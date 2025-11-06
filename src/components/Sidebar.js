@@ -383,6 +383,12 @@ const menuItems = [
         icon: <OrderedListOutlined />,
       },
       {
+        key: "/inquiries/cancellation",
+        path: "/inquiries/cancellation",
+        name: "구독 해지 관리",
+        icon: <FileProtectOutlined />,
+      },
+      {
         key: "/inquiries/faq",
         path: "/inquiries/faq",
         name: "FAQ 관리",

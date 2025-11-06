@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     Table,
     Typography,
@@ -12,6 +12,7 @@ import {
 } from 'antd';
 import { HistoryOutlined, SearchOutlined, ReloadOutlined, CalendarOutlined, FilterOutlined } from '@ant-design/icons';
 import moment from 'moment';
+import { useLocation } from 'react-router-dom';
 
 const { Title, Text } = Typography;
 const { RangePicker } = DatePicker;
@@ -41,6 +42,17 @@ const SubscriptionHistory = () => {
     const [loading, setLoading] = useState(false);
     const [filters, setFilters] = useState({});
     const [searchText, setSearchText] = useState('');
+    const location = useLocation();
+
+    // Deep link support: q (search), status
+    useEffect(() => {
+        const params = new URLSearchParams(location.search);
+        const q = params.get('q');
+        const status = params.get('status');
+        if (q) setSearchText(q);
+        if (status) setFilters(prev => ({ ...prev, status }));
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [location.search]);
 
     // TODO: Implement filtering logic based on filters and searchText
 
@@ -166,7 +178,32 @@ const SubscriptionHistory = () => {
 
                 <Table
                     columns={columns}
-                    dataSource={subscriptions} // TODO: Use filtered data
+                    dataSource={(() => {
+                        let rows = subscriptions;
+                        if (searchText) {
+                            const q = searchText.toLowerCase();
+                            rows = rows.filter(r =>
+                                (r.userId && r.userId.toLowerCase().includes(q)) ||
+                                (r.userName && r.userName.toLowerCase().includes(q))
+                            );
+                        }
+                        if (filters.status === 'active' || filters.status === 'expired') {
+                            rows = rows.filter(record => {
+                                const today = moment().startOf('day');
+                                const endDate = record.endDate ? moment(record.endDate).startOf('day') : null;
+                                const isActive = record.status === 'active' && endDate && endDate.isSameOrAfter(today);
+                                return filters.status === 'active' ? isActive : !isActive;
+                            });
+                        }
+                        if (filters.dateRange && filters.dateRange.length === 2) {
+                            const [start, end] = filters.dateRange;
+                            rows = rows.filter(r => {
+                                const s = moment(r.startDate, 'YYYY-MM-DD');
+                                return s.isBetween(start, end, 'day', '[]');
+                            });
+                        }
+                        return rows;
+                    })()}
                     loading={loading}
                     pagination={{ pageSize: 10, showSizeChanger: true }}
                     scroll={{ x: 1000 }}

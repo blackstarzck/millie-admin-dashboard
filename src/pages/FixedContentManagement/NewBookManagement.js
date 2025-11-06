@@ -293,7 +293,7 @@ const NewBookManagement = () => {
 
   return (
     <div style={{ padding: '20px' }}>
-      <Typography.Title level={4}>신규 도서 관리</Typography.Title>
+      <Typography.Title level={4}>장르별 인기 도서 관리</Typography.Title>
       <Typography.Paragraph>독자에게 노출될 '신규 도서' 목록을 관리합니다. 도서를 추가, 제외하고 순서를 변경할 수 있습니다.</Typography.Paragraph>
       <Flex justify="space-between" align="center" style={{ marginBottom: 16 }}>
         <Select value={selectedCategory} onChange={handleCategoryChange} style={{ width: 200 }}>

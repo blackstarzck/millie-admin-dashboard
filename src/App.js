@@ -29,6 +29,7 @@ import EventRegistration from "./pages/EventManagement/EventRegistration";
 import EventStatus from "./pages/EventManagement/EventStatus";
 import FaqManagement from "./pages/InquiryManagement/FaqManagement";
 import InquiryLookup from "./pages/InquiryManagement/InquiryLookup";
+import SubscriptionCancellationManagement from "./pages/InquiryManagement/SubscriptionCancellationManagement";
 import NoticeHistory from "./pages/NoticeManagement/NoticeHistory";
 import NoticeList from "./pages/NoticeManagement/NoticeList";
 import DispatchHistory from "./pages/NotificationManagement/DispatchHistory";
@@ -294,6 +295,10 @@ function App() {
               {/* 문의사항 관리 */}
               <Route path="inquiries/list" element={<InquiryLookup />} />
               <Route path="inquiries/faq" element={<FaqManagement />} />
+              <Route
+                path="inquiries/cancellation"
+                element={<SubscriptionCancellationManagement />}
+              />
               {/* 사용자 분석 */}
               <Route
                 path="user-analysis/statistics"
