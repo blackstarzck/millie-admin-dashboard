@@ -314,14 +314,14 @@ const menuItems = [
         icon: <OrderedListOutlined />,
       },
       {
-        key: "/fixed-content/new-books",
-        path: "/fixed-content/new-books",
+        key: "/fixed-content/genre-popular-books",
+        path: "/fixed-content/genre-popular-books",
         name: "장르별 인기 도서 관리",
         icon: <BookOutlined />,
       },
       {
-        key: "/fixed-content/new-audiobooks",
-        path: "/fixed-content/new-audiobooks",
+        key: "/fixed-content/genre-popular-audiobooks",
+        path: "/fixed-content/genre-popular-audiobooks",
         name: "장르별 인기 오디오북 관리",
         icon: <CustomerServiceOutlined />,
       },

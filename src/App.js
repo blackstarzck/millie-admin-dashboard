@@ -58,8 +58,8 @@ import SubscriptionHistory from "./pages/UserManagement/SubscriptionHistory";
 // 새로 추가된 신고 관리 페이지 컴포넌트 임포트
 import BookRankingManagement from "./pages/FixedContentManagement/BookRankingManagement";
 import FixedContentManagement from "./pages/FixedContentManagement/FixedContentManagement";
-import NewAudiobookManagement from "./pages/FixedContentManagement/NewAudiobookManagement";
-import NewBookManagement from "./pages/FixedContentManagement/NewBookManagement";
+import GenrePopularAudiobookManagement from "./pages/FixedContentManagement/GenrePopularAudiobookManagement";
+import GenrePopularBookManagement from "./pages/FixedContentManagement/GenrePopularBookManagement";
 import ReportList from "./pages/ReportManagement/ReportList";
 import ReportSettings from "./pages/ReportManagement/ReportSettings";
 import WorksList from "./pages/SelfPublishing/WorksList";
@@ -201,12 +201,12 @@ function App() {
                 element={<BookRankingManagement />}
               />
               <Route
-                path="fixed-content/new-books"
-                element={<NewBookManagement />}
+                path="fixed-content/genre-popular-books"
+                element={<GenrePopularBookManagement />}
               />
               <Route
-                path="fixed-content/new-audiobooks"
-                element={<NewAudiobookManagement />}
+                path="fixed-content/genre-popular-audiobooks"
+                element={<GenrePopularAudiobookManagement />}
               />
               {/* 자가출판 */}
               <Route
