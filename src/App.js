@@ -50,6 +50,7 @@ import ApiManagement from "./pages/SystemSettings/ApiManagement";
 import PermissionManagement from "./pages/SystemSettings/PermissionManagement";
 import SecuritySettings from "./pages/SystemSettings/SecuritySettings";
 import ServicePolicy from "./pages/SystemSettings/ServicePolicy";
+import ForbiddenWordsManagement from "./pages/SystemSettings/ForbiddenWordsManagement";
 import AccountSanctions from "./pages/UserManagement/AccountSanctions";
 import BadgeManagement from "./pages/UserManagement/BadgeManagement";
 import MemberInfo from "./pages/UserManagement/MemberInfo";
@@ -324,6 +325,10 @@ function App() {
               <Route path="settings/api" element={<ApiManagement />} />
               <Route path="settings/security" element={<SecuritySettings />} />
               <Route path="settings/policy" element={<ServicePolicy />} />
+              <Route
+                path="settings/forbidden-words"
+                element={<ForbiddenWordsManagement />}
+              />
               <Route
                 path="settings/version-history"
                 element={<VersionHistory />}

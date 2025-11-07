@@ -156,6 +156,12 @@ const menuItems = [
         icon: <HistoryOutlined />,
       },
       {
+        key: "/settings/forbidden-words",
+        path: "/settings/forbidden-words",
+        name: "금지어 관리",
+        icon: <BlockOutlined />,
+      },
+      {
         key: "/users/sanctions",
         path: "/users/sanctions",
         name: "계정 제재",
@@ -470,6 +476,12 @@ const menuItems = [
         icon: <FileProtectOutlined />,
       },
       {
+        key: "/settings/forbidden-words",
+        path: "/settings/forbidden-words",
+        name: "금지어 관리",
+        icon: <BlockOutlined />,
+      },
+      {
         key: "/settings/version-history",
         path: "/settings/version-history",
         name: "플랫폼 버전 히스토리",
@@ -505,12 +517,15 @@ const menuItems = [
 ];
 
 // 메뉴 아이템 렌더링 함수
-const renderMenuItems = (items) => {
+const renderMenuItems = (items, parentKey) => {
   return items.map((item) => {
+    if (parentKey === "/users" && item.path === "/settings/forbidden-words") {
+      return null;
+    }
     if (item.subMenu && item.subMenu.length > 0) {
       return (
         <Menu.SubMenu key={item.key} icon={item.icon} title={item.name}>
-          {renderMenuItems(item.subMenu)}
+          {renderMenuItems(item.subMenu, item.key)}
         </Menu.SubMenu>
       );
     } else {
@@ -574,7 +589,7 @@ const Sidebar = () => {
       onOpenChange={handleOpenChange} // 열림/닫힘 변경 핸들러 연결
       style={{ height: "calc(100% - 64px)", borderRight: 0 }} // 로고 높이만큼 빼기
     >
-      {renderMenuItems(menuItems)}
+      {renderMenuItems(menuItems, null)}
     </Menu>
   );
 };
