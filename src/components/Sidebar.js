@@ -1,7 +1,6 @@
-import { Menu } from "antd";
-import React, { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
-// 아이콘 임포트 (예시 - 필요에 따라 추가/변경)
+import React, { useMemo, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { AutoComplete, Input, Menu } from "antd";
 import {
   ApartmentOutlined,
   ApiOutlined,
@@ -15,7 +14,6 @@ import {
   DatabaseOutlined,
   DollarCircleOutlined,
   EditOutlined,
-  EyeOutlined,
   FileProtectOutlined,
   FileTextOutlined,
   FormOutlined,
@@ -32,110 +30,45 @@ import {
   SecurityScanOutlined,
   SettingOutlined,
   SolutionOutlined,
+  SoundOutlined,
   StarOutlined,
   TagOutlined,
   TagsOutlined,
   TeamOutlined,
   TrophyOutlined,
-  UsergroupAddOutlined,
   UserOutlined,
   UserSwitchOutlined,
   WarningOutlined,
+  SearchOutlined,
 } from "@ant-design/icons";
 
-// 메뉴 데이터 구조화 (key 추가, 아이콘 추가)
 const menuItems = [
+  { key: "/dashboard", path: "/dashboard", name: "대시보드", icon: <PieChartOutlined /> },
   {
-    key: "/dashboard",
-    path: "/dashboard",
-    name: "대시보드",
-    icon: <PieChartOutlined />,
-  },
-  {
-    key: "/content", // SubMenu의 key
+    key: "/content",
     name: "콘텐츠 관리",
     icon: <BookOutlined />,
     subMenu: [
-      {
-        key: "/content/books",
-        path: "/content/books",
-        name: "도서 관리",
-        icon: <BookOutlined />,
-      },
-
-      {
-        key: "/content/series-management",
-        path: "/content/series-management",
-        name: "시리즈 관리",
-        icon: <ApartmentOutlined />,
-      },
-      {
-        key: "/content/metadata",
-        path: "/content/metadata",
-        name: "메타데이터 관리",
-        icon: <DatabaseOutlined />,
-      },
-      {
-        key: "/content/curation",
-        path: "/content/curation",
-        name: "큐레이션 관리",
-        icon: <TagsOutlined />,
-      },
-      {
-        key: "/content/categories",
-        path: "/content/categories",
-        name: "카테고리 관리",
-        icon: <TagOutlined />,
-      },
-      {
-        key: "/content/keywords",
-        path: "/content/keywords",
-        name: "키워드 관리",
-        icon: <TagsOutlined />,
-      },
-      {
-        key: "/content/review-keywords",
-        path: "/content/review-keywords",
-        name: "키워드 관리(리뷰)",
-        icon: <StarOutlined />,
-      },
-      {
-        key: "/content/keyword-preferences",
-        path: "/content/keyword-preferences",
-        name: "키워드별 선호도 통계",
-        icon: <AreaChartOutlined />,
-      },
-      {
-        key: "/content/analysis",
-        path: "/content/analysis",
-        name: "도서 통계",
-        icon: <BookOutlined />,
-      },
+      { key: "/content/books", path: "/content/books", name: "도서 관리", icon: <BookOutlined /> },
+      { key: "/content/series-management", path: "/content/series-management", name: "시리즈 관리", icon: <ApartmentOutlined /> },
+      { key: "/content/metadata", path: "/content/metadata", name: "메타데이터 관리", icon: <DatabaseOutlined /> },
+      { key: "/content/curation", path: "/content/curation", name: "큐레이션 관리", icon: <TagsOutlined /> },
+      { key: "/content/categories", path: "/content/categories", name: "카테고리 관리", icon: <TagOutlined /> },
+      { key: "/content/keywords", path: "/content/keywords", name: "키워드 관리", icon: <TagsOutlined /> },
+      { key: "/content/review-keywords", path: "/content/review-keywords", name: "리뷰 키워드 관리", icon: <StarOutlined /> },
+      { key: "/content/keyword-preferences", path: "/content/keyword-preferences", name: "키워드별 선호 통계", icon: <AreaChartOutlined /> },
+      { key: "/content/analysis", path: "/content/analysis", name: "도서 통계", icon: <BookOutlined /> },
+      { key: "/content/unsubscribe", path: "/content/unsubscribe", name: "구독 해지 관리", icon: <FileProtectOutlined /> },
     ],
   },
   {
     key: "/self-publishing",
-    name: "자가출판",
+    name: "자기출판",
     icon: <EditOutlined />,
     subMenu: [
-      {
-        key: "/self-publishing/approval",
-        path: "/self-publishing/approval",
-        name: "심사",
-        icon: <CheckSquareOutlined />,
-      },
-      {
-        key: "/self-publishing/authors",
-        path: "/self-publishing/authors",
-        name: "작가 정보 관리",
-        icon: <SolutionOutlined />,
-      },
-      {
-        key: "/self-publishing/works",
-        path: "/self-publishing/works",
-        name: "작품 목록",
-        icon: <OrderedListOutlined />,
-      },
+      { key: "/self-publishing/approval", path: "/self-publishing/approval", name: "승인", icon: <CheckSquareOutlined /> },
+      { key: "/self-publishing/authors", path: "/self-publishing/authors", name: "저자 정보 관리", icon: <SolutionOutlined /> },
+      { key: "/self-publishing/works", path: "/self-publishing/works", name: "작품 목록", icon: <OrderedListOutlined /> },
     ],
   },
   {
@@ -143,55 +76,19 @@ const menuItems = [
     name: "회원 관리",
     icon: <UserOutlined />,
     subMenu: [
-      {
-        key: "/users/info",
-        path: "/users/info",
-        name: "회원 정보",
-        icon: <ProfileOutlined />,
-      },
-      {
-        key: "/users/subscriptions",
-        path: "/users/subscriptions",
-        name: "구독 내역",
-        icon: <HistoryOutlined />,
-      },
-      {
-        key: "/settings/forbidden-words",
-        path: "/settings/forbidden-words",
-        name: "금지어 관리",
-        icon: <BlockOutlined />,
-      },
-      {
-        key: "/users/sanctions",
-        path: "/users/sanctions",
-        name: "계정 제재",
-        icon: <WarningOutlined />,
-      },
+      { key: "/users/info", path: "/users/info", name: "회원 정보", icon: <ProfileOutlined /> },
+      { key: "/users/subscriptions", path: "/users/subscriptions", name: "구독 이력", icon: <HistoryOutlined /> },
+      { key: "/users/sanctions", path: "/users/sanctions", name: "계정 제재", icon: <WarningOutlined /> },
+      { key: "/users/badges", path: "/users/badges", name: "배지 관리", icon: <TrophyOutlined /> },
     ],
-  },
-  {
-    key: "/users/badges",
-    path: "/users/badges",
-    name: "배지 관리",
-    icon: <TrophyOutlined />,
   },
   {
     key: "/reports",
     name: "신고 관리",
     icon: <WarningOutlined />,
     subMenu: [
-      {
-        key: "/reports/list",
-        path: "/reports/list",
-        name: "신고 접수 및 심사",
-        icon: <OrderedListOutlined />,
-      },
-      {
-        key: "/reports/settings",
-        path: "/reports/settings",
-        name: "신고 정책 관리",
-        icon: <SettingOutlined />,
-      },
+      { key: "/reports/list", path: "/reports/list", name: "신고 접수/조사", icon: <OrderedListOutlined /> },
+      { key: "/reports/settings", path: "/reports/settings", name: "신고 정책 관리", icon: <SettingOutlined /> },
     ],
   },
   {
@@ -199,94 +96,30 @@ const menuItems = [
     name: "알림 관리",
     icon: <NotificationOutlined />,
     subMenu: [
-      {
-        key: "/notifications/dispatch",
-        path: "/notifications/dispatch",
-        name: "알림 발송",
-        icon: <BellOutlined />,
-      },
-      {
-        key: "/notifications/history",
-        path: "/notifications/history",
-        name: "발송 내역",
-        icon: <HistoryOutlined />,
-      },
-      {
-        key: "/notifications/templates",
-        path: "/notifications/templates",
-        name: "알림 템플릿",
-        icon: <FileTextOutlined />,
-      },
-
-      {
-        key: "/notifications/groups",
-        path: "/notifications/groups",
-        name: "발송 대상 그룹 관리",
-        icon: <UsergroupAddOutlined />,
-      },
-    ],
-  },
-  {
-    key: "/email",
-    name: "이메일 관리",
-    icon: <MailOutlined />,
-    subMenu: [
-      {
-        key: "/email/templates",
-        path: "/email/templates",
-        name: "이메일 템플릿 등록",
-        icon: <FormOutlined />,
-      },
-      {
-        key: "/email/operations",
-        path: "/email/operations",
-        name: "이메일 템플릿 운영",
-        icon: <EyeOutlined />,
-      },
+      { key: "/notifications/dispatch", path: "/notifications/dispatch", name: "알림 발송", icon: <BellOutlined /> },
+      { key: "/notifications/history", path: "/notifications/history", name: "발송 이력", icon: <HistoryOutlined /> },
+      { key: "/notifications/templates", path: "/notifications/templates", name: "알림 템플릿", icon: <FileTextOutlined /> },
+      { key: "/notifications/groups", path: "/notifications/groups", name: "발송 그룹 관리", icon: <TeamOutlined /> },
     ],
   },
   {
     key: "/popups",
     name: "팝업 관리",
-    icon: <BlockOutlined />,
+    icon: <MessageOutlined />,
     subMenu: [
-      {
-        key: "/popups/create",
-        path: "/popups/create",
-        name: "팝업 생성",
-        icon: <FormOutlined />,
-      },
-      {
-        key: "/popups/templates",
-        path: "/popups/templates",
-        name: "템플릿 관리",
-        icon: <FileTextOutlined />,
-      },
-      {
-        key: "/popups/settings",
-        path: "/popups/settings",
-        name: "노출 설정",
-        icon: <SettingOutlined />,
-      },
+      { key: "/popups/create", path: "/popups/create", name: "팝업 생성", icon: <FormOutlined /> },
+      { key: "/popups/templates", path: "/popups/templates", name: "템플릿 관리", icon: <FileTextOutlined /> },
+      { key: "/popups/settings", path: "/popups/settings", name: "노출 설정", icon: <SettingOutlined /> },
+      { key: "/popups/history", path: "/popups/history", name: "노출 이력", icon: <HistoryOutlined /> },
     ],
   },
   {
     key: "/notices",
-    name: "공지사항 관리",
-    icon: <MessageOutlined />, // 아이콘 변경 가능
+    name: "공지/게시 관리",
+    icon: <SoundOutlined />,
     subMenu: [
-      {
-        key: "/notices/manage",
-        path: "/notices/manage",
-        name: "게시 관리",
-        icon: <OrderedListOutlined />,
-      },
-      {
-        key: "/notices/history",
-        path: "/notices/history",
-        name: "노출 내역",
-        icon: <HistoryOutlined />,
-      },
+      { key: "/notices/manage", path: "/notices/manage", name: "게시 관리", icon: <OrderedListOutlined /> },
+      { key: "/notices/history", path: "/notices/history", name: "게시 이력", icon: <HistoryOutlined /> },
     ],
   },
   {
@@ -294,18 +127,8 @@ const menuItems = [
     name: "이벤트 관리",
     icon: <CalendarOutlined />,
     subMenu: [
-      {
-        key: "/events/register",
-        path: "/events/register",
-        name: "이벤트 등록",
-        icon: <FormOutlined />,
-      },
-      {
-        key: "/events/status",
-        path: "/events/status",
-        name: "이벤트 상태",
-        icon: <CheckSquareOutlined />,
-      },
+      { key: "/events/register", path: "/events/register", name: "이벤트 등록", icon: <FormOutlined /> },
+      { key: "/events/status", path: "/events/status", name: "이벤트 상태", icon: <CheckSquareOutlined /> },
     ],
   },
   {
@@ -313,24 +136,9 @@ const menuItems = [
     name: "랭킹/인기도서 관리",
     icon: <FileTextOutlined />,
     subMenu: [
-      {
-        key: "/fixed-content/book-ranking",
-        path: "/fixed-content/book-ranking",
-        name: "랭킹 관리",
-        icon: <OrderedListOutlined />,
-      },
-      {
-        key: "/fixed-content/genre-popular-books",
-        path: "/fixed-content/genre-popular-books",
-        name: "장르별 인기 도서 관리",
-        icon: <BookOutlined />,
-      },
-      {
-        key: "/fixed-content/genre-popular-audiobooks",
-        path: "/fixed-content/genre-popular-audiobooks",
-        name: "장르별 인기 오디오북 관리",
-        icon: <CustomerServiceOutlined />,
-      },
+      { key: "/fixed-content/book-ranking", path: "/fixed-content/book-ranking", name: "랭킹 관리", icon: <OrderedListOutlined /> },
+      { key: "/fixed-content/genre-popular-books", path: "/fixed-content/genre-popular-books", name: "장르별 인기 도서 관리", icon: <BookOutlined /> },
+      { key: "/fixed-content/genre-popular-audiobooks", path: "/fixed-content/genre-popular-audiobooks", name: "장르별 인기 오디오북 관리", icon: <CustomerServiceOutlined /> },
     ],
   },
   {
@@ -338,18 +146,8 @@ const menuItems = [
     name: "쿠폰 관리",
     icon: <TagsOutlined />,
     subMenu: [
-      {
-        key: "/coupons/list",
-        path: "/coupons/list",
-        name: "쿠폰 목록",
-        icon: <OrderedListOutlined />,
-      },
-      {
-        key: "/coupons/register",
-        path: "/coupons/register",
-        name: "쿠폰 등록",
-        icon: <FormOutlined />,
-      },
+      { key: "/coupons/list", path: "/coupons/list", name: "쿠폰 목록", icon: <OrderedListOutlined /> },
+      { key: "/coupons/register", path: "/coupons/register", name: "쿠폰 등록", icon: <FormOutlined /> },
     ],
   },
   {
@@ -357,87 +155,36 @@ const menuItems = [
     name: "배너 관리",
     icon: <PictureOutlined />,
     subMenu: [
-      {
-        key: "/banner/list",
-        path: "/banner/list",
-        name: "배너 목록",
-        icon: <OrderedListOutlined />,
-      },
-      {
-        key: "/banner/register",
-        path: "/banner/register",
-        name: "배너 등록",
-        icon: <FormOutlined />,
-      },
+      { key: "/banner/list", path: "/banner/list", name: "배너 목록", icon: <OrderedListOutlined /> },
+      { key: "/banner/register", path: "/banner/register", name: "배너 등록", icon: <FormOutlined /> },
     ],
   },
   {
-    key: "/reviews/manage",
-    path: "/reviews/manage",
-    name: "앱 리뷰 관리",
-    icon: <StarOutlined />,
-  },
-  {
     key: "/inquiries",
-    name: "문의사항 관리",
-    icon: <MessageOutlined />,
+    name: "문의/고객 관리",
+    icon: <MailOutlined />,
     subMenu: [
-      {
-        key: "/inquiries/list",
-        path: "/inquiries/list",
-        name: "문의 조회",
-        icon: <OrderedListOutlined />,
-      },
-      {
-        key: "/inquiries/cancellation",
-        path: "/inquiries/cancellation",
-        name: "구독 해지 관리",
-        icon: <FileProtectOutlined />,
-      },
-      {
-        key: "/inquiries/faq",
-        path: "/inquiries/faq",
-        name: "FAQ 관리",
-        icon: <QuestionCircleOutlined />,
-      },
+      { key: "/inquiries/list", path: "/inquiries/list", name: "문의 조회", icon: <OrderedListOutlined /> },
+      { key: "/inquiries/cancellation", path: "/inquiries/cancellation", name: "구독 해지 관리", icon: <FileProtectOutlined /> },
+      { key: "/inquiries/faq", path: "/inquiries/faq", name: "FAQ 관리", icon: <QuestionCircleOutlined /> },
     ],
   },
   {
     key: "/user-analysis",
-    name: "사용자 분석",
+    name: "이용자 분석",
     icon: <UserOutlined />,
     subMenu: [
-      {
-        key: "/user-analysis/statistics",
-        path: "/user-analysis/statistics",
-        name: "사용자 통계",
-        icon: <UserOutlined />,
-      },
-      {
-        key: "/user-analysis/visits",
-        path: "/user-analysis/visits",
-        name: "방문 통계",
-        icon: <PieChartOutlined />,
-      },
+      { key: "/user-analysis/statistics", path: "/user-analysis/statistics", name: "이용자 통계", icon: <UserOutlined /> },
+      { key: "/user-analysis/visits", path: "/user-analysis/visits", name: "방문 통계", icon: <PieChartOutlined /> },
     ],
   },
   {
     key: "/analysis",
-    name: "데이터 분석",
+    name: "마케팅 분석",
     icon: <AreaChartOutlined />,
     subMenu: [
-      {
-        key: "/analysis/campaign",
-        path: "/analysis/campaign",
-        name: "알림/팝업/이벤트 효과",
-        icon: <FundViewOutlined />,
-      },
-      {
-        key: "/analysis/reports",
-        path: "/analysis/reports",
-        name: "리포트 생성",
-        icon: <FileTextOutlined />,
-      },
+      { key: "/analysis/campaign", path: "/analysis/campaign", name: "알림/샵/이벤트 효과", icon: <FundViewOutlined /> },
+      { key: "/analysis/reports", path: "/analysis/reports", name: "리포트 생성", icon: <FileTextOutlined /> },
     ],
   },
   {
@@ -445,48 +192,13 @@ const menuItems = [
     name: "시스템 설정",
     icon: <SettingOutlined />,
     subMenu: [
-      {
-        key: "/settings/permissions",
-        path: "/settings/permissions",
-        name: "권한 관리",
-        icon: <UserSwitchOutlined />,
-      },
-      {
-        key: "/settings/admin-activity-log",
-        path: "/settings/admin-activity-log",
-        name: "관리자 활동 내역",
-        icon: <HistoryOutlined />,
-      },
-      {
-        key: "/settings/api",
-        path: "/settings/api",
-        name: "API 관리",
-        icon: <ApiOutlined />,
-      },
-      {
-        key: "/settings/security",
-        path: "/settings/security",
-        name: "보안 설정",
-        icon: <SecurityScanOutlined />,
-      },
-      {
-        key: "/settings/policy",
-        path: "/settings/policy",
-        name: "서비스 정책",
-        icon: <FileProtectOutlined />,
-      },
-      {
-        key: "/settings/forbidden-words",
-        path: "/settings/forbidden-words",
-        name: "금지어 관리",
-        icon: <BlockOutlined />,
-      },
-      {
-        key: "/settings/version-history",
-        path: "/settings/version-history",
-        name: "플랫폼 버전 히스토리",
-        icon: <HistoryOutlined />,
-      },
+      { key: "/settings/permissions", path: "/settings/permissions", name: "권한 관리", icon: <UserSwitchOutlined /> },
+      { key: "/settings/admin-activity-log", path: "/settings/admin-activity-log", name: "관리자 활동 이력", icon: <HistoryOutlined /> },
+      { key: "/settings/api", path: "/settings/api", name: "API 관리", icon: <ApiOutlined /> },
+      { key: "/settings/security", path: "/settings/security", name: "보안 설정", icon: <SecurityScanOutlined /> },
+      { key: "/settings/policy", path: "/settings/policy", name: "서비스 정책", icon: <FileProtectOutlined /> },
+      { key: "/settings/forbidden-words", path: "/settings/forbidden-words", name: "금지어 관리", icon: <BlockOutlined /> },
+      { key: "/settings/version-history", path: "/settings/version-history", name: "버전 히스토리", icon: <HistoryOutlined /> },
     ],
   },
   {
@@ -494,104 +206,140 @@ const menuItems = [
     name: "파트너 관리",
     icon: <TeamOutlined />,
     subMenu: [
-      {
-        key: "/partners/accounts",
-        path: "/partners/accounts",
-        name: "파트너 계정",
-        icon: <SolutionOutlined />,
-      },
-      {
-        key: "/partners/settlement",
-        path: "/partners/settlement",
-        name: "정산 관리",
-        icon: <DollarCircleOutlined />,
-      },
-      {
-        key: "/partners/inquiries",
-        path: "/partners/inquiries",
-        name: "문의 관리",
-        icon: <MessageOutlined />,
-      },
+      { key: "/partners/accounts", path: "/partners/accounts", name: "파트너 계정", icon: <SolutionOutlined /> },
+      { key: "/partners/settlement", path: "/partners/settlement", name: "정산 관리", icon: <DollarCircleOutlined /> },
+      { key: "/partners/inquiries", path: "/partners/inquiries", name: "문의 관리", icon: <MessageOutlined /> },
     ],
   },
 ];
 
-// 메뉴 아이템 렌더링 함수
-const renderMenuItems = (items, parentKey) => {
-  return items.map((item) => {
-    if (parentKey === "/users" && item.path === "/settings/forbidden-words") {
-      return null;
-    }
-    if (item.subMenu && item.subMenu.length > 0) {
-      return (
-        <Menu.SubMenu key={item.key} icon={item.icon} title={item.name}>
-          {renderMenuItems(item.subMenu, item.key)}
-        </Menu.SubMenu>
-      );
-    } else {
-      return (
-        <Menu.Item key={item.path} icon={item.icon}>
-          <Link to={item.path}>{item.name}</Link>
-        </Menu.Item>
-      );
-    }
-  });
-};
+const renderMenuItems = (items) =>
+  items.map((item) =>
+    item.subMenu && item.subMenu.length ? (
+      <Menu.SubMenu key={item.key} icon={item.icon} title={item.name}>
+        {renderMenuItems(item.subMenu)}
+      </Menu.SubMenu>
+    ) : (
+      <Menu.Item key={item.path} icon={item.icon}>
+        <Link to={item.path}>{item.name}</Link>
+      </Menu.Item>
+    )
+  );
 
-const Sidebar = () => {
-  const location = useLocation(); // 현재 위치 정보 가져오기
+const Sidebar = ({ collapsed = false }) => {
+  const location = useLocation();
+  const navigate = useNavigate();
   const currentPath = location.pathname;
 
-  // 현재 경로에 맞는 SubMenu 키 찾기
   const findInitialOpenKeys = (path) => {
     for (const item of menuItems) {
       if (item.subMenu) {
-        const foundSubItem = item.subMenu.find((sub) =>
-          path.startsWith(sub.path)
-        );
-        if (foundSubItem) {
-          return [item.key]; // 부모 메뉴의 key 반환
-        }
+        const found = item.subMenu.find((sub) => path.startsWith(sub.path));
+        if (found) return [item.key];
       }
     }
-    return []; // 해당 없으면 빈 배열
+    return [];
   };
 
-  // 열린 메뉴 상태 관리
   const [openKeys, setOpenKeys] = useState(findInitialOpenKeys(currentPath));
-
-  // SubMenu 열림/닫힘 핸들러 (아코디언 동작)
   const handleOpenChange = (keys) => {
-    // menuItems에서 최상위 SubMenu 키 목록 생성
     const rootSubmenuKeys = menuItems
       .filter((item) => item.subMenu && item.subMenu.length > 0)
       .map((item) => item.key);
-
     const latestOpenKey = keys.find((key) => openKeys.indexOf(key) === -1);
+    if (rootSubmenuKeys.indexOf(latestOpenKey) !== -1) setOpenKeys([latestOpenKey]);
+    else setOpenKeys(latestOpenKey ? [latestOpenKey] : []);
+  };
 
-    // 최신으로 열린 키가 rootSubmenuKeys에 포함되어 있다면 해당 키만 열린 상태로 설정
-    if (rootSubmenuKeys.indexOf(latestOpenKey) !== -1) {
-      setOpenKeys([latestOpenKey]);
-    } else {
-      // 그렇지 않으면 (예: 하위 메뉴 클릭 또는 메뉴 닫기) 현재 keys 배열 사용 (Ant Design 기본 동작 유지 또는 수정 가능)
-      // 여기서는 마지막으로 열린 키만 유지하도록 설정 (아코디언 효과)
-      // 만약 모든 메뉴가 닫혔다면 빈 배열로 설정
-      setOpenKeys(latestOpenKey ? [latestOpenKey] : []);
-    }
+  const flatMenu = useMemo(() => {
+    const out = [];
+    const walk = (items, parents = []) => {
+      items.forEach((it) => {
+        const crumb = [...parents.map((p) => p.name), it.name].filter(Boolean).join(" > ");
+        if (it.subMenu && it.subMenu.length) walk(it.subMenu, [...parents, it]);
+        else if (it.path) out.push({ name: it.name, crumb, path: it.path });
+      });
+    };
+    walk(menuItems);
+    return out;
+  }, []);
+
+  const [search, setSearch] = useState("");
+  const options = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    return flatMenu
+      .filter(
+        (m) => !q || m.crumb.toLowerCase().includes(q) || m.name.toLowerCase().includes(q) || m.path.toLowerCase().includes(q)
+      )
+      .slice(0, 20)
+      .map((m) => ({ value: m.name, label: m.crumb, path: m.path, name: m.name }));
+  }, [search, flatMenu]);
+
+  const handleSelect = (val, option) => {
+    const path = option?.path || flatMenu.find((m) => m.name === val)?.path || val;
+    setSearch(option?.name || val);
+    navigate(path);
+    setOpenKeys(findInitialOpenKeys(path));
   };
 
   return (
-    <Menu
-      theme="dark" // 다크 테마 적용
-      mode="inline"
-      selectedKeys={[currentPath]} // 현재 경로를 selectedKeys로 설정
-      openKeys={openKeys} // 상태로 관리되는 열린 키
-      onOpenChange={handleOpenChange} // 열림/닫힘 변경 핸들러 연결
-      style={{ height: "calc(100% - 64px)", borderRight: 0 }} // 로고 높이만큼 빼기
-    >
-      {renderMenuItems(menuItems, null)}
-    </Menu>
+    <>
+      {!collapsed && (
+        <div style={{ padding: "8px 0" }}>
+          <AutoComplete style={{ width: "100%" }} options={options} value={search} onChange={setSearch} onSelect={handleSelect}>
+            <Input.Search
+              allowClear
+              placeholder="메뉴 검색"
+              onSearch={() => {
+                const first = flatMenu.find(
+                  (m) => m.crumb.includes(search) || m.name.includes(search) || m.path.includes(search)
+                );
+                if (first) {
+                  setSearch(first.name);
+                  handleSelect(first.name, { path: first.path, name: first.name });
+                }
+              }}
+            />
+          </AutoComplete>
+        </div>
+      )}
+      <Menu
+        theme="dark"
+        mode="inline"
+        selectedKeys={[currentPath]}
+        openKeys={openKeys}
+        onOpenChange={handleOpenChange}
+        inlineCollapsed={collapsed}
+        style={{ height: "calc(100% - 64px)", borderRight: 0 }}
+      >
+        {collapsed && (
+          <Menu.SubMenu key="__search" icon={<SearchOutlined />} title="검색">
+            <Menu.Item key="__search_input" disabled>
+              <div style={{ padding: 8, width: 240 }}>
+                <AutoComplete style={{ width: "100%" }} options={options} value={search} onChange={setSearch} onSelect={handleSelect}>
+                  <Input.Search
+                    allowClear
+                    placeholder="메뉴 검색"
+                    onSearch={() => {
+                      const first = flatMenu.find(
+                        (m) => m.crumb.includes(search) || m.name.includes(search) || m.path.includes(search)
+                      );
+                      if (first) {
+                        setSearch(first.name);
+                        handleSelect(first.name, { path: first.path, name: first.name });
+                      }
+                    }}
+                  />
+                </AutoComplete>
+              </div>
+            </Menu.Item>
+          </Menu.SubMenu>
+        )}
+        {renderMenuItems(menuItems)}
+      </Menu>
+    </>
   );
 };
 
 export default Sidebar;
+
