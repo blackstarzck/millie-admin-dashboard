@@ -1,6 +1,3 @@
-import React, { useMemo, useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import { AutoComplete, Input, Menu } from "antd";
 import {
   ApartmentOutlined,
   ApiOutlined,
@@ -27,6 +24,7 @@ import {
   PieChartOutlined,
   ProfileOutlined,
   QuestionCircleOutlined,
+  SearchOutlined,
   SecurityScanOutlined,
   SettingOutlined,
   SolutionOutlined,
@@ -39,8 +37,10 @@ import {
   UserOutlined,
   UserSwitchOutlined,
   WarningOutlined,
-  SearchOutlined,
 } from "@ant-design/icons";
+import { AutoComplete, Input, Menu } from "antd";
+import React, { useMemo, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 const menuItems = [
   { key: "/dashboard", path: "/dashboard", name: "대시보드", icon: <PieChartOutlined /> },
@@ -103,6 +103,15 @@ const menuItems = [
     ],
   },
   {
+    key: "/email",
+    name: "이메일 관리",
+    icon: <MailOutlined />,
+    subMenu: [
+      { key: "/email/templates", path: "/email/templates", name: "이메일 템플릿", icon: <FileTextOutlined /> },
+      { key: "/email/operations", path: "/email/operations", name: "이메일 운영", icon: <FormOutlined /> },
+    ],
+  },
+  {
     key: "/popups",
     name: "팝업 관리",
     icon: <MessageOutlined />,
@@ -158,6 +167,12 @@ const menuItems = [
       { key: "/banner/list", path: "/banner/list", name: "배너 목록", icon: <OrderedListOutlined /> },
       { key: "/banner/register", path: "/banner/register", name: "배너 등록", icon: <FormOutlined /> },
     ],
+  },
+  {
+    key: "/reviews/manage",
+    path: "/reviews/manage",
+    name: "앱 리뷰 관리",
+    icon: <StarOutlined />,
   },
   {
     key: "/inquiries",
@@ -342,4 +357,3 @@ const Sidebar = ({ collapsed = false }) => {
 };
 
 export default Sidebar;
-
