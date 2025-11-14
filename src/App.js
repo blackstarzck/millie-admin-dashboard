@@ -42,7 +42,6 @@ import SettlementManagement from "./pages/PartnerManagement/SettlementManagement
 import ExposureHistory from "./pages/PopupManagement/ExposureHistory";
 import PopupExposureSettings from "./pages/PopupManagement/ExposureSettings";
 import PopupCreation from "./pages/PopupManagement/PopupCreation";
-import PopupTemplateManagement from "./pages/PopupManagement/TemplateManagement";
 import AuthorInfoManagement from "./pages/SelfPublishing/AuthorInfoManagement";
 import VersionHistory from "./pages/SystemManagement/VersionHistory";
 import AdminActivityLog from "./pages/SystemSettings/AdminActivityLog"; // 새로 추가
@@ -252,10 +251,6 @@ function App() {
               <Route path="/email/operations" element={<EmailTemplateOperations />} />
               {/* 팝업 관리 */}
               <Route path="popups/create" element={<PopupCreation />} />
-              <Route
-                path="popups/templates"
-                element={<PopupTemplateManagement />}
-              />
               <Route
                 path="popups/settings"
                 element={<PopupExposureSettings />}

@@ -25,6 +25,7 @@ import {
     UserOutlined, // Target audience icon
     CheckCircleOutlined,
     StopOutlined,
+    WarningOutlined,
 } from '@ant-design/icons';
 import moment from 'moment';
 import { DndProvider, useDrag, useDrop } from 'react-dnd';
@@ -36,12 +37,12 @@ const { Option } = Select;
 const { RangePicker } = DatePicker;
 const { Search } = Input;
 
-// --- Sample Data (Popups created via PopupCreate) ---
+// --- Sample Data (Popups created via PopupCreate) - PopupCreation.js와 일치하는 필드 구조 사용 ---
 const initialPopups = [
-    { key: 'pop1', id: 'P001', name: '여름맞이 특별 이벤트 팝업', type: 'image', status: true, startDate: '2024-07-20 00:00:00', endDate: '2024-08-31 23:59:59', frequency: 'daily', targetAudience: 'all', priority: 1, position: 'center' },
-    { key: 'pop2', id: 'P002', name: '신규 기능 안내 (템플릿)', type: 'template', status: true, startDate: '2024-07-25 10:00:00', endDate: '2024-08-10 23:59:59', frequency: 'once', targetAudience: 'loggedIn', priority: 5, position: 'top' },
-    { key: 'pop3', id: 'P003', name: '마케팅 수신 동의 팝업', type: 'template', status: false, startDate: '2024-06-01 00:00:00', endDate: '2024-12-31 23:59:59', frequency: 'session', targetAudience: 'loggedIn_non_marketing_agreed', priority: 10, position: 'bottom-right' },
-    { key: 'pop4', id: 'P004', name: '서버 점검 안내', type: 'image', status: false, startDate: '2024-07-30 22:00:00', endDate: '2024-07-31 06:00:00', frequency: 'always', targetAudience: 'all', priority: 100, position: 'center' },
+    { key: 'pop1', id: 'P001', name: '여름맞이 특별 이벤트 팝업', contentType: 'image', status: true, startDate: '2024-07-20 00:00:00', endDate: '2024-08-31 23:59:59', frequencyType: 'once_per_day', targetAudience: 'all', priority: 1, creationDate: '2024-07-19', imageUrl: 'https://via.placeholder.com/300x200.png?text=Summer+Event', linkUrl: 'https://example.com/summer-event', templateId: null, exposurePages: [], hideOptions: [] },
+    { key: 'pop2', id: 'P002', name: '신규 기능 안내 (템플릿)', contentType: 'template', status: true, startDate: '2024-07-25 10:00:00', endDate: '2024-08-10 23:59:59', frequencyType: 'once_per_session', targetAudience: 'loggedIn', priority: 5, creationDate: '2024-07-24', templateId: '신규 기능 안내 템플릿', linkUrl: null, imageUrl: null, exposurePages: [], hideOptions: ['day'] },
+    { key: 'pop3', id: 'P003', name: '마케팅 수신 동의 팝업', contentType: 'template', status: false, startDate: '2024-06-01 00:00:00', endDate: '2024-12-31 23:59:59', frequencyType: 'once_per_session', targetAudience: 'loggedIn_non_marketing_agreed', priority: 10, creationDate: '2024-05-31', templateId: '마케팅 동의 템플릿', linkUrl: null, imageUrl: null, exposurePages: [], hideOptions: ['week'] },
+    { key: 'pop4', id: 'P004', name: '서버 점검 안내', contentType: 'image', status: false, startDate: '2024-07-30 22:00:00', endDate: '2024-07-31 06:00:00', frequencyType: 'every_time', targetAudience: 'all', priority: 100, creationDate: '2024-07-30', imageUrl: 'https://via.placeholder.com/300x150.png?text=Server+Maintenance', linkUrl: null, templateId: null, exposurePages: [], hideOptions: [] },
 ];
 
 // --- Helper Functions ---
@@ -50,12 +51,17 @@ const getStatusTag = (status) => {
 };
 
 const formatFrequency = (freq) => {
-    switch(freq){
-        case 'daily': return '하루 한 번';
+    const frequencyType = freq || '';
+    switch(frequencyType){
+        case 'once_per_day': return '하루에 한 번';
+        case 'once_per_session': return '세션 당 한 번';
+        case 'every_time': return '매번 (주의)';
+        // 하위 호환성을 위한 레거시 값들
+        case 'daily': return '하루에 한 번';
         case 'once': return '다시 보지 않음';
         case 'session': return '세션 당 한 번';
         case 'always': return '매번 (주의)';
-        default: return freq;
+        default: return frequencyType || '-';
     }
 };
 
@@ -152,6 +158,7 @@ const PopupExposureSettings = () => {
         form.setFieldsValue({
             ...popup,
             exposurePeriod: (startDate && endDate) ? [startDate, endDate] : null,
+            frequencyType: popup.frequencyType || popup.frequency, // frequencyType으로 통일
         });
         setIsModalOpen(true);
     };
@@ -171,9 +178,12 @@ const PopupExposureSettings = () => {
                     ...values,
                     startDate: values.exposurePeriod ? values.exposurePeriod[0].format('YYYY-MM-DD HH:mm:ss') : null,
                     endDate: values.exposurePeriod ? values.exposurePeriod[1].format('YYYY-MM-DD HH:mm:ss') : null,
+                    frequencyType: values.frequencyType || values.frequency, // frequencyType으로 통일
+                    contentType: editingPopup.contentType, // contentType 유지
                     exposurePeriod: undefined, // Remove RangePicker value
                 };
                 delete processedValues.exposurePeriod;
+                delete processedValues.frequency; // frequency 제거 (frequencyType 사용)
 
                 setPopups(prevPopups =>
                     prevPopups.map(p => p.key === editingPopup.key ? { ...p, ...processedValues } : p)
@@ -208,7 +218,7 @@ const PopupExposureSettings = () => {
         [popups],
     );
 
-     // --- Direct Status Toggle --- 
+     // --- Direct Status Toggle ---
      const handleStatusToggle = (key, checked) => {
         setPopups(prevPopups =>
             prevPopups.map(p => p.key === key ? { ...p, status: checked } : p)
@@ -249,15 +259,18 @@ const PopupExposureSettings = () => {
              sorter: (a, b) => moment(a.startDate || 0).unix() - moment(b.startDate || 0).unix(),
         },
         {
-            title: '노출 위치', dataIndex: 'position', key: 'position', width: 120,
-            render: (position) => {
-                switch(position) {
-                    case 'center': return '중앙';
-                    case 'top': return '상단';
-                    case 'bottom-right': return '우측 하단';
-                    default: return position || '-';
+            title: '콘텐츠 타입', dataIndex: 'contentType', key: 'contentType', width: 120,
+            render: (type) => {
+                switch(type) {
+                    case 'image': return '이미지';
+                    case 'template': return '템플릿';
+                    default: return type || '-';
                 }
             }
+        },
+        {
+            title: '노출 빈도', key: 'frequencyType', width: 150,
+            render: (_, record) => formatFrequency(record.frequencyType || record.frequency),
         },
         { title: '노출 대상', dataIndex: 'targetAudience', key: 'targetAudience', width: 150, render: formatTargetAudience }, // Simplify display
         { title: '우선순위', dataIndex: 'priority', key: 'priority', width: 100, align: 'right', sorter: (a,b)=> (a.priority || 0) - (b.priority || 0) },
@@ -355,29 +368,17 @@ const PopupExposureSettings = () => {
                         </Form.Item>
 
                         <Form.Item
-                            name="frequency"
+                            name="frequencyType"
                             label="노출 빈도"
                             rules={[{ required: true }]}
                          >
                              <Select>
-                                 <Option value="daily"><ClockCircleOutlined /> 하루에 한 번</Option>
-                                 <Option value="once"><StopOutlined /> 다시 보지 않음</Option>
-                                 <Option value="session"><ClockCircleOutlined /> 세션 당 한 번</Option>
-                                 <Option value="always"><WarningOutlined /> 매번 (주의)</Option>
+                                 <Option value="once_per_day"><ClockCircleOutlined /> 하루에 한 번</Option>
+                                 <Option value="once_per_session"><ClockCircleOutlined /> 세션 당 한 번</Option>
+                                 <Option value="every_time"><WarningOutlined /> 매번 (주의)</Option>
                              </Select>
                          </Form.Item>
 
-                        <Form.Item
-                             name="position"
-                             label="노출 위치"
-                             rules={[{ required: true, message: '팝업이 표시될 위치를 선택해주세요!' }]}
-                         >
-                             <Select placeholder="노출 위치 선택">
-                                 <Option value="center">중앙</Option>
-                                 <Option value="top">상단</Option>
-                                 <Option value="bottom-right">우측 하단</Option>
-                             </Select>
-                         </Form.Item>
 
                         <Form.Item name="targetAudience" label="노출 대상" rules={[{ required: true }]}>
                              <Radio.Group>
@@ -388,7 +389,7 @@ const PopupExposureSettings = () => {
                              </Radio.Group>
                          </Form.Item>
                         {/* Add more detailed targeting: OS, Device, User Groups etc. */}
-                         {/* <Form.Item name="targetOS" label="Target OS"><Checkbox.Group options={['iOS', 'Android']} /></Form.Item> */} 
+                         {/* <Form.Item name="targetOS" label="Target OS"><Checkbox.Group options={['iOS', 'Android']} /></Form.Item> */}
 
                          <Form.Item
                              name="priority"
@@ -406,4 +407,4 @@ const PopupExposureSettings = () => {
     );
 };
 
-export default PopupExposureSettings; 
+export default PopupExposureSettings;

@@ -27,12 +27,25 @@ import moment from 'moment';
 const { Title, Text } = Typography;
 const { RangePicker } = DatePicker;
 
-// Sample Data
+// Sample Data - PopupCreation.js와 일치하는 필드 구조 사용
+const pageList = [
+    { id: 'platform_main', name: '메인' },
+    { id: 'search_result', name: '검색 결과' },
+    { id: 'book_detail', name: '도서 상세' },
+    { id: 'viewer', name: '뷰어' },
+    { id: 'my_library', name: '내 서재' },
+    { id: 'category_best', name: '카테고리/베스트' },
+    { id: 'event_detail', name: '이벤트 상세' },
+    { id: 'user_profile', name: '사용자 프로필' },
+    { id: 'subscription_info', name: '구독 정보' },
+];
+
 const initialExposureHistory = [
-    { key: '1', popupId: 'pop001', popupName: '신규 기능 출시 안내', exposureTime: '2023-11-10 09:00:05', userId: 'user123', device: 'PC Web', pageUrl: '/main', priority: 1, creationDate: '2024-06-30', status: true, startDate: '2024-07-01 00:00', endDate: '2024-07-31 23:59' },
-    { key: '2', popupId: 'pop002', popupName: '블랙프라이데이 할인', exposureTime: '2023-11-10 09:01:15', userId: 'user456', device: 'Mobile App', pageUrl: '/products/sale', priority: 5, creationDate: '2024-11-01', status: false, startDate: '2024-11-20 00:00', endDate: '2024-11-30 23:59' },
-    { key: '3', popupId: 'pop001', popupName: '신규 기능 출시 안내', exposureTime: '2023-11-10 09:02:30', userId: 'user789', device: 'Mobile Web', pageUrl: '/main', priority: 1, creationDate: '2024-06-30', status: true, startDate: '2024-07-01 00:00', endDate: '2024-07-31 23:59' },
-    { key: '4', popupId: 'pop003', popupName: '긴급 시스템 점검', exposureTime: '2023-11-09 18:00:00', userId: 'admin01', device: 'PC Web', pageUrl: '/admin', priority: 10, creationDate: '2024-07-28', status: true, startDate: '2024-07-28 18:00', endDate: '2024-07-29 06:00' },
+    { key: '1', popupId: 'pop001', popupName: '신규 기능 출시 안내', exposureTime: '2023-11-10 09:00:05', userId: 'user123', device: 'PC Web', pageUrl: '/main', priority: 1, creationDate: '2024-06-30', status: true, startDate: '2024-07-01 00:00', endDate: '2024-07-31 23:59', contentType: 'template', templateId: '신규 기능 안내 템플릿', linkUrl: null, imageUrl: null, title: '신규 기능 출시!', exposurePages: ['platform_main'], hideOptions: ['day'], frequencyType: 'once_per_day', variables: { '[feature_name]': 'AI 추천 기능', '[link]': 'https://example.com/feature' } },
+    { key: '2', popupId: 'pop002', popupName: '블랙프라이데이 할인', exposureTime: '2023-11-10 09:01:15', userId: 'user456', device: 'Mobile App', pageUrl: '/products/sale', priority: 5, creationDate: '2024-11-01', status: false, startDate: '2024-11-20 00:00', endDate: '2024-11-30 23:59', contentType: 'image', imageUrl: 'https://via.placeholder.com/300x200.png?text=Black+Friday', linkUrl: 'https://example.com/sale', templateId: null, title: null, exposurePages: ['category_best', 'event_detail'], hideOptions: ['day', 'week'], frequencyType: 'once_per_session', variables: null },
+    { key: '3', popupId: 'pop001', popupName: '신규 기능 출시 안내', exposureTime: '2023-11-10 09:02:30', userId: 'user789', device: 'Mobile Web', pageUrl: '/main', priority: 1, creationDate: '2024-06-30', status: true, startDate: '2024-07-01 00:00', endDate: '2024-07-31 23:59', contentType: 'template', templateId: '신규 기능 안내 템플릿', linkUrl: null, imageUrl: null, title: '신규 기능 출시!', exposurePages: ['platform_main'], hideOptions: ['day'], frequencyType: 'once_per_day', variables: { '[feature_name]': 'AI 추천 기능', '[link]': 'https://example.com/feature' } },
+    { key: '4', popupId: 'pop003', popupName: '긴급 시스템 점검', exposureTime: '2023-11-09 18:00:00', userId: 'admin01', device: 'PC Web', pageUrl: '/admin', priority: 10, creationDate: '2024-07-28', status: true, startDate: '2024-07-28 18:00', endDate: '2024-07-29 06:00', contentType: 'image', imageUrl: 'https://via.placeholder.com/300x150.png?text=System+Maintenance', linkUrl: null, templateId: null, title: null, exposurePages: [], hideOptions: [], frequencyType: 'every_time', variables: null },
+    { key: '5', popupId: 'pop005', popupName: '대시보드 전용 공지', exposureTime: '2024-08-15 14:30:20', userId: 'user999', device: 'Mobile App', pageUrl: '/dashboard', priority: 2, creationDate: '2024-08-14', status: true, startDate: '2024-08-15 00:00', endDate: '2024-08-16 23:59', contentType: 'template', templateId: '긴급 공지 팝업 템플릿', linkUrl: null, imageUrl: null, title: '중요 공지사항', exposurePages: ['my_library'], hideOptions: ['week'], frequencyType: 'once_per_session', variables: null },
     // ... more data
 ];
 
@@ -197,22 +210,6 @@ const ExposureHistory = () => {
             sorter: (a, b) => moment(a.creationDate).unix() - moment(b.creationDate).unix(),
         },
         {
-            title: '상태',
-            dataIndex: 'status',
-            key: 'status',
-            width: 80,
-            align: 'center',
-            render: (isActive) => (
-                 <Switch
-                     checked={isActive}
-                     disabled
-                     size="small"
-                     checkedChildren={<EyeOutlined />}
-                     unCheckedChildren={<EyeInvisibleOutlined />}
-                 />
-            ),
-        },
-        {
             title: '노출 기간',
             key: 'period',
             width: 220,
@@ -305,14 +302,51 @@ const ExposureHistory = () => {
             >
                 {selectedHistoryItem && (
                     <Descriptions bordered column={1} size="small">
-                        <Descriptions.Item label="노출 시각">{selectedHistoryItem.exposureTime}</Descriptions.Item>
-                        <Descriptions.Item label="노출 사용자 ID">{selectedHistoryItem.userId}</Descriptions.Item>
-                        <Descriptions.Item label="팝업 ID">{selectedHistoryItem.popupId}</Descriptions.Item>
-                        <Descriptions.Item label="팝업 이름">{selectedHistoryItem.popupName}</Descriptions.Item>
-                        <Descriptions.Item label="팝업 우선순위">{selectedHistoryItem.priority ?? '-'}</Descriptions.Item>
-                        <Descriptions.Item label="디바이스">{selectedHistoryItem.device}</Descriptions.Item>
-                        <Descriptions.Item label="노출 페이지 URL">{selectedHistoryItem.pageUrl}</Descriptions.Item>
-                        {/* Add more details if needed */}
+                        {/* 팝업 생성 페이지의 입력 항목 순서대로 표시 */}
+                        <Descriptions.Item label="팝업 ID">{selectedHistoryItem.popupId || '-'}</Descriptions.Item>
+                        <Descriptions.Item label="등록일">{selectedHistoryItem.creationDate ? moment(selectedHistoryItem.creationDate).format('YYYY-MM-DD') : '-'}</Descriptions.Item>
+                        <Descriptions.Item label="팝업 이름 (관리용)">{selectedHistoryItem.popupName}</Descriptions.Item>
+
+                        {selectedHistoryItem.imageUrl && (
+                            <Descriptions.Item label="팝업 이미지">
+                                <a href={selectedHistoryItem.imageUrl} target="_blank" rel="noopener noreferrer">{selectedHistoryItem.imageUrl}</a>
+                            </Descriptions.Item>
+                        )}
+
+                        <Descriptions.Item label="연결 URL (클릭 시 이동)">
+                            {selectedHistoryItem.linkUrl ? (
+                                <a href={selectedHistoryItem.linkUrl} target="_blank" rel="noopener noreferrer">{selectedHistoryItem.linkUrl}</a>
+                            ) : '-'}
+                        </Descriptions.Item>
+
+                        <Descriptions.Item label="노출 기간">
+                            {selectedHistoryItem.startDate && selectedHistoryItem.endDate
+                                ? `${moment(selectedHistoryItem.startDate).format('YYYY-MM-DD HH:mm')} ~ ${moment(selectedHistoryItem.endDate).format('YYYY-MM-DD HH:mm')}`
+                                : '-'}
+                        </Descriptions.Item>
+
+                        <Descriptions.Item label="노출 페이지">
+                            {selectedHistoryItem.exposurePages && Array.isArray(selectedHistoryItem.exposurePages) && selectedHistoryItem.exposurePages.length > 0
+                                ? selectedHistoryItem.exposurePages.map(pageId => {
+                                    const page = pageList.find(p => p.id === pageId);
+                                    return page ? page.name : pageId;
+                                }).join(', ')
+                                : '전체 노출'}
+                        </Descriptions.Item>
+
+                        <Descriptions.Item label="페이지 내 초기 우선순위">{selectedHistoryItem.priority ?? '-'}</Descriptions.Item>
+
+                        <Descriptions.Item label="다시 보지 않기 옵션">
+                            {(() => {
+                                const hideOption = Array.isArray(selectedHistoryItem.hideOptions) && selectedHistoryItem.hideOptions.length > 0
+                                    ? selectedHistoryItem.hideOptions[0]
+                                    : (selectedHistoryItem.hideOptions || null);
+
+                                if (hideOption === 'day') return '하루 동안 보지 않기';
+                                if (hideOption === 'week') return '일주일 동안 보지 않기';
+                                return hideOption || '없음';
+                            })()}
+                        </Descriptions.Item>
                     </Descriptions>
                 )}
             </Modal>
@@ -320,4 +354,4 @@ const ExposureHistory = () => {
     );
 };
 
-export default ExposureHistory; 
+export default ExposureHistory;

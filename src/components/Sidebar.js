@@ -117,7 +117,6 @@ const menuItems = [
     icon: <MessageOutlined />,
     subMenu: [
       { key: "/popups/create", path: "/popups/create", name: "팝업 생성", icon: <FormOutlined /> },
-      { key: "/popups/templates", path: "/popups/templates", name: "템플릿 관리", icon: <FileTextOutlined /> },
       { key: "/popups/settings", path: "/popups/settings", name: "노출 설정", icon: <SettingOutlined /> },
       { key: "/popups/history", path: "/popups/history", name: "노출 이력", icon: <HistoryOutlined /> },
     ],
