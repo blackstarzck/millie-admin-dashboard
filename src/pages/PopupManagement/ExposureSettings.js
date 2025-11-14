@@ -145,7 +145,6 @@ const generateInitialPopups = () => {
     return [
         // 1. 수동 설정 (고정값 표시)
         { key: 'p1', id: 'pop001', name: '신규 기능 안내 (고정 D-39)', status: true, startDate: '2024-09-10 00:00', endDate: '2024-09-22 10:00', frequencyType: 'once_per_day', targetAudience: ['all'], targetPages: ['/dashboard'], priority: 1, creationDate: '2024-08-01', contentType: 'template', templateId: '신규 기능 안내 템플릿', linkUrl: null, imageUrl: null, hideOptions: ['day'], displayRemainingTime: 'D-39' },
-        { key: 'p5', id: 'pop005', name: '대시보드 전용 공지 (고정 162분)', status: true, startDate: now.clone().add(162, 'minutes').format('YYYY-MM-DD HH:mm'), endDate: now.clone().add(1, 'day').format('YYYY-MM-DD HH:mm'), frequencyType: 'once_per_day', targetAudience: ['all'], targetPages: ['/dashboard'], priority: 2, creationDate: now.clone().subtract(1, 'day').format('YYYY-MM-DD'), contentType: 'template', templateId: '긴급 공지 팝업 템플릿', linkUrl: null, imageUrl: null, hideOptions: ['week'], displayRemainingTime: '162분' },
 
         // 2. 노출 종료
         { key: 'p2', id: 'pop002', name: '블랙프라이데이 (종료됨)', status: false, startDate: '2023-11-20 00:00', endDate: '2023-11-30 23:59', frequencyType: 'once_per_session', targetAudience: ['vip', 'group_A'], targetPages: ['event_detail_1'], priority: 1, creationDate: '2023-11-01', contentType: 'image', imageUrl: 'https://via.placeholder.com/300x200.png?text=Black+Friday', linkUrl: 'https://example.com/sale', templateId: null, hideOptions: ['day'] },
@@ -889,7 +888,7 @@ const PopupExposureSettings = () => {
                     <Form.Item
                         name="exposurePages"
                         label={<><PushpinOutlined /> 노출 페이지</>}
-                        tooltip="팝업을 노출할 페이지를 선택합니다. 하나의 페이지만 선택할 수 있습니다."
+                        tooltip="팝업을 노출할 페이지를 선택합니다. 하나의 페이지만 선택할 수 있으며, 한 페이지당 최대 4개의 팝업만 설정할 수 있습니다."
                     >
                         <Select
                             allowClear
@@ -901,15 +900,36 @@ const PopupExposureSettings = () => {
                                     {pages.map(page => {
                                         // 페이지별 팝업 수 계산
                                         const popupCount = getPopupCountForPage(page.id);
+                                        // 현재 편집 중인 팝업이 이미 이 페이지에 있는지 확인
+                                        const isCurrentPage = editingPopup &&
+                                            ((Array.isArray(editingPopup.targetPages) && editingPopup.targetPages.length > 0 &&
+                                              (pathToPageIdMap[editingPopup.targetPages[0]] || editingPopup.targetPages[0]) === page.id) ||
+                                             (!Array.isArray(editingPopup.targetPages) && editingPopup.targetPages &&
+                                              (pathToPageIdMap[editingPopup.targetPages] || editingPopup.targetPages) === page.id));
+                                        // 현재 페이지가 아니고 이미 4개 이상이면 비활성화
+                                        const isMaxReached = !isCurrentPage && popupCount >= 4;
                                         return (
-                                            <Option key={page.id} value={page.id}>
-                                                {page.name} {popupCount > 0 && <span style={{ color: 'rgba(24, 144, 255, 0.65)' }}>({popupCount}개)</span>}
+                                            <Option
+                                                key={page.id}
+                                                value={page.id}
+                                                disabled={isMaxReached}
+                                                title={isMaxReached ? '이 페이지에는 이미 최대 4개의 팝업이 설정되어 있습니다.' : ''}
+                                            >
+                                                {page.name}
+                                                {isMaxReached ? (
+                                                    <span style={{ color: '#ff4d4f', marginLeft: '8px' }}>(최대 도달)</span>
+                                                ) : (
+                                                    popupCount > 0 && <span style={{ color: 'rgba(24, 144, 255, 0.65)' }}>({popupCount}개)</span>
+                                                )}
                                             </Option>
                                         );
                                     })}
                                 </OptGroup>
                             ))}
                         </Select>
+                        <Text type="secondary" style={{ fontSize: '12px', display: 'block', marginTop: '4px' }}>
+                            ℹ️ 한 페이지당 최대 4개의 팝업만 설정할 수 있습니다. 이미 4개의 팝업이 있는 페이지는 선택할 수 없습니다.
+                        </Text>
                     </Form.Item>
 
                      <Form.Item

@@ -83,7 +83,7 @@ const getPopupCountForPage = (pageId) => {
     // 실제로는 ExposureSettings.js의 generateInitialPopups와 동일한 데이터를 사용해야 함
     // 여기서는 간단히 더미 카운트 반환 (실제 구현 시 API 호출 필요)
     const dummyCounts = {
-        'platform_main': 5,
+        'platform_main': 4,
         'search_result': 0,
         'book_detail': 0,
         'viewer': 0,
@@ -328,7 +328,7 @@ const PopupCreation = () => {
                     <Form.Item
                         name="exposurePages"
                         label={<><PushpinOutlined /> 노출 페이지</>}
-                        tooltip="팝업을 노출할 페이지를 선택합니다. 하나의 페이지만 선택할 수 있습니다. 이벤트 페이지를 선택하면 해당 이벤트 기간이 자동으로 설정됩니다."
+                        tooltip="팝업을 노출할 페이지를 선택합니다. 하나의 페이지만 선택할 수 있으며, 한 페이지당 최대 4개의 팝업만 설정할 수 있습니다. 이벤트 페이지를 선택하면 해당 이벤트 기간이 자동으로 설정됩니다."
                     >
                         <Select
                             allowClear
@@ -356,15 +356,29 @@ const PopupCreation = () => {
                                     {pages.map(page => {
                                         // 페이지별 팝업 수 계산 (더미 데이터 기반)
                                         const popupCount = getPopupCountForPage(page.id);
+                                        const isMaxReached = popupCount >= 4;
                                         return (
-                                            <Option key={page.id} value={page.id}>
-                                                {page.name} {popupCount > 0 && <span style={{ color: 'rgba(24, 144, 255, 0.65)' }}>({popupCount}개)</span>}
+                                            <Option
+                                                key={page.id}
+                                                value={page.id}
+                                                disabled={isMaxReached}
+                                                title={isMaxReached ? '이 페이지에는 이미 최대 4개의 팝업이 설정되어 있습니다.' : ''}
+                                            >
+                                                {page.name}
+                                                {isMaxReached ? (
+                                                    <span style={{ color: '#ff4d4f', marginLeft: '8px' }}>(최대 도달)</span>
+                                                ) : (
+                                                    popupCount > 0 && <span style={{ color: 'rgba(24, 144, 255, 0.65)' }}>({popupCount}개)</span>
+                                                )}
                                             </Option>
                                         );
                                     })}
                                 </OptGroup>
                             ))}
                         </Select>
+                        <Text type="secondary" style={{ fontSize: '12px', display: 'block', marginTop: '4px' }}>
+                            ℹ️ 한 페이지당 최대 4개의 팝업만 설정할 수 있습니다. 이미 4개의 팝업이 있는 페이지는 선택할 수 없습니다.
+                        </Text>
                     </Form.Item>
 
                     <Row gutter={16}>
