@@ -1,5 +1,5 @@
 import { Editor } from '@tinymce/tinymce-react';
-import { Button, Card, Col, Input, Row, Tabs, Typography } from 'antd';
+import { Alert, Button, Card, Col, Input, Row, Tabs, Typography } from 'antd';
 import React, { useRef, useState } from 'react';
 
 const { TabPane } = Tabs;
@@ -75,6 +75,19 @@ const EmailTemplateManagement = () => {
     const [activeTab, setActiveTab] = useState('confirm_signup');
     const editorRef = useRef(null);
 
+    // TinyMCE API 키 확인
+    const tinymceApiKey = process.env.REACT_APP_TINYMCE_API_KEY;
+
+    // 개발 환경에서만 로그 출력
+    if (process.env.NODE_ENV === 'development') {
+        console.log('TinyMCE API Key loaded:', tinymceApiKey ? 'Yes' : 'No');
+    }
+
+    // API 키가 없을 경우 경고
+    if (!tinymceApiKey) {
+        console.error('TinyMCE API Key is missing! Please set REACT_APP_TINYMCE_API_KEY environment variable.');
+    }
+
     const handleSubjectChange = (e) => {
         const newTemplates = { ...templates };
         newTemplates[activeTab].subject = e.target.value;
@@ -134,8 +147,17 @@ const EmailTemplateManagement = () => {
                 <Col span={24}>
                      <Card>
                         <Title level={5}>메시지 본문</Title>
+                        {!tinymceApiKey && (
+                            <Alert
+                                message="TinyMCE API 키가 설정되지 않았습니다"
+                                description="환경변수 REACT_APP_TINYMCE_API_KEY를 설정해주세요. Vercel에서는 프로젝트 설정 > Environment Variables에서 설정할 수 있습니다."
+                                type="error"
+                                showIcon
+                                style={{ marginBottom: 16 }}
+                            />
+                        )}
                          <Editor
-                            apiKey={process.env.REACT_APP_TINYMCE_API_KEY}
+                            apiKey={tinymceApiKey}
                             onInit={(evt, editor) => editorRef.current = editor}
                             initialValue={currentTemplate.body}
                             onEditorChange={handleEditorChange}
