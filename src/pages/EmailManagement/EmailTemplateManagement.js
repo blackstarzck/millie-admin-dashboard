@@ -135,26 +135,36 @@ const EmailTemplateManagement = () => {
                      <Card>
                         <Title level={5}>메시지 본문</Title>
                          <Editor
-                            apiKey="rifvxl0c172arwiqci4y95fzqhwhrmfvpsrzehs65tu0ols6" // 여기에 TinyMCE API 키를 입력하세요.
+                            apiKey={process.env.REACT_APP_TINYMCE_API_KEY}
                             onInit={(evt, editor) => editorRef.current = editor}
                             initialValue={currentTemplate.body}
                             onEditorChange={handleEditorChange}
                             init={{
                                 height: 500,
-                                menubar: true,
+                                menubar: 'file edit view insert format tools table help',
                                 language: 'ko_KR', // 에디터 언어를 한국어로 설정
                                 plugins: [
-                                    'advlist autolink lists link image charmap print preview anchor',
-                                    'searchreplace visualblocks code fullscreen',
-                                    'insertdatetime media table paste code help wordcount'
+                                    'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'print', 'preview', 'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen', 'insertdatetime', 'media', 'table', 'paste', 'help', 'wordcount', 'preview'
                                 ],
                                 toolbar: 'undo redo | formatselect | ' +
                                 'bold italic backcolor | alignleft aligncenter ' +
                                 'alignright alignjustify | bullist numlist outdent indent | ' +
-                                'removeformat | templateVariables | code | help', // 템플릿 변수 버튼 추가
+                                'removeformat | templateVariables | preview | code | help', // 미리보기 버튼 추가
                                 content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
+                                // 파일 메뉴 커스터마이징 - preview와 print만 표시
+                                menu: {
+                                    file: { title: '파일', items: 'preview | print' },
+                                    edit: { title: '편집', items: 'undo redo | cut copy paste | selectall | searchreplace' },
+                                    view: { title: '보기', items: 'code | visualaid visualchars visualblocks | spellchecker | fullscreen' },
+                                    insert: { title: '삽입', items: 'image link media template codesample inserttable | charmap emoticons hr | pagebreak nonbreaking anchor toc | insertdatetime' },
+                                    format: { title: '서식', items: 'bold italic underline strikethrough superscript subscript codeformat | formats blockformats fontformats fontsizes align lineheight | forecolor backcolor | removeformat' },
+                                    tools: { title: '도구', items: 'spellchecker spellcheckerlanguage | code wordcount' },
+                                    table: { title: '표', items: 'inserttable | cell row column | tableprops deletetable' },
+                                    help: { title: '도움말', items: 'help' }
+                                },
                                 // 템플릿 변수 드롭다운 메뉴 설정
                                 setup: (editor) => {
+                                    // 템플릿 변수 버튼 추가
                                     editor.ui.registry.addMenuButton('templateVariables', {
                                         text: '템플릿 변수',
                                         fetch: (callback) => {
