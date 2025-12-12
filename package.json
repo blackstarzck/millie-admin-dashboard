@@ -2,7 +2,6 @@
   "name": "admin-dashboard",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://blackstarzck.github.io/millie-admin-dashboard/",
   "dependencies": {
     "@ant-design/icons": "^6.0.0",
     "@ant-design/plots": "^2.3.3",
