@@ -135,7 +135,7 @@ const EmailTemplateManagement = () => {
                      <Card>
                         <Title level={5}>메시지 본문</Title>
                          <Editor
-                            apiKey={process.env.REACT_APP_TINYMCE_API_KEY}
+                            apiKey={process.env.TINYMCE_API_KEY}
                             onInit={(evt, editor) => editorRef.current = editor}
                             initialValue={currentTemplate.body}
                             onEditorChange={handleEditorChange}
