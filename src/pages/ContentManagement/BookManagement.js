@@ -2718,7 +2718,7 @@ const BookManagement = () => {
       ellipsis: true,
     },
     {
-      title: "서비스",
+      title: "상태",
       dataIndex: "BOOK_SERVICE_YN",
       key: "service",
       align: "center",
