@@ -332,6 +332,36 @@ const SubscriptionCancellationManagement = () => {
     setFilters(FILTER_DEFAULT);
   };
 
+  // 카드 클릭 핸들러
+  const handleCardClick = (type) => {
+    switch (type) {
+      case 'total':
+        setFilters(FILTER_DEFAULT);
+        break;
+      case 'autoCancel':
+        setFilters({
+          ...FILTER_DEFAULT,
+          cancellationType: CANCELLATION_TYPES.AUTO_CANCEL,
+        });
+        break;
+      case 'midCancel':
+        setFilters({
+          ...FILTER_DEFAULT,
+          cancellationType: CANCELLATION_TYPES.MID_CANCEL,
+        });
+        break;
+      case 'pendingRefund':
+        setFilters({
+          ...FILTER_DEFAULT,
+          cancellationType: CANCELLATION_TYPES.MID_CANCEL,
+          status: STATUS.RECEIVED,
+        });
+        break;
+      default:
+        break;
+    }
+  };
+
   // 필터링된 데이터
   const filtered = useMemo(() => {
     return data.filter((row) => {
@@ -641,7 +671,15 @@ const SubscriptionCancellationManagement = () => {
       {/* 통계 카드 */}
       <Row gutter={16} style={{ marginBottom: 24 }}>
         <Col span={6}>
-          <Card size="small">
+          <Card
+            size="small"
+            hoverable
+            onClick={() => handleCardClick('total')}
+            style={{
+              cursor: 'pointer',
+              transition: 'all 0.3s',
+            }}
+          >
             <div style={{ textAlign: 'center' }}>
               <Text type="secondary">전체 해지 건수</Text>
               <Title level={3} style={{ margin: '8px 0 0' }}>{stats.total}</Title>
@@ -649,7 +687,15 @@ const SubscriptionCancellationManagement = () => {
           </Card>
         </Col>
         <Col span={6}>
-          <Card size="small">
+          <Card
+            size="small"
+            hoverable
+            onClick={() => handleCardClick('autoCancel')}
+            style={{
+              cursor: 'pointer',
+              transition: 'all 0.3s',
+            }}
+          >
             <div style={{ textAlign: 'center' }}>
               <Text type="secondary">자동결제 해지</Text>
               <Title level={3} style={{ margin: '8px 0 0', color: '#1890ff' }}>{stats.autoCancel}</Title>
@@ -657,7 +703,15 @@ const SubscriptionCancellationManagement = () => {
           </Card>
         </Col>
         <Col span={6}>
-          <Card size="small">
+          <Card
+            size="small"
+            hoverable
+            onClick={() => handleCardClick('midCancel')}
+            style={{
+              cursor: 'pointer',
+              transition: 'all 0.3s',
+            }}
+          >
             <div style={{ textAlign: 'center' }}>
               <Text type="secondary">중도해지</Text>
               <Title level={3} style={{ margin: '8px 0 0', color: '#fa541c' }}>{stats.midCancel}</Title>
@@ -665,10 +719,33 @@ const SubscriptionCancellationManagement = () => {
           </Card>
         </Col>
         <Col span={6}>
-          <Card size="small" style={{ borderColor: stats.pendingRefund > 0 ? '#faad14' : undefined }}>
+          <Card
+            size="small"
+            hoverable
+            onClick={() => handleCardClick('pendingRefund')}
+            style={{
+              cursor: 'pointer',
+              transition: 'all 0.3s',
+              borderColor: stats.pendingRefund > 0 ? '#faad14' : undefined,
+              borderWidth: stats.pendingRefund > 0 ? 2 : 1,
+              backgroundColor: stats.pendingRefund > 0 ? '#fffbe6' : undefined,
+              boxShadow: stats.pendingRefund > 0 ? '0 2px 8px rgba(250, 173, 20, 0.2)' : undefined,
+            }}
+          >
             <div style={{ textAlign: 'center' }}>
-              <Text type="secondary">환불 안내 대기</Text>
-              <Title level={3} style={{ margin: '8px 0 0', color: '#faad14' }}>{stats.pendingRefund}</Title>
+              <Text type="secondary" style={{ fontWeight: stats.pendingRefund > 0 ? 500 : 'normal' }}>
+                환불 안내 대기
+              </Text>
+              <Title
+                level={3}
+                style={{
+                  margin: '8px 0 0',
+                  color: '#faad14',
+                  fontWeight: 'bold',
+                }}
+              >
+                {stats.pendingRefund}
+              </Title>
             </div>
           </Card>
         </Col>
