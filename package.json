@@ -15,6 +15,7 @@
     "ajv": "^8.8.2",
     "antd": "^5.26.4",
     "chart.js": "^4.4.9",
+    "codex": "^0.2.3",
     "date-fns": "^4.1.0",
     "emoji-picker-react": "^4.13.2",
     "gh-pages": "^6.3.0",

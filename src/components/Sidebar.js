@@ -78,6 +78,7 @@ const menuItems = [
     subMenu: [
       { key: "/users/info", path: "/users/info", name: "회원 정보", icon: <ProfileOutlined /> },
       { key: "/users/subscriptions", path: "/users/subscriptions", name: "구독 이력", icon: <HistoryOutlined /> },
+      { key: "/users/cancellation", path: "/users/cancellation", name: "구독 해지 관리", icon: <FileProtectOutlined /> },
       { key: "/users/sanctions", path: "/users/sanctions", name: "계정 제재", icon: <WarningOutlined /> },
       { key: "/users/badges", path: "/users/badges", name: "배지 관리", icon: <TrophyOutlined /> },
     ],
@@ -179,7 +180,6 @@ const menuItems = [
     icon: <MailOutlined />,
     subMenu: [
       { key: "/inquiries/list", path: "/inquiries/list", name: "문의 조회", icon: <OrderedListOutlined /> },
-      { key: "/inquiries/cancellation", path: "/inquiries/cancellation", name: "구독 해지 관리", icon: <FileProtectOutlined /> },
       { key: "/inquiries/faq", path: "/inquiries/faq", name: "FAQ 관리", icon: <QuestionCircleOutlined /> },
     ],
   },

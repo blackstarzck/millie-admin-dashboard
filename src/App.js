@@ -225,6 +225,10 @@ function App() {
                 path="users/subscriptions"
                 element={<SubscriptionHistory />}
               />
+              <Route
+                path="users/cancellation"
+                element={<SubscriptionCancellationManagement />}
+              />
               <Route path="users/badges" element={<BadgeManagement />} />
               {/* 신고 관리 라우트 추가 */}
               <Route path="reports/list" element={<ReportList />} />
@@ -291,10 +295,6 @@ function App() {
               {/* 문의사항 관리 */}
               <Route path="inquiries/list" element={<InquiryLookup />} />
               <Route path="inquiries/faq" element={<FaqManagement />} />
-              <Route
-                path="inquiries/cancellation"
-                element={<SubscriptionCancellationManagement />}
-              />
               {/* 사용자 분석 */}
               <Route
                 path="user-analysis/statistics"
