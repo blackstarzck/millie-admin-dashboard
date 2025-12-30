@@ -13,4 +13,4 @@
    ```
 
    브라우저에서 [http://localhost:3000](http://localhost:3000)으로 접속합니다.
-   vercel에서 배포되었습니다. (https://millie-admin-dashboard.vercel.app/#/dashboard)
+   vercel에서 배포되었습니다. https://millie-admin-dashboard.vercel.app/#/dashboard
